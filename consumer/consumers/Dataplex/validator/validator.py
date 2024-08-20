@@ -21,14 +21,25 @@ PARENT = default['parent']
 CLIENT = LineageClient(credentials=Credentials.from_service_account_file(default['credentialFileLocation']))
 
 
+class ScenariosUtils:
+    pass
+
+
+class Report:
+    pass
+
+
+class ApiUtils:
+    pass
+
+
 def list_scenarios():
     return [entry.name for entry in os.scandir(f"{CONSUMER_DIR}/scenarios") if entry.is_dir()]
 
 
 def load_ol_events(scenario):
     return [{'name': entry.name, 'payload': ParseDict(json.load(open(entry.path, 'r')), struct_pb2.Struct())} for entry
-            in os.scandir(
-            f"{SCENARIO_DIR}/{scenario}/events") if entry.is_file()]
+            in os.scandir(f"{SCENARIO_DIR}/{scenario}/events") if entry.is_file()]
 
 
 def load_validation_events(scenario):
@@ -66,23 +77,13 @@ def get_api_state():
 def validate_api_state(scenario):
     processes_expected, runs_expected, events_expected = load_validation_events(scenario)
     processes_result, runs_result, events_result = get_api_state()
-    process_validation = compare_process_or_run(processes_expected, processes_result)
-    run_validation = compare_process_or_run(runs_expected, runs_result)
-    event_validation = compare_lineage_events(events_expected, events_result)
+    report = [compare_process_or_run(processes_expected, processes_result),
+              compare_process_or_run(runs_expected, runs_result),
+              compare_lineage_events(events_expected, events_result)]
+    return report
 
-    return process_validation, run_validation, event_validation
 
-
-# processes and runs are matchable by entity name
-def compare_process_or_run(expected, result):
-    d = {}
-    for e in expected:
-        d[e['name']] = {}
-        d[e['name']]['expected'] = e
-    for r in result:
-        if not d.keys().__contains__(r['name']):
-            d[r['name']] = {}
-        d[r['name']]['result'] = r
+def compare_dicts(d):
     for v in d.values():
         v['val'] = False, "no matching entity"
         if v.__contains__('expected') and v.__contains__('result'):
@@ -90,36 +91,42 @@ def compare_process_or_run(expected, result):
     return d
 
 
+# processes and runs are matchable by entity name
+def compare_process_or_run(expected, result):
+    d = {}
+    for e in expected:
+        d.setdefault(e['name'], {})['expected'] = e
+    for r in result:
+        d.setdefault(r['name'], {})['result'] = r
+    return compare_dicts(d)
+
+
 # lineage events can't be matched by name, so they're matched by equal start and end time
 def compare_lineage_events(expected, result):
     d = {}
     for r in result:
-        d[r['name']] = {}
-        d[r['name']]['result'] = r
+        d.setdefault(r['name'], {})['result'] = r
     for e in expected:
         matching = next((r for r in result if e['start_time'] == r['start_time'] and e['end_time'] == r['end_time']),
                         None)
         if matching is not None:
             d[matching['name']]['expected'] = e
         else:
-            d[e['name']] = {}
-            d[e['name']]['expected'] = e
+            d.setdefault(e['name'], {})['expected'] = e
+    return compare_dicts(d)
 
-    for v in d.values():
-        v['val'] = False, "no matching entity"
-        if v.__contains__('expected') and v.__contains__('result'):
-            v['val'] = match(v['expected']['links'], v['result']['links'])
-    return d
+
+def compile_report(syntax_report, semantic_report):
+    print("dupa")
 
 
 def validate(scenario):
     clean_up()
     syntax_report = send_events(scenario)
-
+    semantic_report = []
     if not any(event['report']['status'] == "FAILURE" for event in syntax_report):
-        processes, runs, events = validate_api_state(scenario)
-        print([(x, events[x]['val']) for x in events.keys() if not events[x]['val'][0]])
-    # report = compile_report(syntax_report)
+        semantic_report = validate_api_state(scenario)
+    report = compile_report(syntax_report, semantic_report)
     clean_up()
 
 
@@ -130,5 +137,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    print('a')
+    main()
+    # print('a')
