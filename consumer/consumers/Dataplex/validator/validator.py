@@ -140,7 +140,7 @@ def main():
     scenarios = list_scenarios(consumer_dir)
     reports = [validator.validate(scenario) for scenario in scenarios]
     t = open('report.json', 'w')
-    print(t.name)
+    print(os.path.abspath(t.name))
     json.dump(reports, t)
 
 
