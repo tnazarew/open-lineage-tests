@@ -28,7 +28,7 @@ class Validator:
         lineage_events = json.load(open(f"{self.consumer_dir}/scenarios/{scenario}/validation/lineage_events.json", 'r'))
         return processes, runs, lineage_events
 
-    def send_events(self, scenario):
+    def send_ol_events(self, scenario):
         events = self.load_ol_events(scenario)
         report = []
         for e in events:
@@ -41,7 +41,7 @@ class Validator:
 
     def validate(self, scenario):
         self.clean_up()
-        report = self.send_events(scenario)
+        report = self.send_ol_events(scenario)
         if not any(r['status'] == "FAILURE" for r in report):
             report.extend( self.validate_api_state(scenario))
         for r in report:
