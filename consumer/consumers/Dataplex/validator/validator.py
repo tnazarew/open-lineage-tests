@@ -139,7 +139,9 @@ def main():
     validator = Validator(client, consumer_dir, scenario_dir, parent)
     scenarios = list_scenarios(consumer_dir)
     reports = [validator.validate(scenario) for scenario in scenarios]
-    json.dump(reports, open('report.json', 'w'))
+    t = open('report.json', 'w')
+    print(t.name)
+    json.dump(reports, t)
 
 
 if __name__ == "__main__":
