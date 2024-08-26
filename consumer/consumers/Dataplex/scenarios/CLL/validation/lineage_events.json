@@ -9,7 +9,7 @@
           "fully_qualified_name": "custom:file/tmp/cll_test/cll_source2"
         },
         "target": {
-          "fully_qualified_name": "custom:file/tmp/cll_test/tbl"
+          "fully_qualified_name": "custom:file/tmp/cll_test/tbl1"
         }
       },
       {
