@@ -2,6 +2,10 @@ name: Check Changed Directories and Trigger Sub-workflow
 
 on: push
 
+permissions:
+  id-token: write
+  contents: read  # Add any other permissions as needed
+
 jobs:
   detect_changes:
     runs-on: ubuntu-latest
