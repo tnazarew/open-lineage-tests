@@ -1,67 +1,74 @@
 name: Check Changed Directories and Trigger Sub-workflow
 
 on:
-  pull_request:
+  push:
     paths:
       - 'consumer/consumers/Dataplex/**'
       - 'consumer/scenarios/**'
       - 'producer/Spark/**'
       - 'producer/Spark-Dataproc/**'
-
 jobs:
-  check-changes:
+  detect_changes:
     runs-on: ubuntu-latest
     outputs:
-      run-consumer-dataplex: ${{ steps.check.outputs.consumer-dataplex }}
-      run-consumer-scenarios: ${{ steps.check.outputs.consumer-scenarios }}
-      run-producer-spark: ${{ steps.check.outputs.producer-spark }}
-      run-producer-spark-dataproc: ${{ steps.check.outputs.producer-spark-dataproc }}
+      run_dataplex: ${{ steps.check.outputs.run_dataplex }}
+      run_scenarios: ${{ steps.check.outputs.run_scenarios }}
+      run_spark: ${{ steps.check.outputs.run_spark }}
+      run_spark_dataproc: ${{ steps.check.outputs.run_spark_dataproc }}
+      needs_subworkflows: ${{ steps.check.outputs.needs_subworkflows }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Check for changes in directories
-        id: check
+      - id: check
         run: |
           # Initialize outputs
-          echo "run-consumer-dataplex=false" >> $GITHUB_ENV
-          echo "run-consumer-scenarios=false" >> $GITHUB_ENV
-          echo "run-producer-spark=false" >> $GITHUB_ENV
-          echo "run-producer-spark-dataproc=false" >> $GITHUB_ENV
+          echo "run_dataplex=false" >> $GITHUB_ENV
+          echo "run_scenarios=false" >> $GITHUB_ENV
+          echo "run_spark=false" >> $GITHUB_ENV
+          echo "run_spark_dataproc=false" >> $GITHUB_ENV
+
+          needs_subworkflows=()
 
           # Check if files have changed in each directory
           if git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^1/'; then
-            echo "run-consumer-dataplex=true" >> $GITHUB_ENV
+            echo "run_dataplex=true" >> $GITHUB_ENV
           fi
-
           if git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^2/'; then
-            echo "run-consumer-scenarios=true" >> $GITHUB_ENV
+            echo "run_scenarios=true" >> $GITHUB_ENV
           fi
-
           if git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^3/'; then
-            echo "run-producer-spark=true" >> $GITHUB_ENV
+            echo "run_spark=true" >> $GITHUB_ENV
           fi
-
           if git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^4/'; then
-            echo "run-producer-spark-dataproc=true" >> $GITHUB_ENV
+            echo "run_spark_dataproc=true" >> $GITHUB_ENV
           fi
 
   dataplex:
-    needs: check-changes
-    if: needs.check-changes.outputs.run-consumer-dataplex == 'true'
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.run_dataplex == 'true' }}
     uses: ./.github/workflows/consumer/dataplex.yml
 
   scenarios:
-    needs: check-changes
-    if: needs.check-changes.outputs.run-scenarios == 'true'
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.run_scenarios == 'true' }}
     uses: ./.github/workflows/consumer/scenarios.yml
 
   spark:
-    needs: check-changes
-    if: needs.check-changes.outputs.run-producer-spark == 'true'
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.run_spark == 'true' }}
     uses: ./.github/workflows/producer/spark.yml
 
   spark-dataproc:
-    needs: check-changes
-    if: needs.check-changes.outputs.run-producer-spark-dataproc == 'true'
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer/spark-dataproc.yml
+
+  collect-reports:
+    needs:
+      - dataplex
+      - scenarios
+      - spark
+      - dataproc
+    if: ${{ always() }}
+    uses: ./.github/workflows/collect-reports.yml
