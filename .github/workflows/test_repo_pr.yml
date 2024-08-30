@@ -47,22 +47,22 @@ jobs:
   dataplex:
     needs: detect_changes
     if: ${{ needs.detect_changes.outputs.run_dataplex == 'true' }}
-    uses: consumer/dataplex.yml
+    uses: consumer/dataplex.yml@${{ github.ref }}
 
   scenarios:
     needs: detect_changes
     if: ${{ needs.detect_changes.outputs.run_scenarios == 'true' }}
-    uses: consumer/scenarios.yml
+    uses: consumer/scenarios.yml@${{ github.ref }}
 
   spark:
     needs: detect_changes
     if: ${{ needs.detect_changes.outputs.run_spark == 'true' }}
-    uses: producer/spark.yml
+    uses: producer/spark.yml@${{ github.ref }}
 
   spark-dataproc:
     needs: detect_changes
     if: ${{ needs.detect_changes.outputs.run_spark_dataproc == 'true' }}
-    uses: producer/spark-dataproc.yml
+    uses: producer/spark-dataproc.yml@${{ github.ref }}
 
   collect-reports:
     needs:
