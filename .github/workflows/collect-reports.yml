@@ -1,4 +1,4 @@
-name: Spark
+name: Collect Reports
 
 on: workflow_call
 
@@ -9,5 +9,5 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run task for Spark
-        run: echo "Running task for Spark"
+      - name: Run task for Collect Reports
+        run: echo "Running task for Collect Reports"

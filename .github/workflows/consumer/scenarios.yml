@@ -1,0 +1,13 @@
+name: Scenarios
+
+on: workflow_call
+
+jobs:
+  do-something:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run task for Scenarios
+        run: echo "Running task for Scenarios"
