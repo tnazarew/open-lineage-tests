@@ -64,6 +64,6 @@ jobs:
       - dataplex
       - scenarios
       - spark
-      - dataproc
+      - spark-dataproc
     if: ${{ always() }}
     uses: ./.github/workflows/collect-reports.yml
