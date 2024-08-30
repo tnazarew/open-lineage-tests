@@ -1,12 +1,6 @@
 name: Check Changed Directories and Trigger Sub-workflow
 
-on:
-  push:
-    paths:
-      - 'consumer/consumers/Dataplex/**'
-      - 'consumer/scenarios/**'
-      - 'producer/Spark/**'
-      - 'producer/Spark-Dataproc/**'
+on: push
 
 jobs:
   detect_changes:
