@@ -69,5 +69,5 @@ jobs:
       - scenarios
       - spark
       - spark-dataproc
-    if: ${{ always() }}
+    if: ${{ !failure() }}
     uses: ./.github/workflows/collect-reports.yml
