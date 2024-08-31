@@ -24,14 +24,13 @@ jobs:
         with:
           files_yaml: |
             scenarios:
-              - '**.md'
+              - consumer/scenarios/**
             dataplex:
-              - test/**
-              - '!test/**.md'
+              - consumer/consumers/Dataplex/**
             spark:
-              - src/**
+              - producer/spark/**
             spark_dataproc:
-              - src/**
+              - producer/spark-dataproc/**
 
   dataplex:
     needs: detect_changes
