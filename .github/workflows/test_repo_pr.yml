@@ -10,38 +10,28 @@ jobs:
   detect_changes:
     runs-on: ubuntu-latest
     outputs:
-      run_dataplex: ${{ steps.check.outputs.run_dataplex }}
-      run_scenarios: ${{ steps.check.outputs.run_scenarios }}
-      run_spark: ${{ steps.check.outputs.run_spark }}
-      run_spark_dataproc: ${{ steps.check.outputs.run_spark_dataproc }}
-      needs_subworkflows: ${{ steps.check.outputs.needs_subworkflows }}
+      run_dataplex: ${{ steps.changed-files.outputs.dataplex_any_changed }}
+      run_scenarios: ${{ steps.changed-files.outputs.scenarios_any_changed }}
+      run_spark: ${{ steps.changed-files.outputs.spark_any_changed }}
+      run_spark_dataproc: ${{ steps.changed-files.outputs.spark_dataproc_any_changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - id: check
-        run: |
-          # Initialize outputs
-          echo "run_dataplex=false" >> $GITHUB_ENV
-          echo "run_scenarios=false" >> $GITHUB_ENV
-          echo "run_spark=false" >> $GITHUB_ENV
-          echo "run_spark_dataproc=false" >> $GITHUB_ENV
-
-          needs_subworkflows=()
-
-          # Check if files have changed in each directory
-          if git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^1/'; then
-            echo "run_dataplex=true" >> $GITHUB_ENV
-          fi
-          if git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^2/'; then
-            echo "run_scenarios=true" >> $GITHUB_ENV
-          fi
-          if git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^3/'; then
-            echo "run_spark=true" >> $GITHUB_ENV
-          fi
-          if git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^4/'; then
-            echo "run_spark_dataproc=true" >> $GITHUB_ENV
-          fi
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files_yaml: |
+            scenarios:
+              - '**.md'
+            dataplex:
+              - test/**
+              - '!test/**.md'
+            spark:
+              - src/**
+            spark_dataproc:
+              - src/**
 
   dataplex:
     needs: detect_changes
