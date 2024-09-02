@@ -62,6 +62,8 @@ jobs:
     uses: ./.github/workflows/collect-reports.yml
     with:
       dataplex-report: ${{ needs.dataplex.outputs.report || '' }}
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
 
   notify-maintainers:
     needs: collect-reports

@@ -6,6 +6,9 @@ on:
       dataplex-report:
         required: true
         type: string
+    secrets:
+      gcpKey:
+        required: true
 
 jobs:
   collect-reports:
