@@ -43,7 +43,8 @@ jobs:
         --parent projects/gcp-open-lineage-testing/locations/us
     - name: store report in job output
       id: store-report
-      run: echo "::set-output name=report::$(cat dataplex-report.json)"
+      run: |
+        echo "script_output=$(cat consumer/consumers/Dataplex/validator/dataplex-report.json)" >> $GITHUB_ENV
 
 #    - name: 'upload-folder'
 #      uses: 'google-github-actions/upload-cloud-storage@v2'
