@@ -60,3 +60,9 @@ jobs:
       - spark-dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect-reports.yml
+    with:
+      dataplex-report: ${{ needs.dataplex.outputs.report || '' }}
+
+  notify-maintainers:
+    needs: collect-reports
+    uses: ./.github/workflows/notify-maintainers.yml
