@@ -6,7 +6,7 @@ from proto import Message
 from google.api_core.exceptions import InvalidArgument
 from google.oauth2.service_account import Credentials
 from google.cloud.datacatalog_lineage_v1 import LineageClient
-from ol_test import match
+from compare_events import match
 from google.protobuf.json_format import ParseDict
 from google.protobuf import struct_pb2
 
@@ -35,7 +35,7 @@ class Validator:
         for e in events:
             try:
                 response = self.client.process_open_lineage_run_event(parent=self.parent, open_lineage=e['payload'])
-                report.append({"status": "SUCCESS", 'name': e['name']})
+                report.append({"status": "SUCCESS", 'validation': 'syntax', 'name': e['name']})
             except InvalidArgument as exc:
                 report.append({"status": "FAILURE", 'validation': 'syntax', "details": exc.args[0], 'name': e['name']})
         return report
@@ -47,6 +47,7 @@ class Validator:
             report.extend(self.validate_api_state(scenario))
         for r in report:
             r['scenario'] = scenario
+            r['component'] = 'Dataplex'
         self.clean_up()
         return report
 
