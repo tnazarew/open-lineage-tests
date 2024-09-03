@@ -6,6 +6,9 @@ on:
       dataplex-report:
         required: true
         type: string
+      test-input:
+        required: true
+        type: string
     secrets:
       gcpKey:
         required: true
@@ -20,5 +23,6 @@ jobs:
       - name: Run task for Collect Reports
         id: collect-reports
         run: |
+          echo "${{ inputs.test-input }}"
           echo "${{ inputs.dataplex-report }}" >> temp_report
           cat temp_report
