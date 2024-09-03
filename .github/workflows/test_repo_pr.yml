@@ -62,9 +62,6 @@ jobs:
       - spark-dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect-reports.yml
-    with:
-      dataplex-report: ${{ needs.dataplex.outputs.report || 'DUPA2' }}
-      test-input: ${{ needs.dataplex.outputs.test_output || 'DUPA2' }}
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
 
