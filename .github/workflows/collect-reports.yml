@@ -2,13 +2,6 @@ name: Collect Reports
 # TODO update from placeholder to actual functionality
 on:
   workflow_call:
-    inputs:
-      dataplex-report:
-        required: true
-        type: string
-      test-input:
-        required: true
-        type: string
     secrets:
       gcpKey:
         required: true
@@ -20,8 +13,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Create report directory
+        run: mkdir -p reports/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dataplex-report
+          path: reports/
+
       - name: Run task for Collect Reports
         id: collect-reports
-        run: |
-          echo "${{ inputs.test-input || 'DUPA3' }}"
-          echo "${{ inputs.dataplex-report || 'DUPA3' }}"
+        run: cat reports/dataplex-report.json
