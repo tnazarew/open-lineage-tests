@@ -53,7 +53,7 @@ jobs:
       id: store-report
       run: |
         echo "test_output=TEST" >> $GITHUB_OUTPUT
-        echo "report=$(cat consumer/consumers/Dataplex/validator/dataplex-report.json)" >> $GITHUB_OUTPUT
+        echo "report=$(cat dataplex-report.json)" >> $GITHUB_OUTPUT
 
 #    - name: 'upload-folder'
 #      uses: 'google-github-actions/upload-cloud-storage@v2'
