@@ -8,10 +8,10 @@ on:
     outputs:
       report:
         description: "Dataplex test report"
-        value: ${{ jobs.dataplex.outputs.report}}
+        value: ${{ jobs.dataplex.outputs.report || 'DUPA1' }}
       test_output:
         description: "Dataplex test report"
-        value: ${{ jobs.dataplex.outputs.test_output}}
+        value: ${{ jobs.dataplex.outputs.test_output || 'DUPA1' }}
 
 
 permissions:
@@ -24,8 +24,8 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     outputs:
-      report: ${{ steps.store-output.outputs.report }}
-      test_output: ${{ steps.store-output.outputs.test_output }}
+      report: ${{ steps.store-report.outputs.report }}
+      test_output: ${{ steps.store-report.outputs.test_output }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.11
@@ -52,8 +52,8 @@ jobs:
     - name: store report in job output
       id: store-report
       run: |
-        echo "test_output=TEST" >> $GITHUB_ENV
-        echo "report=$(cat consumer/consumers/Dataplex/validator/dataplex-report.json)" >> $GITHUB_ENV
+        echo "test_output=TEST" >> $GITHUB_OUTPUT
+        echo "report=$(cat consumer/consumers/Dataplex/validator/dataplex-report.json)" >> $GITHUB_OUTPUT
 
 #    - name: 'upload-folder'
 #      uses: 'google-github-actions/upload-cloud-storage@v2'

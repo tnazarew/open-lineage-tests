@@ -23,6 +23,5 @@ jobs:
       - name: Run task for Collect Reports
         id: collect-reports
         run: |
-          echo "${{ inputs.test-input }}"
-          echo "${{ inputs.dataplex-report }}" >> temp_report
-          cat temp_report
+          echo "${{ inputs.test-input || 'DUPA3' }}"
+          echo "${{ inputs.dataplex-report || 'DUPA3' }}"
