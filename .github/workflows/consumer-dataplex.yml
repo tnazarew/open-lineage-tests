@@ -53,7 +53,7 @@ jobs:
       id: store-report
       run: |
         echo "test_output=TEST" >> $GITHUB_OUTPUT
-        echo "report=$(cat dataplex-report.json)" >> $GITHUB_OUTPUT
+        echo "report='$(cat dataplex-report.json)'" >> $GITHUB_OUTPUT
         cat $GITHUB_OUTPUT
 
 #    - name: 'upload-folder'
