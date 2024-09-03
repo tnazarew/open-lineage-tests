@@ -64,6 +64,7 @@ jobs:
     uses: ./.github/workflows/collect-reports.yml
     with:
       dataplex-report: ${{ needs.dataplex.outputs.report || '' }}
+      test-input: ${{ needs.dataplex.outputs.test_output }}
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
 
