@@ -21,7 +21,7 @@ jobs:
         id: select-components
         run: |
           python component_versions/check_for_new_versions.py
-          cat component_versions/list >> $GITHUB
+          cat component_versions/list >> $GITHUB_OUTPUT
 
   dataplex:
     needs: select_components
