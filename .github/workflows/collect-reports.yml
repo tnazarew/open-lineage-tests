@@ -18,8 +18,8 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: dataplex-report
           path: reports/
+          merge-multiple: true
 
       - name: Run task for Collect Reports
         id: collect-reports

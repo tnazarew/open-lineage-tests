@@ -41,8 +41,9 @@ jobs:
         --parent projects/gcp-open-lineage-testing/locations/us
     - uses: actions/upload-artifact@v4
       with:
-        name: dataplex-report
+        name: dataplex-report-${{ github.ref }}-${{ github.run_id }}
         path: dataplex-report.json
+        retention-days: 1
 
 #    - name: 'upload-folder'
 #      uses: 'google-github-actions/upload-cloud-storage@v2'

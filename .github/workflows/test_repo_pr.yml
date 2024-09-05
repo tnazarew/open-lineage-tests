@@ -1,4 +1,4 @@
-name: Check Changed Directories and Trigger Sub-workflow
+name: Pull Request to test repo
 
 on: push
 
