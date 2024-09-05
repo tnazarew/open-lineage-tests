@@ -44,11 +44,11 @@ jobs:
       run: |
         raw_branch="${{ github.ref }}"
         branch=$(echo "${raw_branch}" | sed 's:.*/::')
-        echo "dataplex-report-${branch}-${{ github.run_id }}" >> $GITHUB_ENV
+        echo "artifact_name=dataplex-report-${branch}-${{ github.run_id }}" >> $GITHUB_ENV
 
     - uses: actions/upload-artifact@v4
       with:
-        name: dataplex-report-${{ github.ref }}-${{ github.run_id }}
+        name: dataplex-report-${{ env.artifact_name }}-${{ github.run_id }}
         path: dataplex-report.json
         retention-days: 1
 
