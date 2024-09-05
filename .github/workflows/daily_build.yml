@@ -1,6 +1,13 @@
 name: Check Changed Directories and Trigger Sub-workflow
 
+
+
 on: push
+# actual trigger for daily run of workflow
+#on:
+#  check_run:
+#    types: [rerequested, completed]
+
 
 permissions:
   id-token: write
