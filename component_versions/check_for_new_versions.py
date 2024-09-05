@@ -1,7 +1,9 @@
 import json
+import os
 
 
 def main():
+    print(f"JSON file found at: {os.path.abspath('versions.json')}")
     with open('versions.json', 'r') as json_file:
         data = json.load(json_file)
 
