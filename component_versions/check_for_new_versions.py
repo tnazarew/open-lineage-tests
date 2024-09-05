@@ -3,8 +3,8 @@ import os
 
 
 def main():
-    print(f"JSON file found at: {os.path.abspath('versions.json')}")
-    with open('versions.json', 'r') as json_file:
+    print(f"JSON file found at: {os.path.abspath('component_versions/versions.json')}")
+    with open('component_versions/versions.json', 'r') as json_file:
         data = json.load(json_file)
 
     with open('list', 'w') as output_file:
