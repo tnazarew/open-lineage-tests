@@ -1,6 +1,13 @@
 name: Pull Request to test repo
 
-on: push
+on:
+  pull_request:
+  push:
+    paths:
+      - 'consumer/consumers/Dataplex/**'
+      - 'consumer/scenarios/**'
+      - 'producer/Spark/**'
+      - 'producer/Spark-Dataproc/**'
 
 permissions:
   id-token: write
