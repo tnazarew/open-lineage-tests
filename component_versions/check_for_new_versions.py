@@ -7,7 +7,7 @@ def main():
     with open('component_versions/versions.json', 'r') as json_file:
         data = json.load(json_file)
 
-    with open('list', 'w') as output_file:
+    with open('component_versions/list', 'w') as output_file:
         for e in data:
             if should_run(e):
                 output_file.writelines(f"{e['name']}=true")
