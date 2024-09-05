@@ -1,0 +1,61 @@
+name: Check Changed Directories and Trigger Sub-workflow
+
+on: push
+
+permissions:
+  id-token: write
+  contents: read  # Add any other permissions as needed
+
+jobs:
+  detect_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      run_dataplex: ${{ steps.select-components.outputs.dataplex }}
+      run_spark: ${{ steps.select-components.outputs.spark }}
+      run_spark_dataproc: ${{ steps.select-components.outputs.spark_dataproc }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Select components to run
+        id: select-components
+        run: |
+          python component_versions/check_for_new_versions.py
+          cat component_versions/list >> $GITHUB
+
+  dataplex:
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.run_dataplex == 'true' }}
+    uses: ./.github/workflows/consumer-dataplex.yml
+
+  scenarios:
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.run_scenarios == 'true' }}
+    uses: ./.github/workflows/consumer-scenarios.yml
+
+  spark:
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.run_spark == 'true' }}
+    uses: ./.github/workflows/producer-spark.yml
+
+  spark-dataproc:
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.run_spark_dataproc == 'true' }}
+    uses: ./.github/workflows/producer-spark-dataproc.yml
+
+  collect-reports:
+    needs:
+      - dataplex
+      - scenarios
+      - spark
+      - spark-dataproc
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/collect-reports.yml
+
+  notify-maintainers:
+    needs: collect-reports
+    uses: ./.github/workflows/notify-maintainers.yml
+
+  create-version-change-pr:
+    needs: notify-maintainers
+    uses: ./.github/workflows/create-version-change-pr.yml
