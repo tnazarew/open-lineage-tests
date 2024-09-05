@@ -27,6 +27,8 @@ jobs:
     needs: detect_changes
     if: ${{ needs.detect_changes.outputs.run_dataplex == 'true' }}
     uses: ./.github/workflows/consumer-dataplex.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
 
   scenarios:
     needs: detect_changes
