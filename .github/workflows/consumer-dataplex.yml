@@ -43,7 +43,7 @@ jobs:
       id: get-artifact-name
       run: |
         raw_branch="${{ github.ref }}"
-        branch=$(echo ${raw_branch} | sed 's:.*/::')"
+        branch=$(echo "${raw_branch}" | sed 's:.*/::')
         echo "dataplex-report-${branch}-${{ github.run_id }}" >> $GITHUB_ENV
 
     - uses: actions/upload-artifact@v4
