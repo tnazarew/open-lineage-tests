@@ -53,6 +53,8 @@ jobs:
       - spark-dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect-reports.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
 
   notify-maintainers:
     needs: collect-reports
