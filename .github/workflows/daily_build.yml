@@ -6,7 +6,7 @@ on: push
 # actual trigger for daily run of workflow
 #on:
 #  schedule:
-#    - cron: "15 4,5 * * *"
+#    - cron: "0 3 * * *"
 
 
 permissions:
