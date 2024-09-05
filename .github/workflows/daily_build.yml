@@ -4,7 +4,7 @@ on: push
 
 permissions:
   id-token: write
-  contents: read  # Add any other permissions as needed
+  contents: write  # Add any other permissions as needed
 
 jobs:
   select_components:
