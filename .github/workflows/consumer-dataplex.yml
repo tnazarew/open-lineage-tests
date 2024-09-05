@@ -48,7 +48,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: dataplex-report-${{ env.artifact_name }}-${{ github.run_id }}
+        name: dataplex-report-${{ env.artifact_name }}
         path: dataplex-report.json
         retention-days: 1
 
