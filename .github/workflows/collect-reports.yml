@@ -6,7 +6,7 @@ on:
       gcpKey:
         required: true
     inputs:
-        exec_time:
+      exec_time:
         type: string
         description: "Workflow execution time"
 jobs:
