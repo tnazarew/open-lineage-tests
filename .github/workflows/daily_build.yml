@@ -37,7 +37,7 @@ jobs:
         run: |
           pip install beautifulsoup4
           python scripts/check_for_new_versions.py
-          cat component_versions/list >> $GITHUB_OUTPUT
+          cat scripts/list >> $GITHUB_OUTPUT
 
   dataplex:
     needs: initialize_workflow
