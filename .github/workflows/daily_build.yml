@@ -76,7 +76,7 @@ jobs:
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
-      ${{ needs.initialize_workflow.outputs.exec_time }}
+      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
 
   notify-maintainers:
     needs: collect-reports
