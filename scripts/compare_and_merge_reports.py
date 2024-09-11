@@ -23,7 +23,7 @@ from os.path import isfile, join
 def main():
     print(f"{listdir('reports')} \n")
     partial_reports = [join('reports', f) for f in listdir('reports') if
-                       isfile(join('reports', f) and f != "report.json")]
+                       isfile(join('reports', f)) and f != "report.json"]
     print(partial_reports)
     last_report = open('reports/report.json', 'r')
     json.dump({}, open('reports/retention-failures-report.json', 'w'))
