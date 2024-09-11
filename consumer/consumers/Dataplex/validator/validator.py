@@ -35,9 +35,12 @@ class Validator:
         for e in events:
             try:
                 response = self.client.process_open_lineage_run_event(parent=self.parent, open_lineage=e['payload'])
-                report.append({"status": "SUCCESS", 'validation': 'syntax', 'name': e['name']})
+                report.append(
+                    {"status": "SUCCESS", 'validation': 'syntax', 'name': e['name'], 'entity_type': 'openlineage'})
             except InvalidArgument as exc:
-                report.append({"status": "FAILURE", 'validation': 'syntax', "details": exc.args[0], 'name': e['name']})
+                report.append(
+                    {"status": "FAILURE", 'validation_type': 'syntax', "details": exc.args[0], 'name': e['name'],
+                     'entity_type': 'openlineage'})
         return report
 
     def validate(self, scenario):
@@ -45,11 +48,11 @@ class Validator:
         report = self.send_ol_events(scenario)
         if not any(r['status'] == "FAILURE" for r in report):
             report.extend(self.validate_api_state(scenario))
-        for r in report:
-            r['scenario'] = scenario
-            r['component'] = 'Dataplex'
+
         self.clean_up()
-        return report
+        return {"name": scenario,
+                "status": 'FAILURE' if any(r['status'] == "FAILURE" for r in report) else 'SUCCESS',
+                "tests": report}
 
     def get_api_state(self):
         processes = [Message.to_dict(p) for p in self.client.list_processes(parent=self.parent)]
@@ -85,8 +88,8 @@ class Validator:
             result = ["no matching entity"]
             if v.__contains__('expected') and v.__contains__('result'):
                 result = match(v['expected'], v['result'], "")
-            results.append({'type': entity_type, 'status': 'SUCCESS' if len(result) == 0 else 'FAILURE',
-                            'details': result, 'validation': 'semantics', 'name': k})
+            results.append({'entity_type': entity_type, 'status': 'SUCCESS' if len(result) == 0 else 'FAILURE',
+                            'details': result, 'validation_type': 'semantics', 'name': k})
         return results
 
     # lineage events can't be matched by name, so they're matched by equal start and end time
@@ -108,8 +111,8 @@ class Validator:
             result = ["no matching entity"]
             if v.__contains__('expected') and v.__contains__('result'):
                 result = match(v['expected']['links'], v['result']['links'], ".links")
-            results.append({'type': 'event', 'status': 'SUCCESS' if len(result) == 0 else 'FAILURE',
-                            'details': result, 'validation': 'semantics', 'name': k})
+            results.append({'entity_type': 'event', 'status': 'SUCCESS' if len(result) == 0 else 'FAILURE',
+                            'details': result, 'validation_type': 'semantics', 'name': k})
         return results
 
     def __repr__(self):
@@ -145,7 +148,7 @@ def main():
     reports = [validator.validate(scenario) for scenario in scenarios]
     t = open('dataplex-report.json', 'w')
     print(os.path.abspath(t.name))
-    json.dump(reports, t)
+    json.dump([{"name": "Dataplex", "scenarios": reports}], t)
 
 
 if __name__ == "__main__":

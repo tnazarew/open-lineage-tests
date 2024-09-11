@@ -5,15 +5,27 @@ on:
     secrets:
       gcpKey:
         required: true
-
+    inputs:
+      exec_time:
+        type: string
+        description: "Workflow execution time"
 jobs:
   collect-reports:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/heads/main
 
-      - name: Create report directory
+      - uses: actions/upload-artifact@v4
+        with:
+          name: last-report
+          path: generated-files/report.json
+          retention-days: 1
+
+      - uses: actions/checkout@v4
+
+      - name: Create report.json directory
         run: mkdir -p reports/
 
       - uses: actions/download-artifact@v4
@@ -22,5 +34,17 @@ jobs:
           merge-multiple: true
 
       - name: Run task for Collect Reports
-        id: collect-reports
-        run: cat reports/dataplex-report.json
+        id: collect-and-merge-reports
+        run: python compare_and_merge_reports.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: updated-report
+          path: updated-report.json
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retention-failures-report
+          path: retention-failures-report.json
+          retention-days: 1

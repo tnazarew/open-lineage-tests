@@ -17,6 +17,7 @@ jobs:
   detect_changes:
     runs-on: ubuntu-latest
     outputs:
+      exec_time: ${{ steps.exec_time.outputs.time }}
       run_dataplex: ${{ steps.changed-files.outputs.dataplex_any_changed }}
       run_scenarios: ${{ steps.changed-files.outputs.scenarios_any_changed }}
       run_spark: ${{ steps.changed-files.outputs.spark_any_changed }}
@@ -24,6 +25,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Get workflow execution time
+        id: exec_time
+        run: echo "time=$(date +%Y%m%dT%H%M%S)" >> $GITHUB_OUTPUT
 
       - name: Get changed files
         id: changed-files
@@ -75,3 +80,9 @@ jobs:
   notify-maintainers:
     needs: collect-reports
     uses: ./.github/workflows/notify-maintainers.yml
+
+  update-report:
+    needs: notify-maintainers
+    uses: ./.github/workflows/update-report.yml
+
+
