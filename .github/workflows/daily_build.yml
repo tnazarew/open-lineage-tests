@@ -56,8 +56,8 @@ jobs:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_spark == 'true' }}
     uses: ./.github/workflows/producer-spark.yml
-    with:
-      spark_version: ${{ needs.initialize_workflow.outputs.spark_version }}
+#    with:
+#      spark_version: ${{ needs.initialize_workflow.outputs.spark_version }}
 
   spark-dataproc:
     needs: initialize_workflow
