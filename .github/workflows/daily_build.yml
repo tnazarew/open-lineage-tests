@@ -66,6 +66,7 @@ jobs:
 
   collect-reports:
     needs:
+      - initialize_workflow
       - dataplex
       - scenarios
       - spark
