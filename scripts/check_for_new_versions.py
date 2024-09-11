@@ -49,7 +49,7 @@ def main():
     with open('generated-files/versions.json', 'r') as json_file:
         data = json.load(json_file)
 
-    with open('list', 'w') as output_file:
+    with open('generated-files/list', 'w') as output_file:
         for e in data:
             version_to_run = get_version_to_run(e)
             if version_to_run is not None:
