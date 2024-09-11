@@ -35,7 +35,7 @@ jobs:
 
       - name: Run task for Collect Reports
         id: collect-and-merge-reports
-        run: python compare_and_merge_reports.py
+        run: python scripts/compare_and_merge_reports.py
 
       - uses: actions/upload-artifact@v4
         with:
