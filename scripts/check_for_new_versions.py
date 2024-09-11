@@ -46,7 +46,7 @@ def get_version_to_run(e):
 
 
 def main():
-    with open('component_versions/versions.json', 'r') as json_file:
+    with open('generated-files/versions.json', 'r') as json_file:
         data = json.load(json_file)
 
     with open('list', 'w') as output_file:
