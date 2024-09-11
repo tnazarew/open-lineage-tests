@@ -35,6 +35,7 @@ jobs:
       - name: Select components to run
         id: select-components
         run: |
+          pip install beautifulsoup4
           python scripts/check_for_new_versions.py
           cat component_versions/list >> $GITHUB_OUTPUT
 
