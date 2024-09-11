@@ -35,7 +35,7 @@ jobs:
       - name: Select components to run
         id: select-components
         run: |
-          python component_versions/check_for_new_versions.py
+          python scripts/check_for_new_versions.py
           cat component_versions/list >> $GITHUB_OUTPUT
 
   dataplex:
