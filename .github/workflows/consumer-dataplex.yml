@@ -5,7 +5,10 @@ on:
     secrets:
       gcpKey:
         required: true
-
+#    inputs:
+#      artifact_suffix:
+#        type: string
+#        description: "Suffix added to artifact name"
 
 permissions:
   contents: read
@@ -39,21 +42,21 @@ jobs:
         --consumer_dir consumer/consumers/Dataplex \
         --scenario_dir consumer/scenarios/ \
         --parent projects/gcp-open-lineage-testing/locations/us
-    - name: Get artifact name
-      id: get-artifact-name
-      run: |
-        raw_branch="${{ github.ref }}"
-        branch=$(echo "${raw_branch}" | sed 's:.*/::')
-        echo "artifact_name=dataplex-report-${branch}-${{ github.run_id }}" >> $GITHUB_ENV
+#    - name: Get artifact name
+#      id: get-artifact-name
+#      run: |
+#        raw_branch="${{ github.ref_name }}"
+#        branch=$(echo "${raw_branch}" | sed 's:/merge$:-merge:')
+#        echo "artifact_name=dataplex-report-${branch}-${{ github.run_id }}" >> $GITHUB_ENV
 
     - uses: actions/upload-artifact@v4
       with:
-        name: dataplex-report-${{ env.artifact_name }}
+        name: dataplex-report
         path: dataplex-report.json
         retention-days: 1
 
 #    - name: 'upload-folder'
 #      uses: 'google-github-actions/upload-cloud-storage@v2'
 #      with:
-#        path: 'dataplex-report.json'
+#        path: 'dataplex-report.json.json'
 #        destination: 'open-lineage-e2e/reports'

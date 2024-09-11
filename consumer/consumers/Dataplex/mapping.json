@@ -11,12 +11,12 @@
       "output.name": "part of LineageEvent.EventLinks.fully_qualified_name along with output.namespace, component of hashed value at the end of LineageEvent.name",
       "output.namespace": "part LineageEvent.EventLinks.fully_qualified_name along with output.name, component of hashed value at the end of LineageEvent.name"
     },
-    "processing_engine": {
+    "ProcessingEngineRunFacet": {
       "name": "Run.attribute.processing_engine.name",
       "openlineageAdapterVersion": "Run.attribute.processing_engine.openlineageAdapterVersion",
       "version": "Run.attribute.processing_engine.version"
     },
-    "environment-properties": {
+    "EnvironmentFacet": {
       "origin.sourcetype": "Run.attributes.environment-properties.origin.sourcetype",
       "origin.name": "Run.attributes.environment-properties.origin.name",
       "spark.app.id": "Run.attributes.environment-properties.spark.app.id",
@@ -34,14 +34,11 @@
     }
   },
   "knownUnmapped": {
-    "facet1": [
-      "property1",
-      "property2"
-    ],
-    "facet1": [
-      "property1",
-      "property2"
-    ]
+    "DatasourceDatasetFacet": ["*"],
+    "SchemaDatasetFacet": ["*"],
+    "SymlinksDatasetFacet": ["*"],
+    "JobTypeJobFacet": ["*"],
+    "ParentRunFacet": ["*"]
   }
 }
 
