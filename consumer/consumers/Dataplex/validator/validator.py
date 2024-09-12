@@ -36,7 +36,7 @@ class Validator:
             try:
                 response = self.client.process_open_lineage_run_event(parent=self.parent, open_lineage=e['payload'])
                 report.append(
-                    {"status": "SUCCESS", 'validation': 'syntax', 'name': e['name'], 'entity_type': 'openlineage'})
+                    {"status": "SUCCESS", 'validation_type': 'syntax', 'name': e['name'], 'entity_type': 'openlineage'})
             except InvalidArgument as exc:
                 report.append(
                     {"status": "FAILURE", 'validation_type': 'syntax', "details": exc.args[0], 'name': e['name'],
