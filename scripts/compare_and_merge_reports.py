@@ -29,10 +29,10 @@ class Report:
     def get_new_failures(self, old):
         oc = old.components if old is not None and old.components is not None else {}
         return Report({k: nfc for k, v in self.components.items() if
-                (nfc := v.get_new_failures(oc.setdefault(k, None))) is not None})
+                       (nfc := v.get_new_failures(oc.setdefault(k, None))) is not None})
 
     def to_dict(self):
-        return self.components.values()
+        return [c.to_dict() for c in self.components.values()]
 
 
 class Component:
@@ -52,7 +52,7 @@ class Component:
         return Component(self.name, nfs) if any(nfs) else None
 
     def to_dict(self):
-        return self.__dict__
+        return {'name': self.name, 'scenarios': [c.to_dict() for c in self.scenarios.values()]}
 
 
 class Scenario:
@@ -71,6 +71,9 @@ class Scenario:
         ot = old.tests if old is not None and old.tests is not None else {}
         nft = {k: nft for k, v in self.tests.items() if (nft := v.get_new_failure(ot.setdefault(k, None))) is not None}
         return Scenario(self.name, self.status, nft) if any(nft) else None
+
+    def to_dict(self):
+        return {'name': self.name, 'status': self.status, 'tests': [t.to_dict() for t in self.tests.values()]}
 
 
 class Test:
@@ -93,6 +96,10 @@ class Test:
                 return self
         return None
 
+    def to_dict(self):
+        return {"name": self.name, "status": self.status, "validation_type": self.validation_type,
+                "entity_type": self.entity_type, "details": self.details}
+
 
 def main():
     # print(f"{listdir('reports')} \n")
@@ -103,14 +110,12 @@ def main():
     # new_report=[]
     # for report in new_reports:
     #     new_report.extend(report)
-    last_report = json.load(open(
-        '/Users/tomasznazarewicz/projects/open-lineage-tests/consumer/consumers/Dataplex/validator/dataplex-report.json',
-        'r'))
+    last_report = json.load(open('consumer/consumers/Dataplex/validator/dataplex-report.json', 'r'))
     new_report = Report.from_dict(last_report)
     old_report = Report.from_dict([])
 
     failures = new_report.get_new_failures(old_report)
-    print(json.dumps(failures.__dict__))
+    print(json.dumps(failures.to_dict()))
     # compare_reports(new_report, last_report)
     # json.dump({}, open('reports/retention-failures-report.json', 'w'))
     # json.dump({}, open('reports/updated-report.json', 'w'))
