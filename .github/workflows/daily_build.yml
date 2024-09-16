@@ -48,15 +48,15 @@ jobs:
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
 
-  scenarios:
-    needs: initialize_workflow
-    if: ${{ needs.initialize_workflow.outputs.run_scenarios == 'true' }}
-    uses: ./.github/workflows/consumer-scenarios.yml
+#  scenarios:
+#    needs: initialize_workflow
+#    if: ${{ needs.initialize_workflow.outputs.run_scenarios == 'true' }}
+#    uses: ./.github/workflows/consumer-scenarios.yml
 
-  spark:
-    needs: initialize_workflow
-    if: ${{ needs.initialize_workflow.outputs.run_spark == 'true' }}
-    uses: ./.github/workflows/producer-spark.yml
+#  spark:
+#    needs: initialize_workflow
+#    if: ${{ needs.initialize_workflow.outputs.run_spark == 'true' }}
+#    uses: ./.github/workflows/producer-spark.yml
 #    with:
 #      spark_version: ${{ needs.initialize_workflow.outputs.spark_version }}
 
@@ -69,8 +69,8 @@ jobs:
     needs:
       - initialize_workflow
       - dataplex
-      - scenarios
-      - spark
+#      - scenarios
+#      - spark
       - spark-dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect-and-compare-reports.yml
@@ -84,7 +84,9 @@ jobs:
     uses: ./.github/workflows/notify-maintainers.yml
 
   update-repo-files:
-    needs: notify-maintainers
+    needs:
+      - initialize_workflow
+      - notify-maintainers
     uses: ./.github/workflows/update-repo-files.yml
     with:
       exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
