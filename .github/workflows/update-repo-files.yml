@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create report.json directory
         run: mkdir -p reports/
@@ -26,7 +26,7 @@ jobs:
       - id: replace-modified-files
         name: Replace Modified Files
         run: |
-          if [ -f ./generated-files/updated-report.json]; then mv ./generated-files/updated-report.json ./generated-files/report.json; fi
+          if [ -f ./generated-files/updated-report.json ]; then mv ./generated-files/updated-report.json ./generated-files/report.json; fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

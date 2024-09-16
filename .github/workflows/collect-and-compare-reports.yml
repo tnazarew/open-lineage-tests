@@ -40,11 +40,11 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: updated-report
-          path: updated-report.json
+          path: reports/updated-report.json
           retention-days: 1
 
       - uses: actions/upload-artifact@v4
         with:
           name: retention-failures-report
-          path: retention-failures-report.json
+          path: reports/retention-failures-report.json
           retention-days: 1

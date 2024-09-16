@@ -24,7 +24,7 @@ jobs:
       run_spark_dataproc: ${{ steps.changed-files.outputs.spark_dataproc_any_changed }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get workflow execution time
         id: exec_time
