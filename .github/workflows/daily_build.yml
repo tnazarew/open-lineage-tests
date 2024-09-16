@@ -80,7 +80,7 @@ jobs:
       exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
 
   notify-maintainers:
-    needs: collect-reports
+    needs: collect-and-compare-reports
     uses: ./.github/workflows/notify-maintainers.yml
 
   update-repo-files:
