@@ -65,7 +65,7 @@ jobs:
     if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer-spark-dataproc.yml
 
-  collect-reports:
+  collect-and-compare-reports:
     needs:
       - initialize_workflow
       - dataplex
@@ -83,6 +83,8 @@ jobs:
     needs: collect-reports
     uses: ./.github/workflows/notify-maintainers.yml
 
-  create-version-change-pr:
+  update-repo-files:
     needs: notify-maintainers
-    uses: ./.github/workflows/create-version-change-pr.yml
+    uses: ./.github/workflows/update-repo-files.yml
+    with:
+      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
