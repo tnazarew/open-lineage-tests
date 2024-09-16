@@ -12,6 +12,7 @@ on: push
 permissions:
   id-token: write
   contents: write  # Add any other permissions as needed
+  pull-requests: write
 
 jobs:
   initialize_workflow:
