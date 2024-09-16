@@ -148,7 +148,7 @@ def main():
     old_report.update(new_report)
 
     json.dump(failures.to_dict(), open(join(base_dir, 'retention-failures-report.json'), 'w'))
-    json.dump(old_report.to_dict(), open(join(base_dir, 'updated-report.json'), 'w'))
+    json.dump(old_report.to_dict(), open(join(base_dir, 'updated-report.json'), 'w'), indent=2)
 
 
 if __name__ == "__main__":
