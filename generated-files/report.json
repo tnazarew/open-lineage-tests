@@ -82,7 +82,8 @@
             "validation_type": "semantics",
             "entity_type": "run",
             "details": [
-              "In .start_time: Expected value 2024-08-06T13:26:49.980Z does not equal result 2024-08-06T13:26:53.776Z"
+              "In .start_time: Expected value 2024-08-06T13:26:49.980Z does not equal result 2024-08-06T13:26:53.776Z",
+              "In .end_time: Expected value 2024-08-06T13:26:53.465Z does not equal result 2024-08-06T13:26:54.353Z"
             ]
           },
           {
@@ -108,6 +109,34 @@
           },
           {
             "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/f7fb1891-825a-4479-bbf0-7969a387e2ea",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": []
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/2e4d11f4-bd98-449c-99ad-f9da182288b2",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": []
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/3b162542-07be-4674-954b-ab729377f718",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": []
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/75c7813a-63d1-4ccc-8593-1ae0884d7916",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": []
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/de5ab9c4-0e14-4c77-bf0f-d5bf3c98a71d",
             "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "event",
