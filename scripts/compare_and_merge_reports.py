@@ -1,23 +1,9 @@
+import argparse
 import json
 from os import listdir
 from os.path import isfile, join
 
 
-# def get_arguments():
-#     parser = argparse.ArgumentParser(description="")
-#     parser.add_argument('--time', type=str, help="credentials for GCP", default=None)
-#     parser.add_argument('--consumer_dir', type=str, help="Path to the consumer directory", default=None)
-#     parser.add_argument('--scenario_dir', type=str, help="Path to the scenario directory", default=None)
-#     parser.add_argument('--parent', type=str, help="Parent identifier", default=None)
-#
-#     args = parser.parse_args()
-#
-#     client = LineageClient(credentials=Credentials.from_service_account_file(args.credentials))
-#     consumer_dir = args.consumer_dir
-#     scenario_dir = args.scenario_dir
-#     parent = args.parent
-#
-#     return consumer_dir, scenario_dir, parent, client
 class Report:
     def __init__(self, components):
         self.components = components
@@ -29,7 +15,17 @@ class Report:
     def get_new_failures(self, old):
         oc = old.components if old is not None and old.components is not None else {}
         return Report({k: nfc for k, v in self.components.items() if
-                       (nfc := v.get_new_failures(oc.setdefault(k, None))) is not None})
+                       (nfc := v.get_new_failures(oc.get(k))) is not None})
+
+    def update(self, new):
+        if len(self.components) == 0:
+            self.components = new.components
+        else:
+            for k, v in new.components.items():
+                if self.components.keys().__contains__(k):
+                    self.components[k].update(v)
+                else:
+                    self.components[k] = v
 
     def to_dict(self):
         return [c.to_dict() for c in self.components.values()]
@@ -48,8 +44,15 @@ class Component:
     def get_new_failures(self, old):
         os = old.scenarios if old is not None and old.scenarios is not None else {}
         nfs = {k: nfs for k, v in self.scenarios.items() if
-               (nfs := v.get_new_failures(os.setdefault(k, None))) is not None}
+               (nfs := v.get_new_failures(os.get(k))) is not None}
         return Component(self.name, nfs) if any(nfs) else None
+
+    def update(self, new):
+        for k, v in new.scenarios.items():
+            if self.scenarios.keys().__contains__(k):
+                self.scenarios[k].update(v)
+            else:
+                self.scenarios[k] = v
 
     def to_dict(self):
         return {'name': self.name, 'scenarios': [c.to_dict() for c in self.scenarios.values()]}
@@ -69,8 +72,16 @@ class Scenario:
         if self.status == 'SUCCESS':
             return None
         ot = old.tests if old is not None and old.tests is not None else {}
-        nft = {k: nft for k, v in self.tests.items() if (nft := v.get_new_failure(ot.setdefault(k, None))) is not None}
+        nft = {k: nft for k, v in self.tests.items() if (nft := v.get_new_failure(ot.get(k))) is not None}
         return Scenario(self.name, self.status, nft) if any(nft) else None
+
+    def update(self, new):
+        self.status = new.status
+        for k, v in new.tests.items():
+            if self.tests.keys().__contains__(k):
+                self.tests[k].update(v)
+            else:
+                self.tests[k] = v
 
     def to_dict(self):
         return {'name': self.name, 'status': self.status, 'tests': [t.to_dict() for t in self.tests.values()]}
@@ -96,29 +107,48 @@ class Test:
                 return self
         return None
 
+    def update(self, new):
+        self.status = new.status
+        self.details = new.details
+
     def to_dict(self):
         return {"name": self.name, "status": self.status, "validation_type": self.validation_type,
                 "entity_type": self.entity_type, "details": self.details}
 
 
+def get_arguments():
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument('--report_base_dir', type=str, help="directory containing the reports")
+    parser.add_argument('--time', type=str, help="time of workflow execution", default="")
+
+    args = parser.parse_args()
+
+    report_base_dir = args.report_base_dir
+    time = args.time
+
+    return report_base_dir, time
+
+
+def get_new_report(new_report_paths):
+    reports = []
+    for path in new_report_paths:
+        reports.extend(json.load(open(path)))
+    return Report.from_dict(reports)
+
+
 def main():
-    # print(f"{listdir('reports')} \n")
-    # partial_reports = [join('reports', f) for f in listdir('reports') if
-    #                    isfile(join('reports', f)) and f != "report.json"]
-    # print(partial_reports)
-    # new_reports = [Component(json.load(open(file))) for file in partial_reports]
-    # new_report=[]
-    # for report in new_reports:
-    #     new_report.extend(report)
-    last_report = json.load(open('consumer/consumers/Dataplex/validator/dataplex-report.json', 'r'))
-    new_report = Report.from_dict(last_report)
-    old_report = Report.from_dict([])
+    base_dir, time = get_arguments()
+    new_report_paths = [path for f in listdir(base_dir) if
+                        isfile((path := join(base_dir, f))) and f.__contains__("-report.json") and f != "report.json"]
+    old_report_path = join(base_dir, "report.json")
+    new_report = get_new_report(new_report_paths)
+    old_report = Report.from_dict(json.load(open(old_report_path, 'r')))
 
     failures = new_report.get_new_failures(old_report)
-    print(json.dumps(failures.to_dict()))
-    # compare_reports(new_report, last_report)
-    # json.dump({}, open('reports/retention-failures-report.json', 'w'))
-    # json.dump({}, open('reports/updated-report.json', 'w'))
+    old_report.update(new_report)
+
+    json.dump(failures.to_dict(), open(join(base_dir, 'retention-failures-report.json'), 'w'))
+    json.dump(old_report.to_dict(), open(join(base_dir, 'updated-report.json'), 'w'))
 
 
 if __name__ == "__main__":
