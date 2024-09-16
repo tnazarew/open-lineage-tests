@@ -1,13 +1,17 @@
-name: Collect Reports
+name: Update repo files
 # TODO update from placeholder to actual functionality
 on:
   workflow_call:
     secrets:
       gcpKey:
         required: true
+    inputs:
+      exec_time:
+        type: string
+        description: "Workflow execution time"
 
 jobs:
-  collect-reports:
+  update-repo-files:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,7 +29,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           add-paths: |
-            *.java
-            docs/*.md
-          branch: "test-${{ github.event.repository.updated_at}}"
-          title: ""
+            generated-files/report.json
+            generated-files/versions.json
+          branch: "test-${{ inputs.exec_time }}"
+          title: "[bot] update report with data from run ${{ github.run_id }} executed ${{ inputs.exec_time }}"

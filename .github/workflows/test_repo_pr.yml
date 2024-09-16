@@ -83,6 +83,6 @@ jobs:
 
   update-report:
     needs: notify-maintainers
-    uses: ./.github/workflows/update-report.yml
+    uses: ./.github/workflows/update-repo-files.yml
 
 
