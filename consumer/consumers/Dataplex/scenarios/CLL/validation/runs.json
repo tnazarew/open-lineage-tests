@@ -7,10 +7,69 @@
         "version": "3.3.4",
         "openlineageAdapterVersion": "1.19.0-SNAPSHOT",
         "name": "spark"
+      },
+      "spark.logicalPlan": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.19.0-SNAPSHOT/integration/spark",
+        "plan": [
+          {
+            "class": "org.apache.spark.sql.execution.command.CreateTableCommand",
+            "num-children": 0.0,
+            "ignoreIfExists": false,
+            "table": {
+              "partitionColumnNames": [],
+              "identifier": {
+                "product-class": "org.apache.spark.sql.catalyst.TableIdentifier",
+                "table": "cll_source1",
+                "database": "default"
+              },
+              "lastAccessTime": -1.0,
+              "provider": "hive",
+              "properties": null,
+              "schemaPreservesCase": true,
+              "ignoredProperties": null,
+              "schema": {
+                "fields": [
+                  {
+                    "nullable": true,
+                    "type": "integer",
+                    "metadata": {},
+                    "name": "a"
+                  },
+                  {
+                    "nullable": true,
+                    "type": "string",
+                    "metadata": {},
+                    "name": "b"
+                  }
+                ],
+                "type": "struct"
+              },
+              "unsupportedFeatures": [],
+              "createVersion": "",
+              "owner": "",
+              "tracksPartitionsInCatalog": false,
+              "tableType": {
+                "product-class": "org.apache.spark.sql.catalyst.catalog.CatalogTableType",
+                "name": "MANAGED"
+              },
+              "storage": {
+                "product-class": "org.apache.spark.sql.catalyst.catalog.CatalogStorageFormat",
+                "compressed": false,
+                "properties": null,
+                "inputFormat": "org.apache.hadoop.mapred.TextInputFormat",
+                "serde": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+                "outputFormat": "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
+              },
+              "createTime": 1722950811262.0,
+              "product-class": "org.apache.spark.sql.catalyst.catalog.CatalogTable"
+            }
+          }
+        ],
+        "_schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunFacet"
       }
     },
     "start_time": "2024-08-06T13:26:49.980Z",
-    "end_time": "2024-08-06T13:26:54.353Z",
+    "end_time": "2024-08-06T13:26:53.465Z",
     "state": 2
   }
 ]
