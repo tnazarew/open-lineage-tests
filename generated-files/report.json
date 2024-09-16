@@ -1,0 +1,120 @@
+[
+  {
+    "name": "Dataplex",
+    "scenarios": [
+      {
+        "name": "CLL",
+        "status": "FAILURE",
+        "tests": [
+          {
+            "name": "7.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": []
+          },
+          {
+            "name": "5.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": []
+          },
+          {
+            "name": "3.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": []
+          },
+          {
+            "name": "9.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": []
+          },
+          {
+            "name": "4.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": []
+          },
+          {
+            "name": "8.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": []
+          },
+          {
+            "name": "2.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": []
+          },
+          {
+            "name": "6.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": []
+          },
+          {
+            "name": "1.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": []
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": []
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749",
+            "status": "FAILURE",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [
+              "In .start_time: Expected value 2024-08-06T13:26:49.980Z does not equal result 2024-08-06T13:26:53.776Z"
+            ]
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/57b02b1d-f6e5-455a-9063-898d5c877025",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": []
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/a5e0b8fe-b071-478f-9732-0b7207c1e0f2",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": []
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/a7f9238b-3d61-4866-a2aa-c47999ad8637",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": []
+          },
+          {
+            "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/f4ca25e8-2d34-493a-b988-96e3fdfcd024",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": []
+          }
+        ]
+      }
+    ]
+  }
+]
