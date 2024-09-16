@@ -9,6 +9,7 @@ on:
 
 jobs:
   update-repo-files:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,7 +27,12 @@ jobs:
       - id: replace-modified-files
         name: Replace Modified Files
         run: |
-          if [ -f ./generated-files/updated-report.json ]; then mv ./generated-files/updated-report.json ./generated-files/report.json; fi
+          if [ -f ./generated-files/updated-report.json ]; 
+          then 
+            mv ./generated-files/updated-report.json ./generated-files/report.json
+          else
+            echo "./generated-files/updated-report.json does not exist"
+          fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
