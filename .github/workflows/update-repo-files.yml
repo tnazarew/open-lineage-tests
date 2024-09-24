@@ -42,10 +42,10 @@ jobs:
             echo "./generated-files/updated-report.json does not exist"
           fi
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          add-paths: |
-            generated-files/report.json
-          branch: "test-${{ inputs.exec_time }}"
-          title: "[bot] update report with data from run ${{ github.run_id }} executed ${{ inputs.exec_time }}"
+#      - name: Create Pull Request
+#        uses: peter-evans/create-pull-request@v7
+#        with:
+#          add-paths: |
+#            generated-files/report.json
+#          branch: "test-${{ inputs.exec_time }}"
+#          title: "[bot] update report with data from run ${{ github.run_id }} executed ${{ inputs.exec_time }}"

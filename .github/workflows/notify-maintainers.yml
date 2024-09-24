@@ -22,7 +22,7 @@ jobs:
       - name: Run task for Collect Reports
         id: collect-and-merge-reports
         run: |
-          python scripts/compare_and_merge_reports.py \
+          python scripts/generate_issue.py \
           --failure_path=reports/retention-failures-report.json \
           --issue_path=generated-files/issue.md
 
