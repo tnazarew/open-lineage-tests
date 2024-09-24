@@ -7,6 +7,11 @@ on:
         type: string
         description: "Workflow execution time"
 
+permissions:
+  id-token: write
+  contents: write  # Add any other permissions as needed
+  pull-requests: write
+
 jobs:
   update-repo-files:
     permissions:
