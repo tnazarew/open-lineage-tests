@@ -9,6 +9,7 @@ on:
       exec_time:
         type: string
         description: "Workflow execution time"
+
 jobs:
   collect-and-compare-reports:
     runs-on: ubuntu-latest

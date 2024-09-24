@@ -83,6 +83,8 @@ jobs:
   notify-maintainers:
     needs: collect-and-compare-reports
     uses: ./.github/workflows/notify-maintainers.yml
+    with:
+      exec_time: ${{ needs.collect-and-compare-reports.outputs.exec_time }}
 
   update-repo-files:
     needs:
