@@ -11,6 +11,7 @@ permissions:
   id-token: write
   contents: write  # Add any other permissions as needed
   pull-requests: write
+  issues: write
 
 jobs:
   update-repo-files:
