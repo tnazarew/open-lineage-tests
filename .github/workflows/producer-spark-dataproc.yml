@@ -24,7 +24,8 @@ jobs:
           repository: OpenLineage/OpenLineage
           ref: ${{ steps.latest_ol_tag.outputs.ol_version }}
           path: .
-          sparse-checkout: spec/
+          sparse-checkout: |
+            spec/
 
       - name: list files
         run: |
