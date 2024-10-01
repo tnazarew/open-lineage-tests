@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Openlineage/OpenLineage
-          ref: 1.22.0
+          ref: latest
           path: .
           sparse-checkout: spec
 
