@@ -21,6 +21,11 @@ jobs:
           path: .spec/
           sparse-checkout: spec
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
       - name: Run task for Spark Dataplex
         run: |
           pip install jsonschema
