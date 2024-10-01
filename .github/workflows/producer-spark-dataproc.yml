@@ -18,9 +18,9 @@ jobs:
         with:
           repository: Openlineage/OpenLineage
           ref: ${{ steps.latest_ol_tag.outputs.ol_version }}
-          path: .
+          path: .spec/
           sparse-checkout: spec
 
       - name: Run task for Spark Dataplex
         run: |
-          python scripts/validate_schemas.py --event_base_dir=events --spec_dirs=spec/,spec/facets/,spec/registry/gcp/dataproc/facets,spec/registry/gcp/lineage/facets/GcpLineageJobFacet.json --component=Spark
+          python scripts/validate_schemas.py --event_base_dir=events --spec_dirs=spec/spec/,spec/spec/facets/,spec/spec/registry/gcp/dataproc/facets,spec/spec/registry/gcp/lineage/facets/GcpLineageJobFacet.json --component=Spark
