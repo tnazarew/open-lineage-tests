@@ -15,7 +15,7 @@ jobs:
           repository: Openlineage/OpenLineage
           ref: 1.22.0
           path: .
-          sparse-checkout: spec/**
+          sparse-checkout: spec
 
       - name: Run task for Spark Dataplex
         run: |
