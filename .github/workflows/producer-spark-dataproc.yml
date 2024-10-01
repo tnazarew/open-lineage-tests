@@ -23,8 +23,8 @@ jobs:
         with:
           repository: OpenLineage/OpenLineage
           ref: ${{ steps.latest_ol_tag.outputs.ol_version }}
-          path: .spec_1/
-          sparse-checkout: ./spec
+          path: .
+          sparse-checkout: spec/
 
       - name: list files
         run: |
