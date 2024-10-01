@@ -21,7 +21,7 @@ jobs:
       - name: get latest OL spec
         uses: actions/checkout@v4
         with:
-          repository: Openlineage/OpenLineage
+          repository: OpenLineage/OpenLineage
           ref: ${{ steps.latest_ol_tag.outputs.ol_version }}
           path: .spec/
           sparse-checkout: spec
