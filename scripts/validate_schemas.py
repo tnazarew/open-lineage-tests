@@ -5,7 +5,7 @@ import os
 from jsonschema.exceptions import best_match, by_relevance
 from os import listdir
 from os.path import isfile, join, isdir
-from jsonschema.validators import Draft202012Validator
+from jsonschema import Draft202012Validator
 from report import Test, Scenario, Component, Report
 
 
