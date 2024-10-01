@@ -67,30 +67,30 @@ jobs:
     if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer-spark-dataproc.yml
 
-  collect-and-compare-reports:
-    needs:
-      - initialize_workflow
-      - dataplex
-#      - scenarios
-#      - spark
-      - spark-dataproc
-    if: ${{ !failure() }}
-    uses: ./.github/workflows/collect-and-compare-reports.yml
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
-    with:
-      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
-
-  notify-maintainers:
-    needs: collect-and-compare-reports
-    uses: ./.github/workflows/notify-maintainers.yml
+#  collect-and-compare-reports:
+#    needs:
+#      - initialize_workflow
+#      - dataplex
+##      - scenarios
+##      - spark
+#      - spark-dataproc
+#    if: ${{ !failure() }}
+#    uses: ./.github/workflows/collect-and-compare-reports.yml
+#    secrets:
+#      gcpKey: ${{ secrets.GCP_SA_KEY }}
 #    with:
-#      exec_time: ${{ needs.collect-and-compare-reports.outputs.exec_time }}
-
-  update-repo-files:
-    needs:
-      - initialize_workflow
-      - notify-maintainers
-    uses: ./.github/workflows/update-repo-files.yml
-    with:
-      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
+#      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
+#
+#  notify-maintainers:
+#    needs: collect-and-compare-reports
+#    uses: ./.github/workflows/notify-maintainers.yml
+##    with:
+##      exec_time: ${{ needs.collect-and-compare-reports.outputs.exec_time }}
+#
+#  update-repo-files:
+#    needs:
+#      - initialize_workflow
+#      - notify-maintainers
+#    uses: ./.github/workflows/update-repo-files.yml
+#    with:
+#      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
