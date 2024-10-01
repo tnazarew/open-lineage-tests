@@ -26,6 +26,14 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: list files
+        run: |
+          echo "BASE LEVEL FILES\n"
+          ls 
+          echo "FILES IN spec/ \n"
+          ls spec
+          echo "END \n"
+
       - name: Run task for Spark Dataplex
         run: |
           pip install jsonschema
