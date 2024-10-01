@@ -41,14 +41,14 @@ jobs:
           python scripts/check_for_new_versions.py
           cat generated-files/list >> $GITHUB_OUTPUT
 
-  dataplex:
-    needs: initialize_workflow
-    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' }}
-    uses: ./.github/workflows/consumer-dataplex.yml
-#    with:
-#      artifact_suffix: ${{ needs.initialize_workflow.outputs.artifact_suffix }}
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
+#  dataplex:
+#    needs: initialize_workflow
+#    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' }}
+#    uses: ./.github/workflows/consumer-dataplex.yml
+##    with:
+##      artifact_suffix: ${{ needs.initialize_workflow.outputs.artifact_suffix }}
+#    secrets:
+#      gcpKey: ${{ secrets.GCP_SA_KEY }}
 
 #  scenarios:
 #    needs: initialize_workflow
