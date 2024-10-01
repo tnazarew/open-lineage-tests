@@ -9,5 +9,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: get latest OL spec
+        uses: actions/checkout@v4
+        with:
+          repository: Openlineage/OpenLineage
+          ref: 1.22.0
+          path: .
+          sparse-checkout: spec/**
+
       - name: Run task for Spark Dataplex
-        run: echo "Running task for Spark Dataplex"
+        run: |
+          ls
+          ls spec
