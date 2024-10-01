@@ -9,6 +9,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
       - name: get latest OL tag
         id: latest_ol_tag
         run: echo "ol_version=$(curl https://api.github.com/repos/OpenLineage/OpenLineage/releases/latest -s | jq .tag_name -r)" >> $GITHUB_OUTPUT
@@ -20,11 +25,6 @@ jobs:
           ref: ${{ steps.latest_ol_tag.outputs.ol_version }}
           path: .spec/
           sparse-checkout: spec
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.11"
 
       - name: list files
         run: |
