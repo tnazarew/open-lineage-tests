@@ -14,13 +14,21 @@ jobs:
 
       - name: Get OL artifacts
         id: get_ol_artifacts
-        uses: .github/actions/get_openlineage_artifacts
+        uses: ./.github/actions/get_openlineage_artifacts
         with:
           version: ${{ steps.latest_ol_tag.outputs.ol_version }}
 
       - name: Run producer and create events
         id: run-producer
         run: echo "THIS SHOULD RUN THE PRODUCER TESTS AND ALL BUT NOW IT DOES NOTHING"
+
+      - name: Syntax Validation
+        uses: ./.github/actions/run_syntax_validation
+        with:
+          component: 'Spark Dataproc'
+          version: ${{ steps.latest_ol_tag.outputs.ol_version }}
+         target-path:
+
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v3
