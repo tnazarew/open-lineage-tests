@@ -27,7 +27,7 @@ jobs:
         with:
           component: 'Spark Dataproc'
           version: ${{ steps.latest_ol_tag.outputs.ol_version }}
-         target-path:
+          target-path: ${{ report/spark-dataproc-report.json}}
 
 
       - name: Set up Python 3.11
