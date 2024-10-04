@@ -26,10 +26,12 @@ runs:
       with:
         python-version: "3.11"
 
-    - name: create dir for ol spec
+    - name: create dir for ol spec and report
       id: dir_for_spec
       shell: bash
-      run: mkdir -p spec
+      run: |
+        mkdir -p spec
+        mkdir -p report
 
     - name: get latest OL spec
       uses: actions/checkout@v4
