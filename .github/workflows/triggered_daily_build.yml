@@ -1,13 +1,10 @@
-name: Check Changed Directories and Trigger Sub-workflow
-
-
+name: Daily Build
 
 on: push
 # actual trigger for daily run of workflow
 #on:
 #  schedule:
 #    - cron: "0 3 * * *"
-
 
 permissions:
   id-token: write
