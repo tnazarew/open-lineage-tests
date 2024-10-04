@@ -1,0 +1,62 @@
+name: Run syntax validation for OL events
+description: "Runs syntax validation for OL events using spec from given release of OL"
+author: Tomasz Nazarewicz
+inputs:
+  version:
+    description: "Version of the spec to check against"
+    required: true
+  target-path:
+    description: "Path to save the report to"
+    required: true
+  component:
+    description: "Component name to use"
+    required: true
+
+
+outputs:
+  report_path:
+    value: ${{ inputs.target-path }}
+    description: "File path of the downloaded openlineage-java jar"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+
+    - name: create dir for ol spec
+      id: dir_for_spec
+      shell: bash
+      run: mkdir -p spec
+
+    - name: get latest OL spec
+      uses: actions/checkout@v4
+      with:
+        repository: OpenLineage/OpenLineage
+        ref: ${{ inputs.version }}
+        path: spec
+        sparse-checkout: |
+          spec/
+
+    - name: list files
+      shell: bash
+      run: |
+        echo "BASE LEVEL FILES\n"
+        ls 
+        echo "FILES IN spec/ \n"
+        ls spec
+        echo "END \n"
+
+    - name: Validate OpenLineage events
+
+      shell: bash
+      run: |
+        pip install jsonschema
+        python scripts/validate_schemas.py \
+        --event_base_dir=events \
+        --spec_dirs=spec/spec/,spec/spec/facets/,spec/spec/registry/gcp/dataproc/facets,spec/spec/registry/gcp/lineage/facets \
+        --target=${{ inputs.target-path }} \
+        --component=${{ inputs.component }}
+

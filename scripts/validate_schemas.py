@@ -54,16 +54,16 @@ def get_arguments():
     parser.add_argument('--event_base_dir', type=str, help="directory containing the reports")
     parser.add_argument('--spec_dirs', type=str, help="comma separated list of directories containing spec and facets")
     parser.add_argument('--component', type=str, help="component producing the validated events")
-    parser.add_argument('--time', type=str, help="time of workflow execution", default="")
+    parser.add_argument('--target', type=str, help="time of workflow execution")
 
     args = parser.parse_args()
 
     event_base_dir = args.event_base_dir
-    time = args.time
+    target = args.target
     component = args.component
     spec_dirs = args.spec_dirs.split(',')
 
-    return event_base_dir, time, spec_dirs, component
+    return event_base_dir, target, spec_dirs, component
 
 
 def handle_ol_event(path, validator):
@@ -100,7 +100,7 @@ def fun(data, validator, entity):
 
 
 def main():
-    base_dir, time, spec_dirs, component = get_arguments()
+    base_dir, target, spec_dirs, component = get_arguments()
     validator = OLValidator.load_schemas(paths=spec_dirs)
     scenarios = {}
     for s in listdir(base_dir):
@@ -115,7 +115,8 @@ def main():
             scenarios[s] = Scenario(s, "FAILURE" if any(
                 t.status == "FAILURE" for t in tests.values()) else "SUCCESS", tests)
     report = Report({component: Component(component, scenarios)})
-    print(json.dumps(report.to_dict(), indent=2))
+    with open(target, 'w') as f:
+        json.dump(report.to_dict(), f, indent=2)
 
 
 if __name__ == "__main__":

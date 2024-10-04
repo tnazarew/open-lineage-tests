@@ -1,0 +1,74 @@
+name: Check Changed Directories and Trigger Sub-workflow
+
+
+
+on: push
+# actual trigger for daily run of workflow
+#on:
+#  schedule:
+#    - cron: "0 3 * * *"
+
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  initialize_workflow:
+    runs-on: ubuntu-latest
+    outputs:
+      exec_time: ${{ steps.exec_time.outputs.time }}
+      run_dataplex: ${{ steps.select-components.outputs.dataplex }}
+      run_spark_dataproc: ${{ steps.select-components.outputs.spark_dataproc }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get workflow execution time
+        id: exec_time
+        run: echo "time=$(date +%Y%m%dT%H%M%S)" >> $GITHUB_OUTPUT
+
+      - name: Select components to run
+        id: select-components
+        run: |
+          pip install beautifulsoup4
+          python scripts/check_for_new_versions.py
+          cat generated-files/list >> $GITHUB_OUTPUT
+
+  dataplex:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' }}
+    uses: ./.github/workflows/consumer_dataplex.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+
+  spark-dataproc:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
+    uses: ./.github/workflows/producer_spark_dataproc.yml
+
+  collect-and-compare-reports:
+    needs:
+      - initialize_workflow
+      - dataplex
+      - spark-dataproc
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/collect_and_compare_reports.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
+
+#  notify-maintainers:
+#    needs: collect-and-compare-reports
+#    uses: ./.github/workflows/notify_maintainers.yml
+#
+#  update-repo-files:
+#    needs:
+#      - initialize_workflow
+#      - notify-maintainers
+#    uses: ./.github/workflows/update_repo_files.yml
+#    with:
+#      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}

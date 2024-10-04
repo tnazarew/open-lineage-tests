@@ -1,0 +1,56 @@
+name: Get OpenLineage Artifacts
+description: "Download Maven artifacts for openlineage-spark_2.13 and openlineage-java and output file paths"
+author: Tomasz Nazarewicz
+inputs:
+  version:
+    description: "Version of the artifacts to download"
+    required: true
+
+outputs:
+  java_client:
+    value: ${{ steps.download-java-client.outputs.file }}
+    description: "File path of the downloaded openlineage-java jar"
+  java_sql:
+    value: ${{ steps.download-java-sql.outputs.file }}
+    description: "File path of the downloaded openlineage-java jar"
+  spark_integration:
+    value: ${{ steps.download-spark-integration.outputs.file }}
+    description: "File path of the downloaded openlineage-spark jar"
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download openlineage-java Maven Artifact
+      id: download-java-client
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'openlineage-java'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download openlineage-sql Maven Artifact
+      id: download-java-sql
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'openlineage-java'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download openlineage-spark_2.13 Maven Artifact
+      id: download-spark-integration
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'openlineage-spark_2.13'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
