@@ -59,6 +59,10 @@ class Scenario:
         self.tests = tests
 
     @classmethod
+    def simplified(cls, name, tests):
+        return cls(name, 'SUCCESS' if len(tests) == 0 else 'FAILURE', tests)
+
+    @classmethod
     def from_dict(cls, d):
         return cls(d['name'], d['status'], {t['name']: Test.from_dict(t) for t in d['tests']})
 
@@ -88,6 +92,10 @@ class Test:
         self.validation_type = validation_type
         self.entity_type = entity_type
         self.details = details
+
+    @classmethod
+    def simplified(cls, name, validation_type, entity_type, details):
+        return cls(name, 'SUCCESS' if len(details) == 0 else 'FAILURE', validation_type, entity_type, details)
 
     @classmethod
     def from_dict(cls, d):
