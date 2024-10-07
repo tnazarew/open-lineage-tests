@@ -148,7 +148,7 @@ def main():
     reports = [validator.validate(scenario) for scenario in scenarios]
     t = open('dataplex-report.json', 'w')
     print(os.path.abspath(t.name))
-    json.dump([{"name": "Dataplex", "scenarios": reports}], t)
+    json.dump([{"name": "dataplex", "scenarios": reports}], t)
 
 
 if __name__ == "__main__":

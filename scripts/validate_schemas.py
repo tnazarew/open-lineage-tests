@@ -7,9 +7,10 @@ from os import listdir
 from os.path import isfile, join, isdir
 from jsonschema import Draft202012Validator
 from report import Test, Scenario, Component, Report
+from compare_events import match
 
 
-class OLValidator:
+class OLSyntaxValidator:
     def __init__(self, schema_validators):
         self.schema_validators = schema_validators
 
@@ -30,7 +31,7 @@ class OLValidator:
         schema_validators['core'] = Draft202012Validator(spec_schema)
         return cls(schema_validators)
 
-    def validate(self, instance, schema_type):
+    def validate_entity(self, instance, schema_type):
         schema_validator = self.schema_validators.get(schema_type)
         if schema_validator is not None:
             errors = [error for error in schema_validator.iter_errors(instance)]
@@ -39,44 +40,20 @@ class OLValidator:
             else:
                 return [f"{(e := best_match([error], by_relevance())).json_path}: {e.message}" for error in errors]
         elif self.is_custom_facet(instance.get(schema_type)):
-            return [f"$.{schema_type} facet type {schema_type} may be custom facet without available schema json file"]
+            # facet type may be custom facet without available schema json file (defined only as class)
+            return []
         else:
             return [f"$.{schema_type} facet type {schema_type} not recognized"]
 
-
-def load_json(path):
-    with open(path) as f:
-        return json.load(f)
-
-
-def get_arguments():
-    parser = argparse.ArgumentParser(description="")
-    parser.add_argument('--event_base_dir', type=str, help="directory containing the reports")
-    parser.add_argument('--spec_dirs', type=str, help="comma separated list of directories containing spec and facets")
-    parser.add_argument('--component', type=str, help="component producing the validated events")
-    parser.add_argument('--target', type=str, help="time of workflow execution")
-
-    args = parser.parse_args()
-
-    event_base_dir = args.event_base_dir
-    target = args.target
-    component = args.component
-    spec_dirs = args.spec_dirs.split(',')
-
-    return event_base_dir, target, spec_dirs, component
-
-
-def handle_ol_event(path, validator):
-    with open(path) as f:
-        data = json.load(f)
+    def validate(self, event):
         validation_result = []
-        run_validation = validator.validate(data, 'core')
-        run = fun(data, validator, 'run')
-        job = fun(data, validator, 'job')
-        inputs = fun2(data, validator, 'inputs', 'facets')
-        input_ifs = fun2(data, validator, 'inputs', 'inputFacets')
-        outputs = fun2(data, validator, 'outputs', 'facets')
-        output_ofs = fun2(data, validator, 'outputs', 'outputFacets')
+        run_validation = self.validate_entity(event, 'core')
+        run = self.validate_entity_map(event, 'run')
+        job = self.validate_entity_map(event, 'job')
+        inputs = self.validate_entity_array(event, 'inputs', 'facets')
+        input_ifs = self.validate_entity_array(event, 'inputs', 'inputFacets')
+        outputs = self.validate_entity_array(event, 'outputs', 'facets')
+        output_ofs = self.validate_entity_array(event, 'outputs', 'outputFacets')
 
         validation_result.extend(run_validation)
         validation_result.extend(run)
@@ -88,32 +65,115 @@ def handle_ol_event(path, validator):
 
         return validation_result
 
+    def validate_entity_array(self, data, entity, generic_facet_type):
+        return [e.replace('$', f'$.{entity}[{ind}]') for ind, i in enumerate(data[entity]) for k, v in
+                i[generic_facet_type].items() for e in self.validate_entity({k: v}, k)]
 
-def fun2(data, validator, entity, generic_facet_type):
-    return [e.replace('$', f'$.{entity}[{ind}]') for ind, i in enumerate(data[entity]) for k, v in
-            i[generic_facet_type].items() for e in validator.validate({k: v}, k)]
+    def validate_entity_map(self, data, entity):
+        return [e.replace('$', f'$.{entity}') for k, v in data[entity]['facets'].items() for e in
+                self.validate_entity({k: v}, k)]
 
 
-def fun(data, validator, entity):
-    return [e.replace('$', f'$.{entity}') for k, v in data[entity]['facets'].items() for e in
-            validator.validate({k: v}, k)]
+class OLSemanticValidator:
+    def __init__(self, expected_events):
+        self.expected_events = expected_events
+
+    def validate(self, events):
+        tests = {}
+        for name, event in self.expected_events.items():
+            details = self.validate_event(event, events)
+            if details is None:
+                details = ['one or more of .eventType, .job.name, .job.namespace not defined in expected event']
+            tests[name] = Test.simplified(name, 'semantics', 'openlineage', details)
+        return tests
+
+    @staticmethod
+    def validate_event(ee, events):
+        if 'job' in ee and 'eventType' in ee and 'name' in ee['job'] and 'namespace' in ee['job']:
+            found = [
+                f"event with .eventType: {ee['eventType']}, .job.name: {ee['job']['name']} and .job.namespace: {ee['job']['namespace']} not found in result events"]
+            for e in events.values():
+                event_types_match = e['eventType'] == ee['eventType']
+                names_match = e['job']['name'] == ee['job']['name']
+                namespaces_match = e['job']['namespace'] == ee['job']['namespace']
+                if event_types_match and names_match and namespaces_match and len(found) > 0:
+                    found = match(e, ee)
+            return found
+        return None
+
+
+def load_json(path):
+    with open(path) as f:
+        return json.load(f)
+
+
+def get_event_identification(event, default):
+    if 'job' in event and 'eventType' in event and 'name' in event['job'] and 'namespace' in event['job']:
+        return f"{event['job']['namespace']}:{event['job']['name']}:{event['eventType']}"
+    else:
+        return default
+
+
+def all_tests_succeeded(syntax_tests):
+    return not any(t.status == "FAILURE" for t in syntax_tests.values())
+
+
+def get_expected_events(producer_dir, component, scenario_name):
+    expected_path = join(producer_dir, component, 'scenarios', scenario_name, 'events')
+    if isdir(expected_path):
+        expected = {path: load_json(join(expected_path, path)) for path in listdir(expected_path) if isfile(join(expected_path, path))}
+        return expected if len(expected) > 0 else None
+    else:
+        return None
+
+
+def validate_scenario_syntax(result_events, validator):
+    syntax_tests = {}
+    for name, event in result_events.items():
+        details = validator.validate(event)
+        identification = get_event_identification(event, name)
+        syntax_tests[identification] = Test(identification, "FAILURE" if len(details) > 0 else "SUCCESS",
+                                            'syntax', 'openlineage', details)
+    return syntax_tests
+
+
+def get_arguments():
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument('--event_base_dir', type=str, help="directory containing the reports")
+    parser.add_argument('--spec_dirs', type=str, help="comma separated list of directories containing spec and facets")
+    parser.add_argument('--producer_dir', type=str, help="directory storing producers")
+    parser.add_argument('--component', type=str, help="component producing the validated events")
+    parser.add_argument('--target', type=str, help="time of workflow execution")
+
+    args = parser.parse_args()
+
+    event_base_dir = args.event_base_dir
+    producer_dir = args.producer_dir
+    target = args.target
+    component = args.component
+    spec_dirs = args.spec_dirs.split(',')
+
+    return event_base_dir, producer_dir, target, spec_dirs, component
 
 
 def main():
-    base_dir, target, spec_dirs, component = get_arguments()
-    validator = OLValidator.load_schemas(paths=spec_dirs)
+    base_dir, producer_dir, target, spec_dirs, component = get_arguments()
+    validator = OLSyntaxValidator.load_schemas(paths=spec_dirs)
     scenarios = {}
-    for s in listdir(base_dir):
-        s_path = join(base_dir, s)
-        if isdir(s_path):
-            tests = {}
-            for t in listdir(s_path):
-                t_path = join(s_path, t)
-                if isfile(t_path):
-                    details = handle_ol_event(t_path, validator)
-                    tests[t] = Test(t, "SUCCESS" if len(details) == 0 else "FAILURE", 'syntax', 'openlineage', details)
-            scenarios[s] = Scenario(s, "FAILURE" if any(
-                t.status == "FAILURE" for t in tests.values()) else "SUCCESS", tests)
+    for scenario_name in listdir(base_dir):
+        scenario_path = join(base_dir, scenario_name)
+        if isdir(scenario_path):
+            expected = get_expected_events(producer_dir, component, scenario_name)
+            result_events = {file: load_json(path) for file in listdir(scenario_path) if
+                             isfile(path := join(scenario_path, file))}
+            tests = validate_scenario_syntax(result_events, validator)
+
+            if all_tests_succeeded(tests) and expected is not None:
+                for name, res in OLSemanticValidator(expected).validate(result_events).items():
+                    tests[name] = res
+
+            scenarios[scenario_name] = Scenario(scenario_name, "FAILURE" if all_tests_succeeded(tests)
+            else "SUCCESS", tests)
     report = Report({component: Component(component, scenarios)})
     with open(target, 'w') as f:
         json.dump(report.to_dict(), f, indent=2)
