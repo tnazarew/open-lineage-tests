@@ -26,7 +26,8 @@ jobs:
       - name: Get unreleased OL artifacts
         id: get-unreleased
         uses: ./.github/actions/get_unreleased_openlineage_artifacts
-        with: ${{ steps.latest_ol_tag.outputs.ol_version }}
+        with:
+          version: ${{ steps.latest_ol_tag.outputs.ol_version }}
 
       - name: Run producer and create events
         id: run-producer
