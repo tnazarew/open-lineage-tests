@@ -23,6 +23,11 @@ jobs:
           skip-gcp-lineage: 'true'
           skip-sql: 'true'
 
+      - name: Get unreleased OL artifacts
+        id: get-unreleased
+        uses: ./.github/actions/get_unreleased_openlineage_artifacts
+        with: ${{ steps.latest_ol_tag.outputs.ol_version }}
+
       - name: Run producer and create events
         id: run-producer
         run: echo "THIS SHOULD RUN THE PRODUCER TESTS AND ALL BUT NOW IT DOES NOTHING"
