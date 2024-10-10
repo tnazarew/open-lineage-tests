@@ -55,7 +55,7 @@ runs:
 
       shell: bash
       run: |
-        pip install jsonschema
+        pip install jsonschema dateutil
         python scripts/validate_schemas.py \
         --event_base_dir=events \
         --spec_dirs=spec/spec/,spec/spec/facets/,spec/spec/registry/gcp/dataproc/facets,spec/spec/registry/gcp/lineage/facets \

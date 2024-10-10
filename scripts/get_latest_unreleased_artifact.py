@@ -111,7 +111,9 @@ def main():
     if workflow:
         artifacts_list = get_artifacts_list(workflow)
         for url in artifacts_list:
+            print(f"Downloading from url: ${url}\n")
             download_jar(path, url)
+            print("success\n")
     else:
         print('no workflow found')
         sys.exit(1)
