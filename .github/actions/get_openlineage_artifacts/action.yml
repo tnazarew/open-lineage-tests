@@ -5,6 +5,39 @@ inputs:
   version:
     description: "Version of the artifacts to download"
     required: true
+  skip-spark:
+    description: "Skip spark integration download"
+    required: false
+    default: 'false'
+  skip-flink:
+    description: "Skip spark integration download"
+    required: false
+    default: 'false'
+  skip-java:
+    description: "Skip java client download"
+    required: false
+    default: 'false'
+  skip-sql:
+    description: "Skip sql interface download"
+    required: false
+    default: 'false'
+  skip-extensions:
+    description: "Skip extensions download"
+    required: false
+    default: 'false'
+  skip-gcp-lineage:
+    description: "Skip gcp-lineage transport download"
+    required: false
+    default: 'false'
+  skip-s3:
+    description: "Skip s3 transport download"
+    required: false
+    default: 'false'
+  skip-gcs:
+    description: "Skip gcs transport download"
+    required: false
+    default: 'false'
+
 
 outputs:
   java_client:
@@ -16,6 +49,21 @@ outputs:
   spark_integration:
     value: ${{ steps.download-spark-integration.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
+  flink_integration:
+    value: ${{ steps.download-spark-integration.outputs.file }}
+    description: "File path of the downloaded openlineage-spark jar"
+  spark_extensions:
+    value: ${{ steps.download-spark-extension-interfaces.outputs.file }}
+    description: "File path of the downloaded openlineage-spark jar"
+  gcp_lineage_transport:
+    value: ${{ steps.download-transports-dataplex.outputs.file }}
+    description: "File path of the downloaded openlineage-spark jar"
+  gcs_transport:
+    value: ${{ steps.download-transports-gcs.outputs.file }}
+    description: "File path of the downloaded openlineage-spark jar"
+  s3_transport:
+    value: ${{ steps.download-transports-s3.outputs.file }}
+    description: "File path of the downloaded openlineage-spark jar"
 
 
 runs:
@@ -23,6 +71,7 @@ runs:
   steps:
     - name: Download openlineage-java Maven Artifact
       id: download-java-client
+      if: ${{ inputs.skip-java == 'false' }}
       uses: clausnz/github-action-download-maven-artifact@master
       with:
         url: 'https://repo1.maven.org'
@@ -34,23 +83,85 @@ runs:
 
     - name: Download openlineage-sql Maven Artifact
       id: download-java-sql
+      if: ${{ inputs.skip-sql == 'false' }}
       uses: clausnz/github-action-download-maven-artifact@master
       with:
         url: 'https://repo1.maven.org'
         repository: 'maven2'
         groupId: 'io.openlineage'
-        artifactId: 'openlineage-java'
+        artifactId: 'openlineage-sql-java'
         version: ${{ inputs.version }}
         extension: 'jar'
 
-    - name: Download openlineage-spark_2.13 Maven Artifact
+    - name: Download openlineage spark integration Maven Artifact
       id: download-spark-integration
+      if: ${{ inputs.skip-spark == 'false' }}
       uses: clausnz/github-action-download-maven-artifact@master
       with:
         url: 'https://repo1.maven.org'
         repository: 'maven2'
         groupId: 'io.openlineage'
         artifactId: 'openlineage-spark_2.13'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download spark extension interfaces Maven Artifact
+      id: download-spark-extension-interfaces
+      if: ${{ inputs.skip-extensions == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'spark-extension-interfaces'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download openlineage flink Maven Artifact
+      id: download-flink-integration
+      if: ${{ inputs.skip-spark == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'openlineage-flink'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download gcp lineage Maven Artifact
+      id: download-transports-dataplex
+      if: ${{ inputs.skip-gcp-lineage == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'transports-dataplex'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download gcs transport Maven Artifact
+      id: download-transports-gcs
+      if: ${{ inputs.skip-gcs == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'transports-gcs'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download s3 transport Maven Artifact
+      id: download-transports-s3
+      if: ${{ inputs.skip-spark == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'transports-s3'
         version: ${{ inputs.version }}
         extension: 'jar'
 
