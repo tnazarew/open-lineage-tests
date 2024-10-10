@@ -18,6 +18,10 @@ jobs:
         uses: ./.github/actions/get_openlineage_artifacts
         with:
           version: ${{ steps.latest_ol_tag.outputs.ol_version }}
+          skip-flink: 'true'
+          skip-s3: 'true'
+          skip-gcp-lineage: 'true'
+          skip-sql: 'true'
 
       - name: Run producer and create events
         id: run-producer
