@@ -40,28 +40,28 @@ inputs:
 
 
 outputs:
-  java_client:
+  java:
     value: ${{ steps.download-java-client.outputs.file }}
     description: "File path of the downloaded openlineage-java jar"
-  java_sql:
+  sql:
     value: ${{ steps.download-java-sql.outputs.file }}
     description: "File path of the downloaded openlineage-java jar"
-  spark_integration:
+  spark:
     value: ${{ steps.download-spark-integration.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
-  flink_integration:
+  flink:
     value: ${{ steps.download-spark-integration.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
-  spark_extensions:
+  extensions:
     value: ${{ steps.download-spark-extension-interfaces.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
-  gcp_lineage_transport:
+  gcp-lineage:
     value: ${{ steps.download-transports-dataplex.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
-  gcs_transport:
+  gcs:
     value: ${{ steps.download-transports-gcs.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
-  s3_transport:
+  s3:
     value: ${{ steps.download-transports-s3.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
 
