@@ -90,8 +90,8 @@ runs:
       run: |
         check_artifact_downloaded() {
           if [ $2 = 'false']; then
-            if [ -f ${{ inputs.artifact-directory }}/${1} ]; then
-              echo "$3=$(ls ${{ inputs.artifact-directory }}/${1})" >> $GITHUB_OUTPUT
+            if [ -f ${{ inputs.artifact-directory }}/$1 ]; then
+              echo "$3=$(ls ${{ inputs.artifact-directory }}/$1)" >> $GITHUB_OUTPUT
             else
               echo "skip-$3=false" >> $GITHUB_OUTPUT
             fi

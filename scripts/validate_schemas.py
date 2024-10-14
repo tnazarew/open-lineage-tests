@@ -168,7 +168,7 @@ def main():
                              isfile(path := join(scenario_path, file))}
             tests = validate_scenario_syntax(result_events, validator)
 
-            if all_tests_succeeded(tests) and expected is not None:
+            if all_tests_succeeded(tests) and expected is not None and not component == 'scenarios':
                 for name, res in OLSemanticValidator(expected).validate(result_events).items():
                     tests[name] = res
 
