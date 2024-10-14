@@ -1,0 +1,71 @@
+name: Check for changes in OL spec and spark integration
+# Assumption here is that there will be a change that touches spec or spark integration
+
+on: push
+# actual trigger for daily run of workflow
+#on:
+#  schedule:
+#    - cron: "0 5 * * 0"
+
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  issues: write
+
+
+
+jobs:
+  initialize_workflow:
+    runs-on: ubuntu-latest
+    outputs:
+      changes_in_spec: ${{steps.check-changes.outputs.changes_found}}
+    steps:
+      - name: Checkout code for openlineage repository
+        uses: actions/checkout@v4
+
+      - name: create dir for ol spec and report
+        id: dir_for_spec
+        shell: bash
+        run: |
+          mkdir -p openlineage
+
+      - name: get latest OL spec
+        uses: actions/checkout@v4
+        with:
+          repository: OpenLineage/OpenLineage
+          path: openlineage
+
+      - name: check for changes in spec
+        id: check-changes
+        run: | 
+          echo "changes_found=false" >> $GITHUB_OUTPUTS
+          
+          python .scripts/compare_spec.py \
+          --spec_base=spec_base=./openlineage/spec \
+          --versions_path=./generated-files/spec_versions.json \
+          --new_versions_path=./updated_spec_versions.json
+          
+          if [ -f updated_spec_versions.json ]
+            echo "changes_found=true" >> $GITHUB_OUTPUTS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: spec-versions
+          path: generated-files/updated_spec_versions.json
+          retention-days: 1
+
+  # check if scenarios are still compatible with the new spec
+  scenarios_check:
+    needs:
+      - initialize_workflow
+    if: ${{ success() && needs.initialize_workflow.outputs.changes_in_spec == 'true' }}
+    uses: ./.github/workflows/check_scenarios.yml
+
+  # check if producers still produce compatible events
+  spark-dataproc:
+    needs:
+      - initialize_workflow
+    if: ${{ success() && needs.initialize_workflow.outputs.changes_in_spec == 'true' }}
+    uses: ./.github/workflows/producer_spark_dataproc.yml

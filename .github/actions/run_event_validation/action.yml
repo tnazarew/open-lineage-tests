@@ -8,6 +8,9 @@ inputs:
   target-path:
     description: "Path to save the report to"
     required: true
+  event-directory:
+    description: "Directory containing the events to validate"
+    required: true
   component:
     description: "Component name to use"
     required: true
@@ -57,7 +60,7 @@ runs:
       run: |
         pip install -r ./scripts/requirements.txt
         python scripts/validate_schemas.py \
-        --event_base_dir=events \
+        --event_base_dir=${{ inputs.event-directory }} \
         --spec_dirs=spec/spec/,spec/spec/facets/,spec/spec/registry/gcp/dataproc/facets,spec/spec/registry/gcp/lineage/facets \
         --target=${{ inputs.target-path }} \
         --component="${{ inputs.component }}" \

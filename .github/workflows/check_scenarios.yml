@@ -1,0 +1,22 @@
+name: Scenario Validation
+
+on: workflow_call
+
+jobs:
+  do-something:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: get latest OL tag
+        id: latest_ol_tag
+        run: echo "ol_version=$(curl https://api.github.com/repos/OpenLineage/OpenLineage/releases/latest -s | jq .tag_name -r)" >> $GITHUB_OUTPUT
+
+      - name: Validation
+        uses: ./.github/actions/run_event_validation
+        with:
+          component: 'scenarios'
+          version: ${{ steps.latest_ol_tag.outputs.ol_version }}
+          target-path: 'scenarios-report.json'
+
