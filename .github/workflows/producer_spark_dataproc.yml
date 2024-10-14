@@ -1,6 +1,10 @@
 name: Spark Dataproc
 
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      gcpKey:
+        required: true
 
 jobs:
   do-something:

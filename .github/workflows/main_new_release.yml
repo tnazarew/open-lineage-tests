@@ -1,6 +1,7 @@
 name: Daily Build
 
 on: push
+
 # actual trigger for daily run of workflow
 #on:
 #  schedule:
@@ -45,6 +46,8 @@ jobs:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
 
   collect-and-compare-reports:
     needs:
