@@ -56,6 +56,9 @@ jobs:
     needs: detect_changes
     if: ${{ needs.detect_changes.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+
 
   collect_reports:
     needs:

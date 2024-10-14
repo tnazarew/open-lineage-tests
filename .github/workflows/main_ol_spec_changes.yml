@@ -69,3 +69,6 @@ jobs:
       - initialize_workflow
     if: ${{ success() && needs.initialize_workflow.outputs.changes_in_spec == 'true' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+
