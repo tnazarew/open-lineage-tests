@@ -29,13 +29,53 @@ jobs:
         with:
           version: ${{ steps.latest_ol_tag.outputs.ol_version }}
 
-      - name: Run producer and create events
-        id: run-producer
-        run: echo "THIS SHOULD RUN THE PRODUCER TESTS AND ALL BUT NOW IT DOES NOTHING"
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: GCP authorization
+        id: gcp-auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.gcpKey }}'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f ./producer/producers/spark_dataproc/runner/requirements.txt ]; then pip install -r ./producer/producers/spark_dataproc/runner/requirements.txt; fi
+
+      - name: Start producer
+        run: |
+          python ./producer/producers/spark_dataproc/runner/dataproc_workflow.py create-cluster \
+          --project-id gcp-open-lineage-testing 
+          --region us-west1 \
+          --cluster-name dataproc-producer-test
+          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} 
+          --metadata "SPARK_BQ_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.41.0.jar,OPENLINEAGE_SPARK_URL=gs://open-lineage-e2e/jars/openlineage-spark_2.12-1.23.0.jar"
+          --initialization-actions="gs://open-lineage-e2e/scripts/get_openlineage_jar.sh"
 
       - name: set producer output event dir
         id: set-producer-output
-        run: echo "event_dir=./events" >> $GITHUB_OUTPUT
+        run: | 
+          echo "event_dir=/tmp/producer-$(date +%s%3N)" >> $GITHUB_OUTPUTS
+
+      - name: Run producer job and create OL events
+        id: run-producer
+        run: |
+          python dataproc_workflow/dataproc_workflow.py run-job \
+          --project-id gcp-open-lineage-testing \
+          --region us-west1 \
+          --cluster-name dataproc-producer-test \
+          --gcs-bucket open-lineage-e2e \
+          --python-job ./producer/spark_dataproc/scenarios/scenario1/test/read_shakespeare.py \
+          --jars  ${{ steps.consolidate-outputs.outputs.gcs }} \
+          --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
+          --output-directory ${{ steps.set-producer-output.event_dir }} \
+          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
+          --dataproc-image-version 2.2-ubuntu22 \
+          --job-args "file:///tmp/outputs/$(date +%s%3N)"
 
       - name: Validation
         uses: ./.github/actions/run_event_validation
@@ -51,5 +91,11 @@ jobs:
           path: spark-dataproc-report.json
           retention-days: 1
 
+      - name: Terminate producer cluster
+        run: |
+          python ./producer/producers/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
+          --project-id gcp-open-lineage-testing
+          --region us-west1 \
+          --cluster-name dataproc-producer-test
+          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
-          
