@@ -33,12 +33,23 @@ jobs:
         id: run-producer
         run: echo "THIS SHOULD RUN THE PRODUCER TESTS AND ALL BUT NOW IT DOES NOTHING"
 
+      - name: set producer output event dir
+        id: set-producer-output
+        run: echo "event_dir=./events" >> $GITHUB_OUTPUT
+
       - name: Validation
         uses: ./.github/actions/run_event_validation
         with:
           component: 'Spark Dataproc'
           version: ${{ steps.latest_ol_tag.outputs.ol_version }}
-          target-path: 'report/spark_dataproc_report.json'
+          event-directory: ${{ steps.set-producer-output.event_dir }}
+          target-path: 'spark-dataproc-report.json'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: spark-dataproc-report
+          path: spark-dataproc-report.json
+          retention-days: 1
 
 
           

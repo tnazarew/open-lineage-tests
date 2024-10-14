@@ -1,1 +1,137 @@
-{}
+{
+  "OpenLineage": {
+    "major": "2",
+    "minor": "0",
+    "patch": "2"
+  },
+  "OutputStatisticsOutputDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "2"
+  },
+  "LifecycleStateChangeDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "SourceCodeLocationJobFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "OwnershipJobFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "ExtractionErrorRunFacet": {
+    "major": "1",
+    "minor": "1",
+    "patch": "2"
+  },
+  "SourceCodeJobFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "DataQualityMetricsInputDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "2"
+  },
+  "ColumnLineageDatasetFacet": {
+    "major": "1",
+    "minor": "2",
+    "patch": "0"
+  },
+  "ProcessingEngineRunFacet": {
+    "major": "1",
+    "minor": "1",
+    "patch": "1"
+  },
+  "DatasetVersionDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "ErrorMessageRunFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "OwnershipDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "ExternalQueryRunFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "2"
+  },
+  "DocumentationJobFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "SchemaDatasetFacet": {
+    "major": "1",
+    "minor": "1",
+    "patch": "1"
+  },
+  "DataQualityAssertionsDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "ParentRunFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "NominalTimeRunFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "StorageDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "SQLJobFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "SymlinksDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "JobTypeJobFacet": {
+    "major": "2",
+    "minor": "0",
+    "patch": "3"
+  },
+  "DatasourceDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "DocumentationDatasetFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "1"
+  },
+  "GcpLineageJobFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "0"
+  },
+  "GcpDataprocSparkRunFacet": {
+    "major": "1",
+    "minor": "0",
+    "patch": "0"
+  }
+}

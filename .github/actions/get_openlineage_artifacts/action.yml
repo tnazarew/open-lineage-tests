@@ -50,7 +50,7 @@ outputs:
     value: ${{ steps.download-spark-integration.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
   flink:
-    value: ${{ steps.download-spark-integration.outputs.file }}
+    value: ${{ steps.download-flink-integration.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
   extensions:
     value: ${{ steps.download-spark-extension-interfaces.outputs.file }}

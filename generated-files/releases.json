@@ -1,1 +1,10 @@
-{}
+[
+  {
+    "name": "dataplex",
+    "latest-version": ""
+  },
+  {
+    "name": "spark_dataproc",
+    "latest-version": ""
+  }
+]

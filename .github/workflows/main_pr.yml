@@ -5,7 +5,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read  # Add any other permissions as needed
+  contents: read
 
 jobs:
   detect_changes:
@@ -40,8 +40,13 @@ jobs:
               - producer/spark_dataproc/**
               - .github/workflows/*
 
+  scenarios:
+
+
   dataplex:
-    needs: detect_changes
+    needs:
+      - detect_changes
+      - scenarios
     if: ${{ needs.detect_changes.outputs.run_dataplex == 'true' || needs.detect_changes.outputs.run_dataplex}}
     uses: ./.github/workflows/consumer_dataplex.yml
     secrets:
