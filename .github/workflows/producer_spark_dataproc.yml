@@ -98,8 +98,8 @@ jobs:
       - name: Terminate producer cluster
         run: |
           python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
-          --project-id gcp-open-lineage-testing
+          --project-id gcp-open-lineage-testing \
           --region us-west1 \
-          --cluster-name dataproc-producer-test
+          --cluster-name dataproc-producer-test \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
