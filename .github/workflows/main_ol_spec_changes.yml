@@ -42,7 +42,7 @@ jobs:
         run: | 
           echo "changes_found=false" >> $GITHUB_OUTPUT
           
-          python .scripts/compare_spec.py \
+          python scripts/compare_spec.py \
           --spec_base=spec_base=./openlineage/spec \
           --versions_path=./generated-files/spec_versions.json \
           --new_versions_path=./updated_spec_versions.json
