@@ -74,7 +74,7 @@ jobs:
           --cluster-name dataproc-producer-test \
           --gcs-bucket open-lineage-e2e \
           --python-job producer/spark_dataproc/scenarios/scenario1/test/read_shakespeare.py \
-          --jars  ${{ steps.consolidate-outputs.outputs.gcs }} \
+          --jars  "${{ steps.consolidate-outputs.outputs.gcs }}" \
           --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
           --output-directory ${{ steps.set-producer-output.event_dir }} \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \

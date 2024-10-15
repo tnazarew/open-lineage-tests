@@ -40,7 +40,7 @@ jobs:
       - name: check for changes in spec
         id: check-changes
         run: | 
-          echo "changes_found=false" >> $GITHUB_OUTPUTS
+          echo "changes_found=false" >> $GITHUB_OUTPUT
           
           python .scripts/compare_spec.py \
           --spec_base=spec_base=./openlineage/spec \
@@ -48,7 +48,7 @@ jobs:
           --new_versions_path=./updated_spec_versions.json
           
           if [ -f updated_spec_versions.json ]
-            echo "changes_found=true" >> $GITHUB_OUTPUTS
+            echo "changes_found=true" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v4
         with:
