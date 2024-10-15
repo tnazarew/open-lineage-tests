@@ -1,10 +1,6 @@
 name: Update repo files
 on:
   workflow_call:
-    inputs:
-      exec_time:
-        type: string
-        description: "Workflow execution time"
 
 permissions:
   id-token: write

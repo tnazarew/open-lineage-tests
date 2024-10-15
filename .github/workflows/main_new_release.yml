@@ -17,23 +17,35 @@ jobs:
   initialize_workflow:
     runs-on: ubuntu-latest
     outputs:
-      exec_time: ${{ steps.exec_time.outputs.time }}
-      run_dataplex: ${{ steps.select-components.outputs.dataplex }}
-      run_spark_dataproc: ${{ steps.select-components.outputs.spark_dataproc }}
+      run_dataplex: 'true'
+      run_spark_dataproc: 'true'
+      openlineage_release: ${{ steps.select-components.outputs.ol_release }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get workflow execution time
-        id: exec_time
-        run: echo "time=$(date +%Y%m%dT%H%M%S)" >> $GITHUB_OUTPUT
-
+        # there should be part about checking not only the OL version but also the producers and consumers
+        # there is no way to check for new releases of spark_dataproc or dataplex so we just run their tests everytime
+        # also normally new release of OL should trigger all producer tests but for now they are run anyway so no need to trigger
       - name: Select components to run
         id: select-components
         run: |
-          pip install beautifulsoup4
-          python scripts/check_for_new_versions.py
-          cat generated-files/list >> $GITHUB_OUTPUT
+          version_sum() {
+            IFS='.' read -r var1 var2 var3 <<< "$1"
+            echo $(( var1 * 1000000 + var2 * 1000 ))
+          }
+          
+          current_ol=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
+          latest_ol=$(curl https://api.github.com/repos/OpenLineage/OpenLineage/releases/latest -s | jq .tag_name -r)
+
+          sum1=$(calculate_sum "$latest_ol")
+          sum2=$(calculate_sum "$current_ol")
+          
+          if (( $(version_sum $latest_ol) > $(version_sum $current_ol) )); then
+              echo "ol_release=${latest_ol}" >> $GITHUB_OUTPUT
+          else
+              echo "ol_release=${ol_release}" >> $GITHUB_OUTPUT  
+          fi          
 
   dataplex:
     needs: initialize_workflow
@@ -48,6 +60,9 @@ jobs:
     uses: ./.github/workflows/producer_spark_dataproc.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.openlineage_release }}
+      get-circleci-artifacts: false
 
   collect-and-compare-reports:
     needs:
@@ -58,8 +73,6 @@ jobs:
     uses: ./.github/workflows/collect_and_compare_reports.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
-    with:
-      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}
 
 #  notify-maintainers:
 #    needs: collect-and-compare-reports
@@ -70,5 +83,3 @@ jobs:
 #      - initialize_workflow
 #      - notify-maintainers
 #    uses: ./.github/workflows/update_repo_files.yml
-#    with:
-#      exec_time: ${{ needs.initialize_workflow.outputs.exec_time }}

@@ -45,17 +45,7 @@ runs:
         sparse-checkout: |
           spec/
 
-    - name: list files
-      shell: bash
-      run: |
-        echo "BASE LEVEL FILES\n"
-        ls 
-        echo "FILES IN spec/ \n"
-        ls spec
-        echo "END \n"
-
     - name: Validate OpenLineage events
-
       shell: bash
       run: |
         pip install -r ./scripts/requirements.txt

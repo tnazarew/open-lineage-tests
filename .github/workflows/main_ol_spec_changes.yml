@@ -1,4 +1,4 @@
-name: Check for changes in OL spec and spark integration
+name: Check for changes in OL
 # Assumption here is that there will be a change that touches spec or spark integration
 
 on: push
@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       changes_in_spec: ${{steps.check-changes.outputs.changes_found}}
+      ol_release: ${{ steps.get-release.outputs.openlineage_release }}
     steps:
       - name: Checkout code for openlineage repository
         uses: actions/checkout@v4
@@ -47,14 +48,21 @@ jobs:
           --versions_path=./generated-files/spec_versions.json \
           --new_versions_path=./updated_spec_versions.json
           
-          if [ -f updated_spec_versions.json ]
+          if [ -f updated_spec_versions.json ]; then
             echo "changes_found=true" >> $GITHUB_OUTPUT
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
           name: spec-versions
           path: generated-files/updated_spec_versions.json
           retention-days: 1
+
+      - name: get openlineage release
+        id: get-release
+        run: |
+          openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
+          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
 
   # check if scenarios are still compatible with the new spec
   scenarios_check:
@@ -71,4 +79,9 @@ jobs:
     uses: ./.github/workflows/producer_spark_dataproc.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      get-circleci-artifacts: true
+
+
 
