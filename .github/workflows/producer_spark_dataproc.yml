@@ -5,6 +5,13 @@ on:
     secrets:
       gcpKey:
         required: true
+    inputs:
+      release:
+        description: "release tag of OpenLineage to use"
+        type: string
+      get-circleci-artifacts:
+        description: "Should the artifact be downloaded from maven repo or circleci"
+        type: boolean
 
 jobs:
   do-something:
@@ -13,25 +20,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: get latest OL tag
-        id: latest_ol_tag
-        run: echo "ol_version=$(curl https://api.github.com/repos/OpenLineage/OpenLineage/releases/latest -s | jq .tag_name -r)" >> $GITHUB_OUTPUT
-
       - name: Get OL artifacts
+        if: ${{ !inputs.get-circleci-artifacts }}
         id: get_ol_artifacts
         uses: ./.github/actions/get_openlineage_artifacts
         with:
-          version: ${{ steps.latest_ol_tag.outputs.ol_version }}
+          version: ${{ inputs.release }}
           skip-flink: 'true'
           skip-s3: 'true'
           skip-gcp-lineage: 'true'
           skip-sql: 'true'
 
-      # - name: Get unreleased OL artifacts
-      #   id: get-unreleased
-      #   uses: ./.github/actions/get_unreleased_openlineage_artifacts
-      #   with:
-      #     version: ${{ steps.latest_ol_tag.outputs.ol_version }}
+      - name: Get unreleased OL artifacts
+        if: ${{ inputs.get-circleci-artifacts }}
+        id: get-unreleased
+        uses: ./.github/actions/get_unreleased_openlineage_artifacts
+        with:
+          version: ${{ inputs.release }}
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v3
@@ -85,7 +90,7 @@ jobs:
         uses: ./.github/actions/run_event_validation
         with:
           component: 'Spark Dataproc'
-          version: ${{ steps.latest_ol_tag.outputs.ol_version }}
+          version: ${{ inputs.release }}
           event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
           target-path: 'spark-dataproc-report.json'
 

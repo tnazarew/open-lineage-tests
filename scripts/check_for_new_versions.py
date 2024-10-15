@@ -1,6 +1,4 @@
 import json
-import os
-import re
 
 import requests
 from bs4 import BeautifulSoup
@@ -36,11 +34,11 @@ def highest_version(url):
 
 
 def get_version_to_run(e):
-    if e['latest-version'] == "":
+    if e['latest_version'] == "":
         return ""
     elif str(e['url']).__contains__('repo1.maven.org'):
         newest_version = highest_version(url=e['url'])
-        if newest_version > e['latest-version']:
+        if newest_version > e['latest_version']:
             return newest_version
     return None
 

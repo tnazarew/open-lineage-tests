@@ -4,10 +4,6 @@ on:
     secrets:
       gcpKey:
         required: true
-    inputs:
-      exec_time:
-        type: string
-        description: "Workflow execution time"
 
 jobs:
   collect-and-compare-reports:

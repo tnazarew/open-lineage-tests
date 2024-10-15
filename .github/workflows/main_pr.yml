@@ -8,21 +8,16 @@ permissions:
   contents: read
 
 jobs:
-  detect_changes:
+  initialize_workflow:
     runs-on: ubuntu-latest
     outputs:
-      exec_time: ${{ steps.exec_time.outputs.time }}
       run_dataplex: ${{ steps.changed_files.outputs.dataplex_any_changed }}
       run_scenarios: ${{ steps.changed_files.outputs.scenarios_any_changed }}
-      run_spark: ${{ steps.changed_files.outputs.spark_any_changed }}
       run_spark_dataproc: ${{ steps.changed_files.outputs.spark_dataproc_any_changed }}
+      ol_release: ${{ steps.get-release.outputs.openlineage_release }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Get workflow execution time
-        id: exec_time
-        run: echo "time=$(date +%Y%m%dT%H%M%S)" >> $GITHUB_OUTPUT
 
       - name: Get changed files
         id: changed_files
@@ -33,32 +28,41 @@ jobs:
               - consumer/scenarios/**
             dataplex:
               - consumer/consumers/Dataplex/**
-              - .github/workflows/*
-            spark:
-              - producer/spark/**
             spark_dataproc:
               - producer/spark_dataproc/**
-              - .github/workflows/*
+
+      - name: get openlineage release
+        id: get-release
+        run: |
+          openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
+          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
+
 
   scenarios:
-
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_scenarios == 'true' }}
+    uses: ./.github/workflows/consumer_dataplex.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
 
   dataplex:
     needs:
-      - detect_changes
+      - initialize_workflow
       - scenarios
-    if: ${{ needs.detect_changes.outputs.run_dataplex == 'true' || needs.detect_changes.outputs.run_dataplex}}
+    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' || needs.initialize_workflow.outputs.run_dataplex}}
     uses: ./.github/workflows/consumer_dataplex.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
 
   spark_dataproc:
-    needs: detect_changes
-    if: ${{ needs.detect_changes.outputs.run_spark_dataproc == 'true' }}
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
-
+    with:
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      get-circleci-artifacts: false
 
   collect_reports:
     needs:
@@ -71,15 +75,13 @@ jobs:
 
   collect-and-compare-reports:
     needs:
-      - detect_changes
+      - initialize_workflow
       - dataplex
       - spark_dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
-    with:
-      exec_time: ${{ needs.detect_changes.outputs.exec_time }}
 
   update_report:
     needs: collect-and-compare-reports
