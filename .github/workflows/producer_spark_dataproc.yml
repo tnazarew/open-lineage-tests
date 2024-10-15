@@ -76,7 +76,7 @@ jobs:
           --python-job producer/spark_dataproc/scenarios/scenario1/test/read_shakespeare.py \
           --jars  "${{ steps.get_ol_artifacts.outputs.gcs }}" \
           --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
-          --output-directory "${{ steps.set-producer-output.event_dir }}" \
+          --output-directory "${{ steps.set-producer-output.outputs.event_dir }}" \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
           --dataproc-image-version 2.2-ubuntu22 \
           --job-args "file:///tmp/outputs/$(date +%s%3N)"
@@ -86,7 +86,7 @@ jobs:
         with:
           component: 'Spark Dataproc'
           version: ${{ steps.latest_ol_tag.outputs.ol_version }}
-          event-directory: ${{ steps.set-producer-output.event_dir }}
+          event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
           target-path: 'spark-dataproc-report.json'
 
       - uses: actions/upload-artifact@v4
