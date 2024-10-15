@@ -63,7 +63,7 @@ jobs:
       - name: set producer output event dir
         id: set-producer-output
         run: | 
-          echo "event_dir=/tmp/producer-$(date +%s%3N)" >> $GITHUB_OUTPUTS
+          echo "event_dir=/tmp/producer-$(date +%s%3N)" >> $GITHUB_OUTPUT
 
       - name: Run producer job and create OL events
         id: run-producer
