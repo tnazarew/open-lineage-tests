@@ -1,9 +1,6 @@
 name: Collect Reports
 on:
   workflow_call:
-    secrets:
-      gcpKey:
-        required: true
 
 jobs:
   collect-and-compare-reports:
