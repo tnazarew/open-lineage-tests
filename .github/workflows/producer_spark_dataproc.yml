@@ -89,7 +89,7 @@ jobs:
       - name: Validation
         uses: ./.github/actions/run_event_validation
         with:
-          component: 'Spark Dataproc'
+          component: 'spark_dataproc'
           version: ${{ inputs.release }}
           event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
           target-path: 'spark-dataproc-report.json'

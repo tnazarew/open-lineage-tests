@@ -172,8 +172,8 @@ def main():
                 for name, res in OLSemanticValidator(expected).validate(result_events).items():
                     tests[name] = res
 
-            scenarios[scenario_name] = Scenario(scenario_name, "FAILURE" if all_tests_succeeded(tests)
-            else "SUCCESS", tests)
+            scenarios[scenario_name] = Scenario(scenario_name, "SUCCESS" if all_tests_succeeded(tests)
+            else "FAILURE", tests)
     report = Report({component: Component(component, scenarios)})
     with open(target, 'w') as f:
         json.dump(report.to_dict(), f, indent=2)
