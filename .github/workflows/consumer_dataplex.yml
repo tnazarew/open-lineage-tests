@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  dataplex:
+  run-dataplex-tests:
     permissions:
       contents: 'read'
       id-token: 'write'

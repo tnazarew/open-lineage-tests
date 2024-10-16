@@ -9,7 +9,7 @@ permissions:
   issues: write
 
 jobs:
-  update-repo-files:
+  update-repository-files:
     permissions:
       pull-requests: write
       contents: write
