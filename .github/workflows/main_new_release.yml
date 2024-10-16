@@ -45,7 +45,7 @@ jobs:
           if (( $(version_sum $latest_ol) > $(version_sum $current_ol) )); then
               echo "ol_release=${latest_ol}" >> $GITHUB_OUTPUT
           else
-              echo "ol_release=${ol_release}" >> $GITHUB_OUTPUT  
+              echo "ol_release=${current_ol}" >> $GITHUB_OUTPUT  
           fi          
 
   dataplex:
