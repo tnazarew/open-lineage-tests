@@ -48,6 +48,8 @@ jobs:
               echo "ol_release=${current_ol}" >> $GITHUB_OUTPUT  
           fi          
 
+  ######## COMPONENT VALIDATION ########
+
   dataplex:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' }}
@@ -64,6 +66,8 @@ jobs:
     with:
       release: ${{ needs.initialize_workflow.outputs.openlineage_release }}
       get-circleci-artifacts: false
+
+  ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
   collect-and-compare-reports:
     needs:

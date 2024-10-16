@@ -37,6 +37,7 @@ jobs:
           openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
           echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
 
+  ######## COMPONENT VALIDATION ########
 
   scenarios:
     needs: initialize_workflow
@@ -64,14 +65,7 @@ jobs:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
       get-circleci-artifacts: false
 
-  collect_reports:
-    needs:
-      - dataplex
-      - spark_dataproc
-    if: ${{ !failure() }}
-    uses: ./.github/workflows/collect_and_compare_reports.yml
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
+  ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
   collect-and-compare-reports:
     needs:
@@ -80,8 +74,6 @@ jobs:
       - spark_dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
 
   update_report:
     needs: collect-and-compare-reports

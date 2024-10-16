@@ -1,6 +1,8 @@
 import argparse
 import json
 import os
+from os.path import join
+
 from proto import Message
 
 from google.api_core.exceptions import InvalidArgument
@@ -23,10 +25,10 @@ class Validator:
                 for entry in os.scandir(f"{self.scenario_dir}/{scenario}/events") if entry.is_file()]
 
     def load_validation_events(self, scenario):
-        processes = json.load(open(f"{self.consumer_dir}/scenarios/{scenario}/validation/processes.json", 'r'))
-        runs = json.load(open(f"{self.consumer_dir}/scenarios/{scenario}/validation/runs.json", 'r'))
-        lineage_events = json.load(
-            open(f"{self.consumer_dir}/scenarios/{scenario}/validation/lineage_events.json", 'r'))
+        validation_dir = join(self.consumer_dir, "scenarios", scenario, "validation")
+        processes = json.load(open(join(validation_dir, 'processes.json'), 'r'))
+        runs = json.load(open(join(validation_dir, 'runs.json'), 'r'))
+        lineage_events = json.load(open(join(validation_dir, 'lineage_events.json'), 'r'))
         return processes, runs, lineage_events
 
     def send_ol_events(self, scenario):

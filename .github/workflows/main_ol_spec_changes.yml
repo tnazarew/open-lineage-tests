@@ -14,8 +14,6 @@ permissions:
   pull-requests: write
   issues: write
 
-
-
 jobs:
   initialize_workflow:
     runs-on: ubuntu-latest
@@ -64,6 +62,9 @@ jobs:
           openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
           echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
 
+
+  ######## COMPONENT VALIDATION ########
+
   # check if scenarios are still compatible with the new spec
   scenarios_check:
     needs:
@@ -83,5 +84,15 @@ jobs:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
       get-circleci-artifacts: true
 
+######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
+#  notify-maintainers:
+#    needs: collect-and-compare-reports
+#    uses: ./.github/workflows/notify_maintainers.yml
+#
+#  update-repo-files:
+#    needs:
+#      - initialize_workflow
+#      - notify-maintainers
+#    uses: ./.github/workflows/update_repo_files.yml
 
