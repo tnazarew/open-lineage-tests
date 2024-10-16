@@ -17,7 +17,6 @@ log = logging.getLogger(__name__)
 def any(result: Any):
     return result
 
-
 def is_datetime(result: Any):
     try:
         parse(result)
