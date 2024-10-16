@@ -76,8 +76,6 @@ jobs:
       - spark-dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
 
 #  notify-maintainers:
 #    needs: collect-and-compare-reports
