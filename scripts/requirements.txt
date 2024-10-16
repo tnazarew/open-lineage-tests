@@ -10,6 +10,7 @@ google-auth==2.33.0
 google-auth-httplib2==0.2.0
 google-cloud==0.34.0
 google-cloud-datacatalog-lineage==0.3.8
+google-cloud-storage==2.18.2; python_version >= "3.7"
 google-cloud-vision==3.7.4
 googleapis-common-protos==1.63.2
 grpcio==1.65.4
