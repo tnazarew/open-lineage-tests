@@ -31,6 +31,25 @@ class Validator:
         lineage_events = json.load(open(join(validation_dir, 'lineage_events.json'), 'r'))
         return processes, runs, lineage_events
 
+    def dump_api_state(self, scenario):
+        dump_dir = join(self.consumer_dir, "scenarios", scenario, "api_state")
+        processes_state, runs_state, events_state = self.get_api_state()
+        try:
+            os.mkdir(dump_dir)
+        except FileExistsError:
+            pass
+        except PermissionError:
+            print(f"Permission denied: Unable to create '{dump_dir}'.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+        with open(join(dump_dir, "processes.json"), 'w') as f:
+            json.dump(processes_state, f)
+        with open(join(dump_dir, "runs.json"), 'w') as f:
+            json.dump(runs_state, f)
+        with open(join(dump_dir, "lineage_events.json"), 'w') as f:
+            json.dump(events_state, f)
+
     def send_ol_events(self, scenario):
         events = self.load_ol_events(scenario)
         report = []
@@ -45,11 +64,14 @@ class Validator:
                      'entity_type': 'openlineage'})
         return report
 
-    def validate(self, scenario):
+    def validate(self, scenario, dump):
         self.clean_up()
         report = self.send_ol_events(scenario)
         if not any(r['status'] == "FAILURE" for r in report):
-            report.extend(self.validate_api_state(scenario))
+            if dump:
+                self.dump_api_state(scenario)
+            else:
+                report.extend(self.validate_api_state(scenario))
 
         self.clean_up()
         return {"name": scenario,
@@ -128,10 +150,11 @@ def list_scenarios(consumer_dir):
 
 def get_arguments():
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument('--credentials', type=str, help="credentials for GCP", default=None)
-    parser.add_argument('--consumer_dir', type=str, help="Path to the consumer directory", default=None)
-    parser.add_argument('--scenario_dir', type=str, help="Path to the scenario directory", default=None)
-    parser.add_argument('--parent', type=str, help="Parent identifier", default=None)
+    parser.add_argument('--credentials', type=str, help="credentials for GCP")
+    parser.add_argument('--consumer_dir', type=str, help="Path to the consumer directory")
+    parser.add_argument('--scenario_dir', type=str, help="Path to the scenario directory")
+    parser.add_argument('--parent', type=str, help="Parent identifier")
+    parser.add_argument("--dump", action='store_true', help="dump api state")
 
     args = parser.parse_args()
 
@@ -139,15 +162,16 @@ def get_arguments():
     consumer_dir = args.consumer_dir
     scenario_dir = args.scenario_dir
     parent = args.parent
+    dump = args.dump
 
-    return consumer_dir, scenario_dir, parent, client
+    return consumer_dir, scenario_dir, parent, client, dump
 
 
 def main():
-    consumer_dir, scenario_dir, parent, client = get_arguments()
+    consumer_dir, scenario_dir, parent, client, dump = get_arguments()
     validator = Validator(client, consumer_dir, scenario_dir, parent)
     scenarios = list_scenarios(consumer_dir)
-    reports = [validator.validate(scenario) for scenario in scenarios]
+    reports = [validator.validate(scenario, dump) for scenario in scenarios]
     t = open('dataplex-report.json', 'w')
     print(os.path.abspath(t.name))
     json.dump([{"name": "dataplex", "scenarios": reports}], t)
