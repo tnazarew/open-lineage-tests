@@ -2,6 +2,9 @@ name: Get OpenLineage Artifacts
 description: "Download Maven artifacts for openlineage-spark_2.13 and openlineage-java and output file paths"
 author: Tomasz Nazarewicz
 inputs:
+  credentials:
+    description: "GCP credentials"
+    required: true
   version:
     description: "Version of the artifacts to download"
     required: true
@@ -75,11 +78,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: GCP authorization
-      id: gcp-auth
-      uses: 'google-github-actions/auth@v2'
-      with:
-        credentials_json: '${{ secrets.gcpKey }}'
     - name: Download openlineage-java Maven Artifact
       id: download-java-client
       if: ${{ inputs.skip-java == 'false' }}
@@ -123,7 +121,7 @@ runs:
       with:
         local-file-path: ${{ steps.download-spark-integration.outputs.file }}
         gcs-path: "gs://open-lineage-e2e/jars"
-        credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+        credentials: ${{ inputs.credentials }}
 
     - name: Download spark extension interfaces Maven Artifact
       id: download-spark-extension-interfaces
@@ -180,7 +178,7 @@ runs:
       with:
         local-file-path: ${{ steps.download-transports-gcs.outputs.file }}
         gcs-path: "gs://open-lineage-e2e/jars"
-        credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+        credentials: ${{ inputs.credentials }}
 
     - name: Download s3 transport Maven Artifact
       id: download-transports-s3

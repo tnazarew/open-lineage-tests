@@ -20,6 +20,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: GCP authorization
+        id: gcp-auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.gcpKey }}'
+
       - name: Get OL artifacts
         if: ${{ !inputs.get-circleci-artifacts }}
         id: get_ol_artifacts
@@ -30,6 +36,7 @@ jobs:
           skip-s3: 'true'
           skip-gcp-lineage: 'true'
           skip-sql: 'true'
+          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
       - name: Get unreleased OL artifacts
         if: ${{ inputs.get-circleci-artifacts }}
@@ -43,12 +50,6 @@ jobs:
         with:
           cache: "pip"
           python-version: "3.11"
-
-      - name: GCP authorization
-        id: gcp-auth
-        uses: 'google-github-actions/auth@v2'
-        with:
-          credentials_json: '${{ secrets.gcpKey }}'
 
       - name: Install dependencies
         run: |
@@ -129,4 +130,3 @@ jobs:
           --region us-west1 \
           --cluster-name dataproc-producer-test-${{ github.run_id }} \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
