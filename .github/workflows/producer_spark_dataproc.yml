@@ -84,7 +84,7 @@ jobs:
 #          --cluster-name dataproc-producer-test \
 #          --gcs-bucket open-lineage-e2e \
 #          --python-job producer/spark_dataproc/scenarios/shakespeare/test/test.py \
-#          --jars  "${{ steps.get_ol_artifacts.outputs.gcs }}" \
+#          --jars  "${{ steps.get_ol_artifacts.outputs.gcs-transport-gcs }}" \
 #          --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
 #          --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/shakespeare" \
 #          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
@@ -102,7 +102,7 @@ jobs:
           --cluster-name dataproc-producer-test-${{ github.run_id }} \
           --gcs-bucket open-lineage-e2e \
           --python-job producer/spark_dataproc/scenarios/simple_scenario/test/test.py \
-          --jars "${{ steps.get_ol_artifacts.outputs.gcs }}" \
+          --jars "${{ steps.get_ol_artifacts.outputs.gcs-transport-gcs }}" \
           --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
           --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/simple_scenario" \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \

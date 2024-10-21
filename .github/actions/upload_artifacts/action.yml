@@ -30,10 +30,10 @@ runs:
       id: upload-artifact
       shell: bash
       run: |
-        uploaded_path=$(python3 scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path}} \
+        uploaded_path=$(python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path}} \
         --credentials ${{ inputs.credentials }})
         if [ -n "$uploaded_path" ]; then
-          echo "uploaded_path="$uploaded_path"" >> $GITHUB_OUTPUT
+          echo "uploaded_path=$uploaded_path" >> $GITHUB_OUTPUT
         else
           echo "File was not uploaded (either it exists on GCS or the local file is missing)"
         fi
