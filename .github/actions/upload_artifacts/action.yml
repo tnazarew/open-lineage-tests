@@ -31,7 +31,7 @@ runs:
       shell: bash
       run: |
         uploaded_path=$(python3 scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path}} \
-        --credentials ${{ ${{ inputs.credentials }} }})
+        --credentials ${{ inputs.credentials }})
         if [ -n "$uploaded_path" ]; then
           echo "uploaded_path="$uploaded_path"" >> $GITHUB_OUTPUT
         else
