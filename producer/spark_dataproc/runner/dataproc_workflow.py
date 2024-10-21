@@ -47,6 +47,9 @@ def upload_to_gcs(
     """
     if not destination_uri.startswith("gs://"):
         raise ValueError("Destination URI must start with 'gs://'")
+    
+    if source_path.startswith("gs://"):
+        return source_path
 
     uri_parts = destination_uri[5:].split("/", 1)
     bucket_name = uri_parts[0]

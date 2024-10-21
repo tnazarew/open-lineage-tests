@@ -1,0 +1,39 @@
+name: Upload Artifact to GCS
+description: "Upload artifact to GCS"
+author: Dominik Dębowczyk
+inputs:
+  local-file-path:
+    description: "Path to the artifact"
+    required: true
+  gcs-path:
+    description: "GCS destination path"
+    required: true
+  credentials:
+    description: "GCP credentials"
+outputs:
+  blob-path:
+    value: ${{ steps.upload-artifact.outputs.uploaded_path }}
+    description: "Path to the uploaded artifact"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip' # caching pip dependencies
+    - name: Install dependencies
+      shell: bash
+      run: |
+        pip install -r ./scripts/requirements.txt
+    - name: Upload artifact
+      id: upload-artifact
+      shell: bash
+      run: |
+        uploaded_path=$(python3 scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path}} \
+        --credentials ${{ ${{ inputs.credentials }} }})
+        if [ -n "$uploaded_path" ]; then
+          echo "uploaded_path="$uploaded_path"" >> $GITHUB_OUTPUT
+        else
+          echo "File was not uploaded (either it exists on GCS or the local file is missing)"
+        fi
