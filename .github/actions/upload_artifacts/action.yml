@@ -30,6 +30,6 @@ runs:
       id: upload-artifact
       shell: bash
       run: |
-        uploaded_path=$(python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path}} \
-        --credentials ${{ inputs.credentials }})
+        uploaded_path=$(python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path}} --credentials ${{ inputs.credentials }})
+        
         echo "uploaded_file=$uploaded_path" >> $GITHUB_OUTPUT

@@ -59,7 +59,7 @@ jobs:
         if: ${{ !inputs.get-circleci-artifacts }}
         uses: ./.github/actions/upload_artifacts
         with:
-          local-file-path: ${{ steps.get_ol_artifacts.outputs.gcs_transport }}
+          local-file-path: ${{ steps.get_ol_artifacts.outputs.gcs-transport }}
           gcs-path: "gs://open-lineage-e2e/jars"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
