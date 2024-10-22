@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import sys
+import time
+
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.appName('Shakespeare on Spark').getOrCreate()
@@ -18,4 +20,4 @@ df.printSchema()
 print('Spark mentions in Shakespeare')
 df.show()
 
-df.coalesce(1).write.csv(sys.argv[1])
+df.coalesce(1).write.csv(f"file:///tmp/outputs/{round(time.time() * 1000)}")
