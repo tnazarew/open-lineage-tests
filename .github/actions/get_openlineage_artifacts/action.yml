@@ -2,9 +2,6 @@ name: Get OpenLineage Artifacts
 description: "Download Maven artifacts for openlineage-spark_2.13 and openlineage-java and output file paths"
 author: Tomasz Nazarewicz
 inputs:
-  credentials:
-    description: "GCP credentials"
-    required: true
   version:
     description: "Version of the artifacts to download"
     required: true
@@ -52,9 +49,6 @@ outputs:
   spark:
     value: ${{ steps.download-spark-integration.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
-  spark-gcs: 
-    value: ${{ steps.upload-spark-integration.outputs.uploaded_path }}
-    description: "Blob path to the uploaded openlineage-spark jar"
   flink:
     value: ${{ steps.download-flink-integration.outputs.file }}
     description: "File path of the downloaded openlineage-spark jar"
@@ -66,9 +60,6 @@ outputs:
     description: "File path of the downloaded openlineage-spark jar"
   gcs-transport:
     value: ${{ steps.download-transports-gcs.outputs.file }}
-    description: "File path of the downloaded openlineage GCS transport jar"
-  gcs-transport-gcs:
-    value: ${{ steps.download-transports-gcs.outputs.uploaded_path }}
     description: "File path of the downloaded openlineage GCS transport jar"
   s3:
     value: ${{ steps.download-transports-s3.outputs.file }}
@@ -113,15 +104,6 @@ runs:
         artifactId: 'openlineage-spark_2.13'
         version: ${{ inputs.version }}
         extension: 'jar'
-
-    - name: Upload openlineage spark integration to GCS
-      id: upload-spark-integration
-      if: ${{ inputs.skip-spark == 'false' }}
-      uses: ./.github/actions/upload_artifacts
-      with:
-        local-file-path: ${{ steps.download-spark-integration.outputs.file }}
-        gcs-path: "gs://open-lineage-e2e/jars"
-        credentials: ${{ inputs.credentials }}
 
     - name: Download spark extension interfaces Maven Artifact
       id: download-spark-extension-interfaces
@@ -170,15 +152,6 @@ runs:
         artifactId: 'transports-gcs'
         version: ${{ inputs.version }}
         extension: 'jar'
-    
-    - name: Upload openlineage GCS transport to GCS
-      id: upload-gcs-transport
-      if: ${{ inputs.skip-spark == 'false' }}
-      uses: ./.github/actions/upload_artifacts
-      with:
-        local-file-path: ${{ steps.download-transports-gcs.outputs.file }}
-        gcs-path: "gs://open-lineage-e2e/jars"
-        credentials: ${{ inputs.credentials }}
 
     - name: Download s3 transport Maven Artifact
       id: download-transports-s3
