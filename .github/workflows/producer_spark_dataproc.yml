@@ -88,12 +88,12 @@ jobs:
           --metadata "SPARK_BQ_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.41.0.jar,OPENLINEAGE_SPARK_URL=${{ steps.upload-spark-integration.outputs.uploaded-file }}" \
           --initialization-actions="gs://open-lineage-e2e/scripts/get_openlineage_jar.sh" 
 
-      - name: set producer output event dir
+      - name: Set producer output event dir
         id: set-producer-output
         run: | 
           echo "event_dir=/tmp/producer-$(date +%s%3N)" >> $GITHUB_OUTPUT
 
-      - name: Run producer job and create OL events
+      - name: Run producer jobs and create OL events
         id: run-producer
         run: |
           for scenario_path in producer/spark_dataproc/scenarios/*
@@ -118,6 +118,14 @@ jobs:
 
               echo "Finished running spark job for scenario: $scenario"
           done
+      
+      - name: Terminate producer cluster
+        run: |
+          python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
+          --project-id gcp-open-lineage-testing \
+          --region us-west1 \
+          --cluster-name dataproc-producer-test-${{ github.run_id }} \
+          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
       - name: Validation
         uses: ./.github/actions/run_event_validation
@@ -132,11 +140,3 @@ jobs:
           name: spark-dataproc-report
           path: spark-dataproc-report.json
           retention-days: 1
-
-      - name: Terminate producer cluster
-        run: |
-          python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
-          --project-id gcp-open-lineage-testing \
-          --region us-west1 \
-          --cluster-name dataproc-producer-test-${{ github.run_id }} \
-          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
