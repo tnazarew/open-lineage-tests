@@ -93,39 +93,31 @@ jobs:
         run: | 
           echo "event_dir=/tmp/producer-$(date +%s%3N)" >> $GITHUB_OUTPUT
 
-#      - name: Run producer job and create OL events
-#        id: run-producer
-#        run: |
-#          python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
-#          --project-id gcp-open-lineage-testing \
-#          --region us-west1 \
-#          --cluster-name dataproc-producer-test \
-#          --gcs-bucket open-lineage-e2e \
-#          --python-job producer/spark_dataproc/scenarios/shakespeare/test/test.py \
-#          --jars  "${{ steps.get_ol_artifacts.outputs.gcs-transport-gcs }}" \
-#          --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
-#          --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/shakespeare" \
-#          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
-#          --dataproc-image-version 2.2-ubuntu22 \
-#          --job-args "file:///tmp/outputs/$(date +%s%3N)"
-#
-
-      # TODO - only for a test, replace with something iterating through scenarios ASAP
       - name: Run producer job and create OL events
         id: run-producer
         run: |
-          python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
-          --project-id gcp-open-lineage-testing \
-          --region us-west1 \
-          --cluster-name dataproc-producer-test-${{ github.run_id }} \
-          --gcs-bucket open-lineage-e2e \
-          --python-job producer/spark_dataproc/scenarios/simple_scenario/test/test.py \
-          --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
-          --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
-          --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/simple_scenario" \
-          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
-          --dataproc-image-version 2.2-ubuntu22 \
-          --job-args "file:///tmp/outputs/$(date +%s%3N)"
+          for scenario_path in producer/spark_dataproc/scenarios/*
+          do
+              scenario="${scenario_path##*/}"
+              run_script=$(find "$scenario_path/test/" -maxdepth 1 -type f -name "*.py" | head -n 1)
+              
+              echo "Running spark job for scenario: $scenario"
+
+              python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
+              --project-id gcp-open-lineage-testing \
+              --region us-west1 \
+              --cluster-name "dataproc-producer-test-${{ github.run_id }}" \
+              --gcs-bucket open-lineage-e2e \
+              --python-job "$run_script" \
+              --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
+              --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
+              --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
+              --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
+              --dataproc-image-version 2.2-ubuntu22 \
+              || { echo "Error: Spark job failed for scenario: $scenario"; }
+
+              echo "Finished running spark job for scenario: $scenario"
+          done
 
       - name: Validation
         uses: ./.github/actions/run_event_validation
