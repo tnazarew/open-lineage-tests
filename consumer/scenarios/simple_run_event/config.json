@@ -1,5 +1,3 @@
 {
-  "scenario_groups": [
-    "run_event"
-  ]
+  "tags": {}
 }

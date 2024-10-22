@@ -44,9 +44,19 @@ jobs:
           
           if (( $(version_sum $latest_ol) > $(version_sum $current_ol) )); then
               echo "ol_release=${latest_ol}" >> $GITHUB_OUTPUT
+              echo "releases_updated=true" >> $GITHUB_OUTPUT
+              jq --arg latest_ol "$latest_ol" 'map(if .name == "openlineage" then .latest_version = $latest_ol else . end)' \
+              generated-files/releases.json > generated-files/updated_releases.json
           else
               echo "ol_release=${current_ol}" >> $GITHUB_OUTPUT  
-          fi          
+          fi       
+
+      - uses: actions/upload-artifact@v4
+        if: steps.select-components.outputs.releases_updated == 'true'
+        with:
+          name: updated_releases
+          path: generated-files/updated_releases.json
+          retention-days: 1
 
   ######## COMPONENT VALIDATION ########
 
@@ -56,6 +66,8 @@ jobs:
     uses: ./.github/workflows/consumer_dataplex.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.openlineage_release }}
 
   spark-dataproc:
     needs: initialize_workflow
@@ -77,12 +89,12 @@ jobs:
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
 
-#  notify-maintainers:
-#    needs: collect-and-compare-reports
-#    uses: ./.github/workflows/notify_maintainers.yml
-#
-#  update-repo-files:
-#    needs:
-#      - initialize_workflow
-#      - notify-maintainers
-#    uses: ./.github/workflows/update_repo_files.yml
+  notify-maintainers:
+    needs: collect-and-compare-reports
+    uses: ./.github/workflows/notify_maintainers.yml
+
+  update-repo-files:
+    needs:
+      - initialize_workflow
+      - notify-maintainers
+    uses: ./.github/workflows/update_repo_files.yml

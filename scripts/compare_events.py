@@ -84,7 +84,11 @@ def match(expected, result, prefix="") -> list:
     if isinstance(expected, dict):
         # Take a look only at keys present at expected dictionary
         for k, v in expected.items():
-            if k not in result:
+            expect_not_defined = isinstance(v, str) and v == '{{ not_defined }}'
+            key_found = k in result
+            if expect_not_defined and key_found:
+                errors.append(f"Key {prefix}.{k} expected not to be defined but found")
+            elif not key_found:
                 errors.append(f"Key {prefix}.{k} missing")
             else:
                 errors.extend(match(v, result[k], f"{prefix}.{k}"))

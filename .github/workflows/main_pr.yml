@@ -54,6 +54,8 @@ jobs:
     uses: ./.github/workflows/consumer_dataplex.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
 
   spark_dataproc:
     needs: initialize_workflow

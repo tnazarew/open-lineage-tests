@@ -31,17 +31,16 @@ jobs:
       - id: replace-modified-files
         name: Replace Modified Files
         run: |
-          if [ -f ./generated-files/updated-report.json ]; 
-          then 
-            mv ./generated-files/updated-report.json ./generated-files/report.json
-          else
-            echo "./generated-files/updated-report.json does not exist"
-          fi
+          mv ./generated-files/updated-report.json ./generated-files/report.json || echo "updated-report.json no found"
+          mv ./generated-files/updated_releases.json ./generated-files/report.json || echo "updated_releases.json no found"
+          mv ./generated-files/updated_spec_versions.json ./generated-files/report.json || echo "updated_spec_versions.json no found"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           add-paths: |
             generated-files/report.json
-          branch: "test-${{ inputs.exec_time }}"
-          title: "[bot] update report with data from run ${{ github.run_id }} executed ${{ inputs.exec_time }}"
+            generated-files/releases.json
+            generated-files/spec_versions.json
+          branch: "test-${{ github.run_id }}"
+          title: "[bot] update report with data from run ${{ github.run_id }}"

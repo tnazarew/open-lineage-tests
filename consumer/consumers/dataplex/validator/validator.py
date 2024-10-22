@@ -14,21 +14,45 @@ from google.protobuf import struct_pb2
 
 
 class Validator:
-    def __init__(self, client=None, consumer_dir=None, scenario_dir=None, parent=None):
+    def __init__(self, client=None, consumer_dir=None, scenario_dir=None, parent=None, release=None):
         self.client = client
         self.consumer_dir = consumer_dir
         self.scenario_dir = scenario_dir
         self.parent = parent
+        self.release = release
+
+    def version_to_number(self, version):
+        split = version.split('.')
+        major = int(split[0])
+        minor = int(split[0])
+        patch = int(split[0])
+        return major * 1000000 + minor * 1000 + patch
+
+    def release_between(self, min_version, max_version):
+        max_ver = 999999999 if max_version is None else self.version_to_number(max_version)
+        min_ver = 0 if min_version is None else self.version_to_number(min_version)
+        rel = self.version_to_number(self.release)
+
+        return min_ver <= rel <= max_ver
 
     def load_ol_events(self, scenario):
         return [{'name': entry.name, 'payload': ParseDict(json.load(open(entry.path, 'r')), struct_pb2.Struct())}
                 for entry in os.scandir(f"{self.scenario_dir}/{scenario}/events") if entry.is_file()]
 
-    def load_validation_events(self, scenario):
-        validation_dir = join(self.consumer_dir, "scenarios", scenario, "validation")
-        processes = json.load(open(join(validation_dir, 'processes.json'), 'r'))
-        runs = json.load(open(join(validation_dir, 'runs.json'), 'r'))
-        lineage_events = json.load(open(join(validation_dir, 'lineage_events.json'), 'r'))
+    def load_validation_events(self, scenario, config):
+        d = {}
+        scenario_dir = join(self.consumer_dir, "scenarios", scenario)
+        for e in config['tests']:
+            if self.release_between(e['tags'].get('min_version'), e['tags'].get('max_version')):
+                name = e['name']
+                path = e['path']
+                entity = e['entity']
+                tags = e['tags']
+                d[name] = {'body': json.load(open(join(scenario_dir, path), 'r')), 'entity': entity, 'tags': tags}
+
+        processes = {k: v for k, v in d.items() if v['entity'] == "process"}
+        runs = {k: v for k, v in d.items() if v['entity'] == "run"}
+        lineage_events = {k: v for k, v in d.items() if v['entity'] == "lineage_event"}
         return processes, runs, lineage_events
 
     def dump_api_state(self, scenario):
@@ -57,21 +81,27 @@ class Validator:
             try:
                 response = self.client.process_open_lineage_run_event(parent=self.parent, open_lineage=e['payload'])
                 report.append(
-                    {"status": "SUCCESS", 'validation_type': 'syntax', 'name': e['name'], 'entity_type': 'openlineage'})
+                    {"status": "SUCCESS", 'validation_type': 'syntax', 'name': e['name'], 'entity_type': 'openlineage',
+                     'tags': []})
             except InvalidArgument as exc:
                 report.append(
                     {"status": "FAILURE", 'validation_type': 'syntax', "details": exc.args[0], 'name': e['name'],
-                     'entity_type': 'openlineage'})
+                     'entity_type': 'openlineage', 'tags': []})
         return report
 
+    def read_config(self, scenario):
+        with open(join(self.consumer_dir, 'scenarios', scenario, "config.json"), 'r') as f:
+            return json.load(f)
+
     def validate(self, scenario, dump):
+        config = self.read_config(scenario)
         self.clean_up()
         report = self.send_ol_events(scenario)
         if not any(r['status'] == "FAILURE" for r in report):
             if dump:
                 self.dump_api_state(scenario)
             else:
-                report.extend(self.validate_api_state(scenario))
+                report.extend(self.validate_api_state(scenario, config))
 
         self.clean_up()
         return {"name": scenario,
@@ -84,8 +114,8 @@ class Validator:
         lineage_events = [Message.to_dict(e) for r in runs for e in self.client.list_lineage_events(parent=r['name'])]
         return processes, runs, lineage_events
 
-    def validate_api_state(self, scenario):
-        processes_expected, runs_expected, events_expected = self.load_validation_events(scenario)
+    def validate_api_state(self, scenario, config):
+        processes_expected, runs_expected, events_expected = self.load_validation_events(scenario, config)
         processes_state, runs_state, events_state = self.get_api_state()
         report = []
         report.extend(self.compare_process_or_run(processes_expected, processes_state, 'process'))
@@ -102,41 +132,37 @@ class Validator:
     # processes and runs are matchable by entity name
     @staticmethod
     def compare_process_or_run(expected, result, entity_type):
-        d = {}
-        for e in expected:
-            d.setdefault(e['name'], {})['expected'] = e
-        for r in result:
-            d.setdefault(r['name'], {})['result'] = r
         results = []
-        for k, v in d.items():
-            result = ["no matching entity"]
-            if v.__contains__('expected') and v.__contains__('result'):
-                result = match(v['expected'], v['result'], "")
-            results.append({'entity_type': entity_type, 'status': 'SUCCESS' if len(result) == 0 else 'FAILURE',
-                            'details': result, 'validation_type': 'semantics', 'name': k})
+        for k, v in expected.items():
+            details = []
+            for exp in v['body']:
+                entity_name = exp['name'].rsplit('/', 1)
+                matched = next((proc for proc in result if proc['name'] == exp['name']), None)
+                if matched is not None:
+                    res = match(exp, matched, "")
+                    details.extend([f"{entity_type} {entity_name}, {r}" for r in res])
+                else:
+                    details.extend(f"{entity_type} {entity_name}, no matching entity")
+            results.append({'entity_type': entity_type, 'status': 'SUCCESS' if len(details) == 0 else 'FAILURE',
+                            'details': details, 'validation_type': 'semantics', 'name': k, 'tags': v['tags']})
         return results
 
     # lineage events can't be matched by name, so they're matched by equal start and end time
     @staticmethod
     def compare_lineage_events(expected, result):
-        d = {}
-        for r in result:
-            d.setdefault(r['name'], {})['result'] = r
-        for e in expected:
-            matching = next(
-                (r for r in result if e['start_time'] == r['start_time'] and e['end_time'] == r['end_time']),
-                None)
-            if matching is not None:
-                d[matching['name']]['expected'] = e
-            else:
-                d.setdefault(e['name'], {})['expected'] = e
         results = []
-        for k, v in d.items():
-            result = ["no matching entity"]
-            if v.__contains__('expected') and v.__contains__('result'):
-                result = match(v['expected']['links'], v['result']['links'], ".links")
-            results.append({'entity_type': 'event', 'status': 'SUCCESS' if len(result) == 0 else 'FAILURE',
-                            'details': result, 'validation_type': 'semantics', 'name': k})
+        for k, v in expected.items():
+            details = []
+            for exp in v['body']:
+                entity_name = exp['start_time']
+                matched = next((r for r in result if exp['start_time'] == r['start_time']), None)
+                if matched is not None:
+                    res = match(exp, matched, "")
+                    details.extend([f"lineage event {entity_name}, {r}" for r in res])
+                else:
+                    details.extend(f"event {entity_name}, no matching entity")
+            results.append({'entity_type': 'event', 'status': 'SUCCESS' if len(details) == 0 else 'FAILURE',
+                            'details': details, 'validation_type': 'semantics', 'name': k, 'tags': v['tags']})
         return results
 
     def __repr__(self):
@@ -154,6 +180,7 @@ def get_arguments():
     parser.add_argument('--consumer_dir', type=str, help="Path to the consumer directory")
     parser.add_argument('--scenario_dir', type=str, help="Path to the scenario directory")
     parser.add_argument('--parent', type=str, help="Parent identifier")
+    parser.add_argument('--release', type=str, help="OpenLineage release used in generating events")
     parser.add_argument("--dump", action='store_true', help="dump api state")
 
     args = parser.parse_args()
@@ -162,19 +189,20 @@ def get_arguments():
     consumer_dir = args.consumer_dir
     scenario_dir = args.scenario_dir
     parent = args.parent
+    release = args.release
     dump = args.dump
 
-    return consumer_dir, scenario_dir, parent, client, dump
+    return consumer_dir, scenario_dir, parent, client, release, dump
 
 
 def main():
-    consumer_dir, scenario_dir, parent, client, dump = get_arguments()
-    validator = Validator(client, consumer_dir, scenario_dir, parent)
+    consumer_dir, scenario_dir, parent, client, release, dump = get_arguments()
+    validator = Validator(client, consumer_dir, scenario_dir, parent, release)
     scenarios = list_scenarios(consumer_dir)
     reports = [validator.validate(scenario, dump) for scenario in scenarios]
     t = open('dataplex-report.json', 'w')
     print(os.path.abspath(t.name))
-    json.dump([{"name": "dataplex", "scenarios": reports}], t)
+    json.dump([{"name": "dataplex", "scenarios": reports}], t, indent=2)
 
 
 if __name__ == "__main__":

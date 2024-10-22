@@ -80,11 +80,12 @@ class OLSemanticValidator:
 
     def validate(self, events):
         tests = {}
-        for name, event in self.expected_events.items():
+        for name, event, tags in self.expected_events:
             details = self.validate_event(event, events)
             if details is None:
                 details = ['one or more of .eventType, .job.name, .job.namespace not defined in expected event']
-            tests[name] = Test.simplified(name, 'semantics', 'openlineage', details)
+            named_details = [f"'{name}' {detail}" for detail in details]
+            tests[name] = Test.simplified(name, 'semantics', 'openlineage', named_details, tags)
         return tests
 
     @staticmethod
@@ -97,7 +98,7 @@ class OLSemanticValidator:
                 names_match = e['job']['name'] == ee['job']['name']
                 namespaces_match = e['job']['namespace'] == ee['job']['namespace']
                 if event_types_match and names_match and namespaces_match and len(found) > 0:
-                    found = match(e, ee)
+                    found = match(ee, e)
             return found
         return None
 
@@ -118,13 +119,30 @@ def all_tests_succeeded(syntax_tests):
     return not any(t.status == "FAILURE" for t in syntax_tests.values())
 
 
-def get_expected_events(producer_dir, component, scenario_name):
-    expected_path = join(producer_dir, component, 'scenarios', scenario_name, 'events')
-    if isdir(expected_path):
-        expected = {path: load_json(join(expected_path, path)) for path in listdir(expected_path) if isfile(join(expected_path, path))}
-        return expected if len(expected) > 0 else None
-    else:
-        return None
+def version_to_number(version):
+    split = version.split('.')
+    major = int(split[0])
+    minor = int(split[0])
+    patch = int(split[0])
+    return major * 1000000 + minor * 1000 + patch
+
+
+def release_between(release, min_version, max_version):
+    max_ver = 999999999 if max_version is None else version_to_number(max_version)
+    min_ver = 0 if min_version is None else version_to_number(min_version)
+    rel = version_to_number(release)
+
+    return min_ver <= rel <= max_ver
+
+
+def get_expected_events(producer_dir, component, scenario_name, config, release):
+    test_events = []
+    for test in config['tests']:
+        if release_between(release, test['tags'].get('min_version'), test['tags'].get('max_version')):
+            filepath = join(producer_dir, component, 'scenarios', scenario_name, test['path'])
+            body = load_json(filepath)
+            test_events.append((test['name'], body, test['tags']))
+    return test_events
 
 
 def validate_scenario_syntax(result_events, validator):
@@ -133,8 +151,13 @@ def validate_scenario_syntax(result_events, validator):
         details = validator.validate(event)
         identification = get_event_identification(event, name)
         syntax_tests[identification] = Test(identification, "FAILURE" if len(details) > 0 else "SUCCESS",
-                                            'syntax', 'openlineage', details)
+                                            'syntax', 'openlineage', details, [])
     return syntax_tests
+
+
+def get_config(producer_dir, component, scenario_name):
+    with open(join(producer_dir, component, 'scenarios', scenario_name, 'config.json')) as f:
+        return json.load(f)
 
 
 def get_arguments():
@@ -143,7 +166,8 @@ def get_arguments():
     parser.add_argument('--spec_dirs', type=str, help="comma separated list of directories containing spec and facets")
     parser.add_argument('--producer_dir', type=str, help="directory storing producers")
     parser.add_argument('--component', type=str, help="component producing the validated events")
-    parser.add_argument('--target', type=str, help="time of workflow execution")
+    parser.add_argument('--release', type=str, help="OpenLineage release used in generating events")
+    parser.add_argument('--target', type=str, help="target file")
 
     args = parser.parse_args()
 
@@ -151,19 +175,21 @@ def get_arguments():
     producer_dir = args.producer_dir
     target = args.target
     component = args.component
+    release = args.release
     spec_dirs = args.spec_dirs.split(',')
 
-    return event_base_dir, producer_dir, target, spec_dirs, component
+    return event_base_dir, producer_dir, target, spec_dirs, component, release
 
 
 def main():
-    base_dir, producer_dir, target, spec_dirs, component = get_arguments()
+    base_dir, producer_dir, target, spec_dirs, component, release = get_arguments()
     validator = OLSyntaxValidator.load_schemas(paths=spec_dirs)
     scenarios = {}
     for scenario_name in listdir(base_dir):
         scenario_path = join(base_dir, scenario_name)
         if isdir(scenario_path):
-            expected = get_expected_events(producer_dir, component, scenario_name)
+            config = get_config(producer_dir, component, scenario_name)
+            expected = get_expected_events(producer_dir, component, scenario_name, config, release)
             result_events = {file: load_json(path) for file in listdir(scenario_path) if
                              isfile(path := join(scenario_path, file))}
             tests = validate_scenario_syntax(result_events, validator)
@@ -172,8 +198,7 @@ def main():
                 for name, res in OLSemanticValidator(expected).validate(result_events).items():
                     tests[name] = res
 
-            scenarios[scenario_name] = Scenario(scenario_name, "SUCCESS" if all_tests_succeeded(tests)
-            else "FAILURE", tests)
+            scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
     report = Report({component: Component(component, scenarios)})
     with open(target, 'w') as f:
         json.dump(report.to_dict(), f, indent=2)

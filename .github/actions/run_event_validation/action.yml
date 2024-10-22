@@ -54,5 +54,6 @@ runs:
         --spec_dirs=spec/spec/,spec/spec/facets/,spec/spec/registry/gcp/dataproc/facets,spec/spec/registry/gcp/lineage/facets \
         --target=${{ inputs.target-path }} \
         --component="${{ inputs.component }}" \
-        --producer_dir=./producer
+        --producer_dir=./producer \
+        --release=${{ inputs.version }}
 

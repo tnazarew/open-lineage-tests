@@ -5,6 +5,10 @@ on:
     secrets:
       gcpKey:
         required: true
+    inputs:
+      release:
+        description: "release tag of OpenLineage to use"
+        type: string
 
 permissions:
   contents: read

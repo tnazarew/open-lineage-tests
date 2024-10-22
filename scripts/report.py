@@ -60,7 +60,7 @@ class Scenario:
 
     @classmethod
     def simplified(cls, name, tests):
-        return cls(name, 'SUCCESS' if len(tests) == 0 else 'FAILURE', tests)
+        return cls(name, 'SUCCESS' if not any(t for n, t in tests.items() if t.status == 'FAILURE') else 'FAILURE', tests)
 
     @classmethod
     def from_dict(cls, d):
@@ -86,21 +86,22 @@ class Scenario:
 
 
 class Test:
-    def __init__(self, name, status, validation_type, entity_type, details):
+    def __init__(self, name, status, validation_type, entity_type, details, tags):
         self.name = name
         self.status = status
         self.validation_type = validation_type
         self.entity_type = entity_type
         self.details = details
+        self.tags = tags
 
     @classmethod
-    def simplified(cls, name, validation_type, entity_type, details):
-        return cls(name, 'SUCCESS' if len(details) == 0 else 'FAILURE', validation_type, entity_type, details)
+    def simplified(cls, name, validation_type, entity_type, details, tags):
+        return cls(name, 'SUCCESS' if len(details) == 0 else 'FAILURE', validation_type, entity_type, details, tags)
 
     @classmethod
     def from_dict(cls, d):
         return cls(d['name'], d['status'], d['validation_type'], d['entity_type'],
-                   d['details'] if d.__contains__('details') else [])
+                   d['details'] if d.__contains__('details') else [], d['tags'])
 
     def get_new_failure(self, old):
         if self.status == 'FAILURE':
@@ -112,8 +113,9 @@ class Test:
     def update(self, new):
         self.status = new.status
         self.details = new.details
+        self.tags = new.tags
 
     def to_dict(self):
         return {"name": self.name, "status": self.status, "validation_type": self.validation_type,
-                "entity_type": self.entity_type, "details": self.details}
+                "entity_type": self.entity_type, "details": self.details, "tags": self.tags}
 

@@ -51,12 +51,14 @@ jobs:
           fi
 
       - uses: actions/upload-artifact@v4
+        if: steps.check-changes.outputs.changes_found == 'true'
         with:
           name: spec-versions
           path: generated-files/updated_spec_versions.json
           retention-days: 1
 
       - name: get openlineage release
+        if: steps.check-changes.outputs.changes_found == 'true'
         id: get-release
         run: |
           openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
@@ -86,13 +88,20 @@ jobs:
 
 ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
-#  notify-maintainers:
-#    needs: collect-and-compare-reports
-#    uses: ./.github/workflows/notify_maintainers.yml
-#
-#  update-repo-files:
-#    needs:
-#      - initialize_workflow
-#      - notify-maintainers
-#    uses: ./.github/workflows/update_repo_files.yml
+  collect-and-compare-reports:
+    needs:
+      - initialize_workflow
+      - spark-dataproc
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/collect_and_compare_reports.yml
+
+  notify-maintainers:
+    needs: collect-and-compare-reports
+    uses: ./.github/workflows/notify_maintainers.yml
+
+  update-repo-files:
+    needs:
+      - initialize_workflow
+      - notify-maintainers
+    uses: ./.github/workflows/update_repo_files.yml
 
