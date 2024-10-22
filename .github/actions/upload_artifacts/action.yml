@@ -11,8 +11,8 @@ inputs:
   credentials:
     description: "GCP credentials"
 outputs:
-  blob-path:
-    value: ${{ steps.upload-artifact.outputs.uploaded_path }}
+  uploaded-file:
+    value: ${{ steps.upload-artifact.outputs.uploaded_file }}
     description: "Path to the uploaded artifact"
 runs:
   using: "composite"
