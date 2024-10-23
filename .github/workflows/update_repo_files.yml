@@ -32,8 +32,9 @@ jobs:
         name: Replace Modified Files
         run: |
           mv ./generated-files/updated-report.json ./generated-files/report.json || echo "updated-report.json no found"
-          mv ./generated-files/updated_releases.json ./generated-files/report.json || echo "updated_releases.json no found"
-          mv ./generated-files/updated_spec_versions.json ./generated-files/report.json || echo "updated_spec_versions.json no found"
+          mv ./generated-files/updated_releases.json ./generated-files/releases.json || echo "updated_releases.json no found"
+          mv ./generated-files/updated_spec_versions.json ./generated-files/spec_versions.json || echo "updated_spec_versions.json no found"
+          mv ./generated-files/updated-compatibility-table.md ./generated-files/compatibility-table.md || echo "updated-compatibility-table.md no found"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

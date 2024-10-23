@@ -24,7 +24,7 @@ jobs:
         id: collect-and-merge-reports
         run: |
           python scripts/generate_compatibility_tables.py \
-          --failure_path=reports/updated-report.json \
+          --report=reports/updated-report.json \
           --target=reports/updated-compatibility-table.md
 
       - uses: actions/upload-artifact@v4
