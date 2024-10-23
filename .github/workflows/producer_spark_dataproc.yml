@@ -146,7 +146,7 @@ jobs:
         uses: ./.github/actions/run_event_validation
         with:
           component: 'spark_dataproc'
-          tag: ${{ get-latest-snapshots == 'true' && 'main' || inputs.release }}
+          tag: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.release }}
           release: ${{ inputs.release }}
           event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
           target-path: 'spark-dataproc-report.json'
