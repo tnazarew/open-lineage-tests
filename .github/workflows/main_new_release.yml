@@ -71,7 +71,7 @@ jobs:
 
   spark-dataproc:
     needs: initialize_workflow
-    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
+    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'false' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
@@ -89,10 +89,10 @@ jobs:
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
 
-  notify-maintainers:
-    needs: collect-and-compare-reports
-    if: ${{ !failure() }}
-    uses: ./.github/workflows/notify_maintainers.yml
+#  notify-maintainers:
+#    needs: collect-and-compare-reports
+#    if: ${{ !failure() }}
+#    uses: ./.github/workflows/notify_maintainers.yml
 
   generate-compatibility-tables:
     needs: collect-and-compare-reports
@@ -102,6 +102,6 @@ jobs:
   update-repo-files:
     needs:
       - initialize_workflow
-      - notify-maintainers
+#      - notify-maintainers
       - generate-compatibility-tables
     uses: ./.github/workflows/update_repo_files.yml

@@ -23,7 +23,7 @@ jobs:
           component: 'scenarios'
           tag: ${{ get-latest-snapshots == 'true' && 'main' || inputs.release }}
           release: ${{ inputs.release }}
-          target-path: 'scenarios-report.json'
+          target-path: 'reports/scenarios-report.json'
 
       - uses: actions/upload-artifact@v4
         with:
@@ -33,5 +33,6 @@ jobs:
 
       - name: fail for failures in report
         id: fail-for-failures
-        run:
+        run: |
+          jq -e '.scenarios.status == "SUCCESS"' downloads/scenario-report.json > /dev/null || exit 1
 
