@@ -16,6 +16,10 @@ jobs:
           path: reports/
           merge-multiple: true
 
+      - name: Install dependencies
+        run: |
+          pip install py-markdown-table 
+
       - name: Run task for Collect Reports
         id: collect-and-merge-reports
         run: |
