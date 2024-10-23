@@ -73,6 +73,9 @@ jobs:
       - initialize_workflow
     if: ${{ success() && needs.initialize_workflow.outputs.changes_in_spec == 'true' }}
     uses: ./.github/workflows/check_scenarios.yml
+    with:
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      get-latest-snapshots: 'true'
 
   # check if producers still produce compatible events
   spark-dataproc:
@@ -97,11 +100,18 @@ jobs:
 
   notify-maintainers:
     needs: collect-and-compare-reports
+    if: ${{ !failure() }}
     uses: ./.github/workflows/notify_maintainers.yml
+
+  generate-compatibility-tables:
+    needs: collect-and-compare-reports
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/generate_compatibility_tables.yml
 
   update-repo-files:
     needs:
       - initialize_workflow
       - notify-maintainers
+      - generate-compatibility-tables
     uses: ./.github/workflows/update_repo_files.yml
 

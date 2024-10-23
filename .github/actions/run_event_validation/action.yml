@@ -2,8 +2,11 @@ name: Run syntax validation for OL events
 description: "Runs syntax validation for OL events using spec from given release of OL"
 author: Tomasz Nazarewicz
 inputs:
-  version:
+  tag:
     description: "Version of the spec to check against"
+    required: true
+  release:
+    description: "release to run the validation with"
     required: true
   target-path:
     description: "Path to save the report to"
@@ -40,7 +43,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: OpenLineage/OpenLineage
-        ref: ${{ inputs.version }}
+        ref: ${{ inputs.tag }}
         path: spec
         sparse-checkout: |
           spec/
@@ -55,5 +58,5 @@ runs:
         --target=${{ inputs.target-path }} \
         --component="${{ inputs.component }}" \
         --producer_dir=./producer \
-        --release=${{ inputs.version }}
+        --release=${{ inputs.release }}
 

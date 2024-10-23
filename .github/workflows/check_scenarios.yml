@@ -6,7 +6,7 @@ on:
       release:
         description: "release tag of OpenLineage to use"
         type: string
-      get-circleci-artifacts:
+      get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
         type: boolean
 
@@ -21,7 +21,8 @@ jobs:
         uses: ./.github/actions/run_event_validation
         with:
           component: 'scenarios'
-          version: ${{ inputs.release }}
+          tag: ${{ get-latest-snapshots == 'true' && 'main' || inputs.release }}
+          release: ${{ inputs.release }}
           target-path: 'scenarios-report.json'
 
       - uses: actions/upload-artifact@v4
@@ -29,3 +30,8 @@ jobs:
           name: scenarios-report
           path: reports/scenarios-report.json
           retention-days: 1
+
+      - name: fail for failures in report
+        id: fail-for-failures
+        run:
+

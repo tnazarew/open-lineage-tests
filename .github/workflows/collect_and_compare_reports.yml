@@ -1,6 +1,12 @@
 name: Collect Reports
 on:
   workflow_call:
+    inputs:
+      fail-for-new-failures:
+        type: boolean
+        required: false
+        default: false
+        description: "fail the job if new failure report is found"
 
 jobs:
   collect-and-compare-reports:
@@ -41,3 +47,9 @@ jobs:
           name: retention-failures-report
           path: reports/retention-failures-report.json
           retention-days: 1
+
+      - name: Fail if new failures found
+        id: fail-for-new-failures
+        if: ${{ inputs.fail-for-new-failures }}
+        run: |
+          [ -f reports/retention-failures-report.json ] || { exit 1 }

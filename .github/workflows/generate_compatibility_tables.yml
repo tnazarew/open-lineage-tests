@@ -1,0 +1,30 @@
+name: Generate compatibility tables
+
+on:
+  workflow_call:
+    
+jobs:
+  generate-compatibility-tables:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: updated-report
+          path: reports/
+          merge-multiple: true
+
+      - name: Run task for Collect Reports
+        id: collect-and-merge-reports
+        run: |
+          python scripts/generate_issue.py \
+          --failure_path=reports/updated-report.json \
+          --target=reports/updated-compatibility-table.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: updated-compatibility-tables
+          path: reports/updated-compatibility-table.md
+          retention-days: 1

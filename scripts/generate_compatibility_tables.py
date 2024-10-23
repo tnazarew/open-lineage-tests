@@ -18,22 +18,16 @@ def get_version_status(min_version, max_version):
 
 
 def generate_facets_table(data):
-    facets = set()
 
-    # Collect all facets from all top-level keys
-    for key, value in data.items():
-        if 'facets' in value:
-            facets.update(value['facets'].keys())
+    facets = get_sorted_facets(data)
 
-    # Prepare table header and rows
     table_data = []
-    header = ['Name'] + sorted(facets)
-    # table_data.append(dict(zip(header, header)))
+
 
     # Populate rows for each top-level key
     for key, value in data.items():
         row = {'Name': key}
-        for facet in sorted(facets):
+        for facet in facets:
             if 'facets' in value and facet in value['facets']:
                 facet_data = value['facets'][facet]
                 status = get_version_status(facet_data['min_version'], facet_data['max_version'])
@@ -45,6 +39,22 @@ def generate_facets_table(data):
     table = markdown_table(table_data)
     table.set_params(row_sep="markdown", quote=False)
     return table.get_markdown()
+
+
+def get_sorted_facets(data):
+    facets = set()
+    for key, value in data.items():
+        if 'facets' in value:
+            facets.update(value['facets'].keys())
+    desired_order = ["run_event", "jobType", "parent", "dataSource", "processing_engine", "sql", "symlinks", "schema",
+                     "columnLineage", "gcp_dataproc_spark", "gcp_lineage", "spark_properties"]
+    sorted_in_order = sorted(
+        [item for item in facets if item in desired_order],
+        key=lambda x: desired_order.index(x)
+    )
+    sorted_out_of_order = sorted(item for item in facets if item not in desired_order)
+    final_sorted_list = sorted_in_order + sorted_out_of_order
+    return final_sorted_list
 
 
 def generate_lineage_table(data):
@@ -87,16 +97,18 @@ def generate_producers_table(data):
 def get_arguments():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--report', type=str, help="path to report file")
+    parser.add_argument('--target', type=str, help="path to target file")
 
     args = parser.parse_args()
 
-    report_base_dir = args.report
+    report_path = args.report
+    target_path = args.target
 
-    return report_base_dir
+    return report_path, target_path
 
 
 def main():
-    report_path = get_arguments()
+    report_path, target_path = get_arguments()
     with open(report_path, 'r') as c:
         report = json.load(c)
     consumer_report = Report.from_dict([e for e in report if e['component_type'] == 'consumer'])
@@ -109,7 +121,7 @@ def main():
     lineage_level_tables = generate_lineage_table(producer_tag_summary)
 
     # Output the tables
-    with open("output_tables.md", "w") as file:
+    with open(target_path, "w") as file:
         file.write("## Producers\n")
         file.write("## Facets Compatibility\n")
         file.write(producer_facets_table + "\n\n")

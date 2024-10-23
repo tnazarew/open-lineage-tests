@@ -27,7 +27,7 @@ jobs:
             scenarios:
               - consumer/scenarios/**
             dataplex:
-              - consumer/consumers/Dataplex/**
+              - consumer/consumers/dataplex/**
             spark_dataproc:
               - producer/spark_dataproc/**
 
@@ -42,15 +42,18 @@ jobs:
   scenarios:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_scenarios == 'true' }}
-    uses: ./.github/workflows/consumer_dataplex.yml
+    uses: ./.github/workflows/check_scenarios.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+     get-latest-snapshots: false
+     release: ${{ needs.initialize_workflow.outputs.ol_release }}
 
   dataplex:
     needs:
       - initialize_workflow
       - scenarios
-    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' || needs.initialize_workflow.outputs.run_dataplex}}
+    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' || needs.initialize_workflow.outputs.run_dataplex }}
     uses: ./.github/workflows/consumer_dataplex.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
@@ -72,13 +75,22 @@ jobs:
   collect-and-compare-reports:
     needs:
       - initialize_workflow
+      - scenarios
       - dataplex
       - spark_dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
+    with:
+      fail-for-new-failures: true
+
+  generate-compatibility-tables:
+    needs: collect-and-compare-reports
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/generate_compatibility_tables.yml
 
   update_report:
     needs: collect-and-compare-reports
+    if: ${{ !failure() }}
     uses: ./.github/workflows/update_repo_files.yml
 
 
