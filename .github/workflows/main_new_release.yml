@@ -104,4 +104,5 @@ jobs:
       - initialize_workflow
 #      - notify-maintainers
       - generate-compatibility-tables
+    if: ${{ !failure() }}
     uses: ./.github/workflows/update_repo_files.yml
