@@ -26,7 +26,7 @@ jobs:
         with:
           credentials_json: '${{ secrets.gcpKey }}'
 
-      - name: Get unreleased OL artifacts
+      - name: Get OL artifacts
         id: get-ol-artifacts
         uses: ./.github/actions/get_openlineage_artifacts
         with:
