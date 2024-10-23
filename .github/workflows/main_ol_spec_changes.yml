@@ -94,6 +94,7 @@ jobs:
   collect-and-compare-reports:
     needs:
       - initialize_workflow
+      - scenarios_check
       - spark-dataproc
     uses: ./.github/workflows/collect_and_compare_reports.yml
 
