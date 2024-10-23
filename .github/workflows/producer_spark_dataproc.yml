@@ -63,6 +63,14 @@ jobs:
           gcs-path: "gs://open-lineage-e2e/jars"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
+      - name: Upload initialization actions to GCS
+        id: upload-initialization-actions
+        uses: ./.github/actions/upload_artifacts
+        with:
+          local-file-path: producer/spark_dataproc/runner/get_openlineage_jar.sh
+          gcs-path: "gs://open-lineage-e2e/scripts"
+          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v3
         with:
@@ -77,7 +85,6 @@ jobs:
 
 
         #TODO - we should be able to set the release of OL spark integration, not have it hardcoded. Not sure about the bigquery jar but probably something similar
-        #TODO - get_openlineage_jar.sh also seems to have hardcoded version
       - name: Start producer
         run: |
           python producer/spark_dataproc/runner/dataproc_workflow.py create-cluster \
@@ -86,7 +93,7 @@ jobs:
           --cluster-name dataproc-producer-test-${{ github.run_id }} \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
           --metadata "SPARK_BQ_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.41.0.jar,OPENLINEAGE_SPARK_URL=${{ steps.upload-spark-integration.outputs.uploaded-file }}" \
-          --initialization-actions="gs://open-lineage-e2e/scripts/get_openlineage_jar.sh" 
+          --initialization-actions="${{ steps.upload-initialization-actions.outputs.uploaded-file }}"
 
       - name: Set producer output event dir
         id: set-producer-output
