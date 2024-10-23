@@ -87,7 +87,7 @@ runs:
       shell: bash
       run: |
         check_artifact_downloaded() {
-          if [ $2 = 'false']; then
+          if [ $2 = 'false' ]; then
             if [ -f ./$1 ]; then
               echo "$3=$(ls ./$1)" >> $GITHUB_OUTPUT
             else
