@@ -28,7 +28,7 @@ jobs:
 
       - name: Get unreleased OL artifacts
         id: get-ol-artifacts
-        uses: ./.github/actions/get_unreleased_openlineage_artifacts
+        uses: ./.github/actions/get_openlineage_artifacts
         with:
           version: ${{ inputs.release }}
           get-latest-snapshots: ${{ inputs.get-latest-snapshots }}
