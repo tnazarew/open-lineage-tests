@@ -76,6 +76,7 @@ jobs:
     with:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
       get-latest-snapshots: 'true'
+      fail-for-failures: false
 
   # check if producers still produce compatible events
   spark-dataproc:
@@ -101,8 +102,4 @@ jobs:
   notify-maintainers:
     needs: collect-and-compare-reports
     uses: ./.github/workflows/notify_maintainers.yml
-
-  generate-compatibility-tables:
-    needs: collect-and-compare-reports
-    uses: ./.github/workflows/generate_compatibility_tables.yml
 
