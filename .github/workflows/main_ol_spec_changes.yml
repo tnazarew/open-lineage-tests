@@ -21,7 +21,7 @@ jobs:
       changes_in_spec: ${{steps.check-changes.outputs.changes_found}}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
     steps:
-      - name: Checkout code for openlineage repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: create dir for ol spec and report
@@ -41,10 +41,10 @@ jobs:
         run: | 
           echo "changes_found=false" >> $GITHUB_OUTPUT
           
-          python scripts/compare_spec_versions.py \
-          --spec_base=spec_base=./openlineage/spec \
-          --versions_path=./generated-files/spec_versions.json \
-          --new_versions_path=./updated_spec_versions.json
+            python scripts/compare_spec_versions.py \
+            --spec_base=spec_base=./openlineage/spec \
+            --versions_path=./generated-files/spec_versions.json \
+            --new_versions_path=./updated_spec_versions.json
           
           if [ -f updated_spec_versions.json ]; then
             echo "changes_found=true" >> $GITHUB_OUTPUT
