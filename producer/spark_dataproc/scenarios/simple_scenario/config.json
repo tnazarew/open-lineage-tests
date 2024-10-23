@@ -5,10 +5,9 @@
       "path": "events/complete_event.json",
       "tags": {
         "facets": ["run_event", "parent", "spark_properties", "processing_engine", "gcp_dataproc_spark", "jobType", "sql", "gcp_lineage", "dataSource", "schema", "symlinks", "columnLineage"],
-        "max_version": "1.23.0",
         "min_version": "1.22.0",
-        "input": {
-          "hive": ["column_level_lineage", "transformation_types"]
+        "lineage_level": {
+          "hive": ["dataset", "column", "transformation"]
         }
       }
     },
@@ -17,10 +16,9 @@
       "path": "events/input_hive.json",
       "tags": {
         "facets": ["dataSource", "schema", "symlinks", "columnLineage"],
-        "max_version": "1.23.0",
         "min_version": "1.22.0",
-        "input": {
-          "hive": ["column_level_lineage", "transformation_types"]
+        "lineage_level": {
+          "hive": ["dataset", "column", "transformation"]
         }
       }
     }

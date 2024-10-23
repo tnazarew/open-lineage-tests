@@ -82,11 +82,11 @@ class Validator:
                 response = self.client.process_open_lineage_run_event(parent=self.parent, open_lineage=e['payload'])
                 report.append(
                     {"status": "SUCCESS", 'validation_type': 'syntax', 'name': e['name'], 'entity_type': 'openlineage',
-                     'tags': []})
+                     'tags': {}})
             except InvalidArgument as exc:
                 report.append(
                     {"status": "FAILURE", 'validation_type': 'syntax', "details": exc.args[0], 'name': e['name'],
-                     'entity_type': 'openlineage', 'tags': []})
+                     'entity_type': 'openlineage', 'tags': {}})
         return report
 
     def read_config(self, scenario):
@@ -202,7 +202,7 @@ def main():
     reports = [validator.validate(scenario, dump) for scenario in scenarios]
     t = open('dataplex-report.json', 'w')
     print(os.path.abspath(t.name))
-    json.dump([{"name": "dataplex", "scenarios": reports}], t, indent=2)
+    json.dump([{"name": "dataplex", "component_type": "consumer", "scenarios": reports}], t, indent=2)
 
 
 if __name__ == "__main__":

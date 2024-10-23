@@ -84,8 +84,6 @@ def get_arguments():
     parser.add_argument('--skip_gcs', type=str, help="skip download of gcs", default="false")
     parser.add_argument('--skip_s3', type=str, help="skip download of s3", default="false")
 
-
-
     args = parser.parse_args()
     skip_artifacts = []
     if args.skip_java == 'true':

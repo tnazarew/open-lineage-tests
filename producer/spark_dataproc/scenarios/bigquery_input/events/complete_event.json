@@ -24,7 +24,7 @@
                 "openlineageAdapterVersion": "{{ any(result) }}"
             },
             "gcp_dataproc_spark": {
-                "jobUuid": "dd36baae-5bc7-427b-8233-6d63710c75ac",
+                "jobUuid": "{{ is_uuid(result) }}",
                 "queryNodeName": "adaptive_spark_plan",
                 "appName": "Reading from BigQuery",
                 "projectId": "gcp-open-lineage-testing"

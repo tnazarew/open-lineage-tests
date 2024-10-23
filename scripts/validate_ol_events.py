@@ -151,7 +151,7 @@ def validate_scenario_syntax(result_events, validator):
         details = validator.validate(event)
         identification = get_event_identification(event, name)
         syntax_tests[identification] = Test(identification, "FAILURE" if len(details) > 0 else "SUCCESS",
-                                            'syntax', 'openlineage', details, [])
+                                            'syntax', 'openlineage', details, {})
     return syntax_tests
 
 
@@ -199,7 +199,7 @@ def main():
                     tests[name] = res
 
             scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
-    report = Report({component: Component(component, scenarios)})
+    report = Report({component: Component(component, 'producer', scenarios)})
     with open(target, 'w') as f:
         json.dump(report.to_dict(), f, indent=2)
 

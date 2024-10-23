@@ -8,7 +8,6 @@ from os.path import isfile, join
 def get_arguments():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--report_base_dir', type=str, help="directory containing the reports")
-    parser.add_argument('--time', type=str, help="time of workflow execution", default="")
 
     args = parser.parse_args()
 

@@ -79,6 +79,15 @@ runs:
       run: |
         python ./scripts/get_latest_unreleased_artifact.py \
         --path=./
+        --skip-java=${{ inputs.skip-java }}
+        --skip-spark=${{ inputs.skip-spark }}
+        --skip-flink=${{ inputs.skip-flink }}
+        --skip-sql=${{ inputs.skip-sql }}
+        --skip-extensions=${{ inputs.skip-extensions }}
+        --skip-gcp-lineage=${{ inputs.skip-gcp-lineage }}
+        --skip-gcs=${{ inputs.skip-gcs }}
+        --skip-s3=${{ inputs.skip-s3 }}
+
     # artifacts snapshots are not published in latest build if no code was changed in them
     # this checks which of not skipped artifacts are missing and marks them as 'to download from maven'
     # if previous step was skipped, all are missing (besides skipped)

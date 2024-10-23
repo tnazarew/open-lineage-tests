@@ -6,6 +6,9 @@ class Report:
     def from_dict(cls, d):
         return cls({s['name']: Component.from_dict(s) for s in d})
 
+    def get_tag_summary(self):
+        return {k: v.get_tag_summary() for k, v in self.components.items()}
+
     def get_new_failures(self, old):
         oc = old.components if old is not None and old.components is not None else {}
         return Report({k: nfc for k, v in self.components.items() if
@@ -27,19 +30,44 @@ class Report:
 
 class Component:
 
-    def __init__(self, name, scenarios):
+    def __init__(self, name, component_type, scenarios):
         self.name = name
+        self.component_type = component_type
         self.scenarios = scenarios
 
     @classmethod
     def from_dict(cls, d):
-        return cls(d['name'], {s['name']: Scenario.from_dict(s) for s in d['scenarios']})
+        return cls(d['name'], d['component_type'], {s['name']: Scenario.from_dict(s) for s in d['scenarios']})
+
+    def get_tag_summary(self):
+        facets = {}
+        inputs = {}
+        for n, s in self.scenarios.items():
+            ss = s.get_tag_summary(self.component_type)
+            for f, ver in ss['facets'].items():
+                s.update_facet_versions(f, facets, ver['max_version'], ver['min_version'])
+            if self.component_type == 'producer':
+                for datasource, lineage_levels in ss['lineage_levels'].items():
+                    for ll, ver in lineage_levels.items():
+                        if inputs.get(datasource) is None:
+                            inputs[datasource] = {}
+                        s.update_facet_versions(ll, inputs[datasource], ver['max_version'], ver['min_version'])
+            else:
+                for i, ver in ss['producers'].items():
+                    s.update_facet_versions(i, inputs, ver['max_version'], ver['min_version'])
+        output = {'facets': facets}
+        if self.component_type == 'producer':
+            output["lineage_levels"] = inputs
+        else:
+            output["producers"] = inputs
+        return output
+
 
     def get_new_failures(self, old):
         os = old.scenarios if old is not None and old.scenarios is not None else {}
         nfs = {k: nfs for k, v in self.scenarios.items() if
                (nfs := v.get_new_failures(os.get(k))) is not None}
-        return Component(self.name, nfs) if any(nfs) else None
+        return Component(self.name, self.component_type, nfs) if any(nfs) else None
 
     def update(self, new):
         for k, v in new.scenarios.items():
@@ -49,7 +77,8 @@ class Component:
                 self.scenarios[k] = v
 
     def to_dict(self):
-        return {'name': self.name, 'scenarios': [c.to_dict() for c in self.scenarios.values()]}
+        return {'name': self.name, 'component_type': self.component_type,
+                'scenarios': [c.to_dict() for c in self.scenarios.values()]}
 
 
 class Scenario:
@@ -60,11 +89,65 @@ class Scenario:
 
     @classmethod
     def simplified(cls, name, tests):
-        return cls(name, 'SUCCESS' if not any(t for n, t in tests.items() if t.status == 'FAILURE') else 'FAILURE', tests)
+        return cls(name, 'SUCCESS' if not any(t for n, t in tests.items() if t.status == 'FAILURE') else 'FAILURE',
+                   tests)
 
     @classmethod
     def from_dict(cls, d):
         return cls(d['name'], d['status'], {t['name']: Test.from_dict(t) for t in d['tests']})
+
+    def get_tag_summary(self, component_type):
+        facets = {}
+        inputs = {}
+        for name, test in self.tests.items():
+            if test.status == 'SUCCESS' and len(test.tags) > 0:
+                tags = test.tags
+                min_ver = tags.get('min_version')
+                max_ver = tags.get('max_version')
+                for f in tags['facets']:
+                    self.update_facet_versions(f, facets, max_ver, min_ver)
+
+                if component_type == 'producer':
+                    for datasource, lineage_levels in tags['lineage_level'].items():
+                        for ll in lineage_levels:
+                            if inputs.get(datasource) is None:
+                                inputs[datasource] = {}
+                            self.update_facet_versions(ll, inputs[datasource], max_ver, min_ver)
+                if component_type == 'consumer':
+                    # if inputs.get(tags['producer']) is None:
+                    #     inputs[tags['producer']] = {}
+                    self.update_facet_versions(tags['producer'], inputs, max_ver, min_ver)
+        output = {'facets': facets}
+        if component_type == 'producer':
+            output["lineage_levels"] = inputs
+        else:
+            output["producers"] = inputs
+        return output
+
+
+    def update_facet_versions(self, f, entity, max_ver, min_ver):
+        if entity.get(f) is None:
+            entity[f] = {'max_version': max_ver, 'min_version': min_ver}
+        else:
+            entity[f]['max_version'] = self.max_version(max_ver, entity[f].get('max_version'))
+            entity[f]['min_version'] = self.min_version(min_ver, entity[f].get('min_version'))
+
+    def max_version(self, v1, v2):
+        if v1 is None or v2 is None:
+            return None
+        return v2 if self.version_to_number(v1) < self.version_to_number(v2) else v1
+
+    def min_version(self, v1, v2):
+        if v1 is None or v2 is None:
+            return None
+        return v2 if self.version_to_number(v1) > self.version_to_number(v2) else v1
+
+    def version_to_number(self, version):
+        split = version.split('.')
+        major = int(split[0])
+        minor = int(split[0])
+        patch = int(split[0])
+        return major * 1000000 + minor * 1000 + patch
 
     def get_new_failures(self, old):
         if self.status == 'SUCCESS':
@@ -118,4 +201,3 @@ class Test:
     def to_dict(self):
         return {"name": self.name, "status": self.status, "validation_type": self.validation_type,
                 "entity_type": self.entity_type, "details": self.details, "tags": self.tags}
-
