@@ -38,7 +38,7 @@ jobs:
 
       - name: check for repo files
         id: check-files
-        run: tree -d openlineage
+        run: tree -d openlineage/spec
 
       - name: check for changes in spec
         id: check-changes
