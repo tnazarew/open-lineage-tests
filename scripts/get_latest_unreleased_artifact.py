@@ -75,14 +75,14 @@ def download_jar(path, url):
 def get_arguments():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--path', type=str, help="download directory")
-    parser.add_argument('--skip_java', type=str, help="skip download of java", default="false")
-    parser.add_argument('--skip_spark', type=str, help="skip download of spark", default="false")
-    parser.add_argument('--skip_flink', type=str, help="skip download of flink", default="false")
-    parser.add_argument('--skip_sql', type=str, help="skip download of sql", default="false")
-    parser.add_argument('--skip_extensions', type=str, help="skip download of extensions", default="false")
-    parser.add_argument('--skip_gcp_lineage', type=str, help="skip download of gcp-lineage", default="false")
-    parser.add_argument('--skip_gcs', type=str, help="skip download of gcs", default="false")
-    parser.add_argument('--skip_s3', type=str, help="skip download of s3", default="false")
+    parser.add_argument('--skip-java', type=str, help="skip download of java", default="false")
+    parser.add_argument('--skip-spark', type=str, help="skip download of spark", default="false")
+    parser.add_argument('--skip-flink', type=str, help="skip download of flink", default="false")
+    parser.add_argument('--skip-sql', type=str, help="skip download of sql", default="false")
+    parser.add_argument('--skip-extensions', type=str, help="skip download of extensions", default="false")
+    parser.add_argument('--skip-gcp-lineage', type=str, help="skip download of gcp-lineage", default="false")
+    parser.add_argument('--skip-gcs', type=str, help="skip download of gcs", default="false")
+    parser.add_argument('--skip-s3', type=str, help="skip download of s3", default="false")
 
     args = parser.parse_args()
     skip_artifacts = []
