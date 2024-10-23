@@ -95,7 +95,6 @@ jobs:
     needs:
       - initialize_workflow
       - spark-dataproc
-    if: ${{ !failure() }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
 
   notify-maintainers:
@@ -107,11 +106,4 @@ jobs:
     needs: collect-and-compare-reports
     if: ${{ !failure() }}
     uses: ./.github/workflows/generate_compatibility_tables.yml
-
-  update-repo-files:
-    needs:
-      - initialize_workflow
-      - notify-maintainers
-      - generate-compatibility-tables
-    uses: ./.github/workflows/update_repo_files.yml
 
