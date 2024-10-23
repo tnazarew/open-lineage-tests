@@ -8,7 +8,7 @@ on:
         type: string
       get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
-        type: boolean
+        type: string
 
 jobs:
   run-scenario-tests:
