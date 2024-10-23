@@ -21,7 +21,7 @@ jobs:
         uses: ./.github/actions/run_event_validation
         with:
           component: 'scenarios'
-          tag: ${{ get-latest-snapshots == 'true' && 'main' || inputs.release }}
+          tag: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.release }}
           release: ${{ inputs.release }}
           target-path: 'reports/scenarios-report.json'
 

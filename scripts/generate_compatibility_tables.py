@@ -122,7 +122,7 @@ def main():
 
     # Output the tables
     with open(target_path, "w") as file:
-        file.write("## Producers\n")
+        file.write("# Producers\n")
         file.write("## Facets Compatibility\n")
         file.write(producer_facets_table + "\n\n")
 
@@ -130,7 +130,7 @@ def main():
             file.write(f"## Lineage level support for {k}\n")
             file.write(v + "\n\n")
 
-        file.write("## Consumers\n")
+        file.write("# Consumers\n")
         file.write("## Facets Compatibility\n")
         file.write(consumer_facets_table + "\n\n")
         for k, v in producers_tables.items():
