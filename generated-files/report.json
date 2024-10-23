@@ -34,7 +34,10 @@
                   "column",
                   "transformation"
                 ],
-                "jdbc": ["dataset", "column"]
+                "jdbc": [
+                  "dataset",
+                  "column"
+                ]
               }
             }
           }
@@ -80,13 +83,264 @@
         "status": "SUCCESS",
         "tests": [
           {
-            "entity_type": "process",
-            "status": "SUCCESS",
-            "details": [],
-            "validation_type": "semantics",
             "name": "mock",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
             "tags": {
               "facets": [],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "dataplex",
+    "component_type": "consumer",
+    "scenarios": [
+      {
+        "name": "simple_run_event",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "simple_run_event.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "process",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "runs",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "lineage_events",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          }
+        ]
+      },
+      {
+        "name": "spark_dataproc_simple_producer_test",
+        "status": "FAILURE",
+        "tests": [
+          {
+            "name": "1729156705647.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156706825.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156712504.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156708643.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156691500.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156709268.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156694923.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156694755.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156706061.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156697298.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156703813.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156699239.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156709267.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156707719.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156701102.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1729156671101.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "process",
+            "status": "FAILURE",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [
+              "process ['projects/484892851355/locations/us/processes', '4498270707ca1472c195acf9439db8dd'], In .display_name: Expected value default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t1 does not equal result default:cl_i_test_application"
+            ],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "runs",
+            "status": "FAILURE",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [
+              "run ['projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd/runs', '0d35c69fdc8ba859b16e4c77f885ccb1'], In .display_name: Expected value 019299c5-12f5-7946-b5b2-c6abab662e20 does not equal result 019299c5-5488-7db5-a64e-11439fc53117",
+              "run ['projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd/runs', '0d35c69fdc8ba859b16e4c77f885ccb1'], In .start_time: Expected value 2024-10-17T09:18:11.500Z does not equal result 2024-10-17T09:18:26.825Z",
+              "run ['projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd/runs', '0d35c69fdc8ba859b16e4c77f885ccb1'], In .end_time: Expected value 2024-10-17T09:18:32.504Z does not equal result 2024-10-17T09:18:25.647Z"
+            ],
+            "tags": {
+              "facets": [
+                "run_event",
+                "processing_engine"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "lineage_events",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
               "max_version": "1.23.0",
               "min_version": "1.22.0",
               "producer": "spark"
