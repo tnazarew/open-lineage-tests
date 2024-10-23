@@ -57,7 +57,9 @@ def main():
     spec_base, versions_path, new_versions_path = get_arguments()
     latest = load_json(versions_path)
 
-    parsed = [parsed for file in read_json_files(spec_base) if (parsed := parse_id_field(load_json(file)))]
+    files = read_json_files(spec_base)
+    print(files)
+    parsed = [parsed for file in files if (parsed := parse_id_field(load_json(file)))]
     print(parsed)
     specs = {k: v for spec in parsed for k, v in spec.items()}
     if any(higher_than(v, latest.get(s)) for s, v in specs.items()):
