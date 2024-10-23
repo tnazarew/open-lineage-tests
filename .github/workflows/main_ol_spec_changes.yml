@@ -36,6 +36,10 @@ jobs:
           repository: OpenLineage/OpenLineage
           path: openlineage
 
+      - name: check for repo files
+        id: check-files
+        run: tree -d openlineage
+
       - name: check for changes in spec
         id: check-changes
         run: | 
