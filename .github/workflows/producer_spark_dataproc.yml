@@ -9,9 +9,9 @@ on:
       release:
         description: "release tag of OpenLineage to use"
         type: string
-      get-circleci-artifacts:
+      get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
-        type: boolean
+        type: string
 
 jobs:
   run-spark-tests:
@@ -26,24 +26,16 @@ jobs:
         with:
           credentials_json: '${{ secrets.gcpKey }}'
 
-      - name: Get OL artifacts
-        if: ${{ !inputs.get-circleci-artifacts }}
-        id: get_ol_artifacts
-        uses: ./.github/actions/get_openlineage_artifacts
+      - name: Get unreleased OL artifacts
+        id: get-ol-artifacts
+        uses: ./.github/actions/get_unreleased_openlineage_artifacts
         with:
           version: ${{ inputs.release }}
+          get-latest-snapshots: ${{ inputs.get-latest-snapshots }}
           skip-flink: 'true'
           skip-s3: 'true'
           skip-gcp-lineage: 'true'
           skip-sql: 'true'
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
-      - name: Get unreleased OL artifacts
-        if: ${{ inputs.get-circleci-artifacts }}
-        id: get-unreleased
-        uses: ./.github/actions/get_unreleased_openlineage_artifacts
-        with:
-          version: ${{ inputs.release }}
 
       # This should be somehow automated and return the newest version
       - name: Download Big Query Spark Maven Artifact
@@ -59,25 +51,22 @@ jobs:
 
       - name: Upload openlineage spark integration to GCS
         id: upload-spark-integration
-        if: ${{ !inputs.get-circleci-artifacts }}
         uses: ./.github/actions/upload_artifacts
         with:
-          local-file-path: ${{ steps.get_ol_artifacts.outputs.spark }}
+          local-file-path: ${{ steps.get-ol-artifacts.outputs.spark }}
           gcs-path: "gs://open-lineage-e2e/jars"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
       - name: Upload openlineage GCS transport to GCS
         id: upload-gcs-transport
-        if: ${{ !inputs.get-circleci-artifacts }}
         uses: ./.github/actions/upload_artifacts
         with:
-          local-file-path: ${{ steps.get_ol_artifacts.outputs.gcs-transport }}
+          local-file-path: ${{ steps.get-ol-artifacts.outputs.gcs }}
           gcs-path: "gs://open-lineage-e2e/jars"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
       - name: Upload Spark BigQuery connector to GCS
         id: upload-spark-bq-connector
-        if: ${{ !inputs.get-circleci-artifacts }}
         uses: ./.github/actions/upload_artifacts
         with:
           local-file-path: ${{ steps.download-spark-bq-connector.outputs.file }}
@@ -104,8 +93,6 @@ jobs:
           pip install flake8 pytest
           if [ -f producer/spark_dataproc/runner/requirements.txt ]; then pip install -r producer/spark_dataproc/runner/requirements.txt; fi
 
-
-        #TODO - we should be able to set the release of OL spark integration, not have it hardcoded. Not sure about the bigquery jar but probably something similar
       - name: Start producer
         run: |
           python producer/spark_dataproc/runner/dataproc_workflow.py create-cluster \

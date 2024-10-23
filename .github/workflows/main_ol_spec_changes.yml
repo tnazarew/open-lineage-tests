@@ -84,7 +84,7 @@ jobs:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
-      get-circleci-artifacts: true
+      get-latest-snapshots: 'true'
 
 ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 

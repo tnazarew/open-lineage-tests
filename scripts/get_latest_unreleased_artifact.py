@@ -75,45 +75,51 @@ def download_jar(path, url):
 def get_arguments():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--path', type=str, help="download directory")
-    # parser.add_argument('--skip_spark', type=str, help="skip download of spark", default="false")
-    # parser.add_argument('--skip_flink', type=str, help="skip download of flink", default="false")
-    # parser.add_argument('--skip_java', type=str, help="skip download of java", default="false")
-    # parser.add_argument('--skip_sql', type=str, help="skip download of sql", default="false")
-    # parser.add_argument('--skip_extensions', type=str, help="skip download of extensions", default="false")
-    # parser.add_argument('--skip_gcs', type=str, help="skip download of gcs", default="false")
-    # parser.add_argument('--skip_gcp_lineage', type=str, help="skip download of gcp-lineage", default="false")
-    # parser.add_argument('--skip_s3', type=str, help="skip download of s3", default="false")
+    parser.add_argument('--skip_java', type=str, help="skip download of java", default="false")
+    parser.add_argument('--skip_spark', type=str, help="skip download of spark", default="false")
+    parser.add_argument('--skip_flink', type=str, help="skip download of flink", default="false")
+    parser.add_argument('--skip_sql', type=str, help="skip download of sql", default="false")
+    parser.add_argument('--skip_extensions', type=str, help="skip download of extensions", default="false")
+    parser.add_argument('--skip_gcp_lineage', type=str, help="skip download of gcp-lineage", default="false")
+    parser.add_argument('--skip_gcs', type=str, help="skip download of gcs", default="false")
+    parser.add_argument('--skip_s3', type=str, help="skip download of s3", default="false")
+
+
 
     args = parser.parse_args()
-    # skipped = { args.skip_flink
-    # args.skip_flink
-    # args.skip_spark
-    # args.skip_extensions
-    # args.skip_java
-    # args.skip_gcp_lineage
-    # args.skip_gcs
-    # args.skip_s3
-    #
-    # skip-flink
-    # skip-spark
-    # skip-extensions
-    # skip-java
-    # skip-gcp-lineage
-    # skip-gcs
-    # skip-s3
+    skip_artifacts = []
+    if args.skip_java == 'true':
+        skip_artifacts.append('openlineage-java')
+    if args.skip_spark == 'true':
+        skip_artifacts.append('openlineage-spark_2.13')
+    if args.skip_flink == 'true':
+        skip_artifacts.append('openlineage-flink')
+    if args.skip_sql:
+        skip_artifacts.append('openlineage-sql-java')
+    if args.skip_extensions == 'true':
+        skip_artifacts.append('spark-extension-interfaces')
+    if args.skip_gcp_lineage == 'true':
+        skip_artifacts.append('transports-dataplex')
+    if args.skip_gcs == 'true':
+        skip_artifacts.append('transports-gcs')
+    if args.skip_s3 == 'true':
+        skip_artifacts.append('transports-s3')
 
-    return args.path
+    return args.path, skip_artifacts
 
 
 def main():
-    path = get_arguments()
+    path, skip_artifacts = get_arguments()
     workflow = get_latest_successful_workflow()
     if workflow:
         artifacts_list = get_artifacts_list(workflow)
         for url in artifacts_list:
-            print(f"Downloading from url: ${url}\n")
-            download_jar(path, url)
-            print("success\n")
+            if not any(a for a in skip_artifacts if url.__contains__(a)):
+                print(f"Downloading from url: ${url}\n")
+                download_jar(path, url)
+                print("success\n")
+            else:
+                print(f"{url} skipped")
     else:
         print('no workflow found')
         sys.exit(1)
@@ -121,3 +127,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
