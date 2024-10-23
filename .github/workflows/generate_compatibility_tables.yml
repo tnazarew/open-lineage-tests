@@ -19,7 +19,7 @@ jobs:
       - name: Run task for Collect Reports
         id: collect-and-merge-reports
         run: |
-          python scripts/generate_issue.py \
+          python scripts/generate_compatibility_tables.py \
           --failure_path=reports/updated-report.json \
           --target=reports/updated-compatibility-table.md
 
