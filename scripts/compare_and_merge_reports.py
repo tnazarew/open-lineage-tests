@@ -12,9 +12,8 @@ def get_arguments():
     args = parser.parse_args()
 
     report_base_dir = args.report_base_dir
-    time = args.time
 
-    return report_base_dir, time
+    return report_base_dir
 
 
 def get_new_report(new_report_paths):
@@ -25,7 +24,7 @@ def get_new_report(new_report_paths):
 
 
 def main():
-    base_dir, time = get_arguments()
+    base_dir = get_arguments()
     new_report_paths = [path for f in listdir(base_dir) if
                         isfile((path := join(base_dir, f))) and f.__contains__("-report.json") and f != "report.json"]
     old_report_path = join(base_dir, "report.json")
