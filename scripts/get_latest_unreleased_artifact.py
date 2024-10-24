@@ -67,6 +67,7 @@ def download_jar(path, url):
         with open(join(path, filename), 'wb') as file:
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
+        print(f"file {join(path, filename)} downloaded successfully")
         return filename
     except Exception as e:
         print(f"Error downloading file: {e}")
