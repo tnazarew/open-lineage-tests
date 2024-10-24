@@ -136,6 +136,8 @@ def release_between(release, min_version, max_version):
 
 
 def get_expected_events(producer_dir, component, scenario_name, config, release):
+    if component == 'scenarios':
+        return None
     test_events = []
     for test in config['tests']:
         if release_between(release, test['tags'].get('min_version'), test['tags'].get('max_version')):
@@ -156,7 +158,11 @@ def validate_scenario_syntax(result_events, validator):
 
 
 def get_config(producer_dir, component, scenario_name):
-    with open(join(producer_dir, component, 'scenarios', scenario_name, 'config.json')) as f:
+    if component == 'scenarios':
+        path = join(producer_dir, 'scenarios', scenario_name, 'config.json')
+    else:
+        path = join(producer_dir, component, 'scenarios', scenario_name, 'config.json')
+    with open(path) as f:
         return json.load(f)
 
 
@@ -186,7 +192,7 @@ def main():
     validator = OLSyntaxValidator.load_schemas(paths=spec_dirs)
     scenarios = {}
     for scenario_name in listdir(base_dir):
-        scenario_path = join(base_dir, scenario_name)
+        scenario_path = get_path(base_dir, component, scenario_name)
         if isdir(scenario_path):
             config = get_config(producer_dir, component, scenario_name)
             expected = get_expected_events(producer_dir, component, scenario_name, config, release)
@@ -202,6 +208,12 @@ def main():
     report = Report({component: Component(component, 'producer', scenarios)})
     with open(target, 'w') as f:
         json.dump(report.to_dict(), f, indent=2)
+
+
+def get_path(base_dir, component, scenario_name):
+    if component == 'scenarios':
+        return join(base_dir, scenario_name, 'events')
+    return join(base_dir, scenario_name)
 
 
 if __name__ == "__main__":
