@@ -28,7 +28,7 @@ jobs:
           release: ${{ inputs.release }}
           target-path: 'reports/scenarios-report.json'
           event-directory: './consumer/scenarios'
-          producer_dir: './consumer'
+          producer-dir: './consumer'
 
       - uses: actions/upload-artifact@v4
         with:
