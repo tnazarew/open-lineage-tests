@@ -1,7 +1,17 @@
 name: Check for changes in OL
 # Assumption here is that there will be a change that touches spec or spark integration
 
-on: push
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      run_tests:
+        description: 'Run tests'
+        required: false
+        default: 'true'
+      openlineage_release:
+        description: 'Override OpenLineage release version'
+        required: false
 # actual trigger for daily run of workflow
 #on:
 #  schedule:
@@ -18,8 +28,8 @@ jobs:
   initialize_workflow:
     runs-on: ubuntu-latest
     outputs:
-      changes_in_spec: ${{steps.check-changes.outputs.changes_found}}
-      ol_release: ${{ steps.get-release.outputs.openlineage_release }}
+      changes_in_spec: ${{ github.event.inputs.run_tests || steps.check-changes.outputs.changes_found }}
+      ol_release: ${{ github.event.inputs.openlineage_release || steps.get-release.outputs.openlineage_release }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

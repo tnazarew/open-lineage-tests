@@ -29,6 +29,7 @@ runs:
       id: upload-artifact
       shell: bash
       run: |
-        uploaded_path=$(python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path }} --credentials ${{ inputs.credentials }})
+        uploaded_path=$(python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path }} --credentials ${{ inputs.credentials }} 2> /tmp/upload.err)
         echo "LOG HERE >>>>>> uploaded_file=$uploaded_path"
+        echo "LOG HERE >>>>>> stderr: $(cat /tmp/upload.err)"
         echo "uploaded_file=$uploaded_path" >> $GITHUB_OUTPUT
