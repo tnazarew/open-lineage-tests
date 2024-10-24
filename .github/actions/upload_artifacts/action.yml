@@ -29,7 +29,14 @@ runs:
       id: upload-artifact
       shell: bash
       run: |
-        uploaded_path=$(python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path }} --credentials ${{ inputs.credentials }} 2> /tmp/upload.err)
-        echo "LOG HERE >>>>>> uploaded_file=$uploaded_path"
-        echo "LOG HERE >>>>>> stderr: $(cat /tmp/upload.err)"
-        echo "uploaded_file=$uploaded_path" >> $GITHUB_OUTPUT
+        python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path }} --credentials ${{ inputs.credentials }}
+        exit_code=$?
+
+        if [ $exit_code -ne 0 ]; then
+          echo "An error occurred during the upload process"
+          exit $exit_code
+        else
+          echo "Script executed successfully"
+          echo "uploaded_file=$(cat /tmp/SUCCESS)" >> $GITHUB_OUTPUT
+          rm /tmp/SUCCESS
+        fi
