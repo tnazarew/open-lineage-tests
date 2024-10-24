@@ -98,7 +98,7 @@ runs:
       shell: bash
       run: |
         echo "downloaded artifacts:"
-        echo "/tmp/openlineage_snapshots"
+        echo "$(ls /tmp/openlineage_snapshots)"
 
     # artifacts snapshots are not published in latest build if no code was changed in them
     # this checks which of not skipped artifacts are missing and marks them as 'to download from maven'
