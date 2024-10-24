@@ -50,6 +50,6 @@ jobs:
 
       - name: Fail if new failures found
         id: fail-for-new-failures
-        if: ${{ inputs.fail-for-new-failures }}
+        if: ${{ inputs.fail-for-new-failures && steps.collect-and-merge-reports.outcome == 'success'}}
         run: |
-          jq -e '. == []' reports/retention-failures-report.json > /dev/null || { exit 1 }
+          jq -e '. == []' reports/retention-failures-report.json > /dev/null ||  exit 1

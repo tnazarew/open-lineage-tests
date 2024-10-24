@@ -54,7 +54,7 @@ jobs:
   dataplex:
     needs:
       - initialize_workflow
-      - scenarios
+#      - scenarios
     if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' || needs.initialize_workflow.outputs.run_dataplex }}
     uses: ./.github/workflows/consumer_dataplex.yml
     secrets:
@@ -89,12 +89,4 @@ jobs:
     needs: collect-and-compare-reports
     if: ${{ !failure() }}
     uses: ./.github/workflows/generate_compatibility_tables.yml
-
-  update_report:
-    needs:
-      - collect-and-compare-reports
-      - generate-compatibility-tables
-    if: ${{ !failure() }}
-    uses: ./.github/workflows/update_repo_files.yml
-
 
