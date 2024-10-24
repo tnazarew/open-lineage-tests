@@ -89,8 +89,8 @@ def get_arguments():
     skip_artifacts = []
     if args.skip_java == 'true':
         skip_artifacts.append('openlineage-java')
-    if args.skip_spark == 'true':
-        skip_artifacts.append('openlineage-spark_2.13')
+
+    skip_artifacts.append('openlineage-spark_2.13')
     if args.skip_flink == 'true':
         skip_artifacts.append('openlineage-flink')
     if args.skip_sql:

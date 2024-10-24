@@ -155,7 +155,7 @@ runs:
         url: 'https://repo1.maven.org'
         repository: 'maven2'
         groupId: 'io.openlineage'
-        artifactId: 'openlineage-spark_2.13'
+        artifactId: 'openlineage-spark_2.12'
         version: ${{ inputs.version }}
         extension: 'jar'
 
