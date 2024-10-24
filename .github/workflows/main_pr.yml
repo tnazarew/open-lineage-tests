@@ -91,7 +91,9 @@ jobs:
     uses: ./.github/workflows/generate_compatibility_tables.yml
 
   update_report:
-    needs: collect-and-compare-reports
+    needs:
+      - collect-and-compare-reports
+      - generate-compatibility-tables
     if: ${{ !failure() }}
     uses: ./.github/workflows/update_repo_files.yml
 
