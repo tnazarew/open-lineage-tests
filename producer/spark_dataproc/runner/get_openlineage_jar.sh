@@ -6,7 +6,7 @@
 set -euxo pipefail
 
 readonly VM_SPARK_JARS_DIR=/usr/lib/spark/jars
-readonly OPENLINEAGE_SPARK_URL=$(/usr/share/google/get_metadata_value attributes/openlineage-spark-url || true)
+readonly OPENLINEAGE_SPARK_URL=$(/usr/share/google/get_metadata_value attributes/OPENLINEAGE_SPARK_URL || true)
 
 if [[ -d ${OPENLINEAGE_SPARK_URL} ]]; then
     jar_url=${OPENLINEAGE_SPARK_URL}
