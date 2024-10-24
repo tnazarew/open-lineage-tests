@@ -26,7 +26,7 @@
       "gcp_dataproc_spark": {
         "queryNodeName": "execute_insert_into_hive_table",
         "appName": "CLI test application",
-        "appId": "local-1729156674719",
+        "appId": "{{ any(result) }}",
         "projectId": "gcp-open-lineage-testing"
       }
     }
@@ -53,12 +53,12 @@
   },
   "inputs": [
     {
-      "namespace": "hdfs://dataproc-producer-test-m",
+      "namespace": "{{ any(result) }}",
       "name": "/user/hive/warehouse/t1",
       "facets": {
         "dataSource": {
-          "name": "hdfs://dataproc-producer-test-m",
-          "uri": "hdfs://dataproc-producer-test-m"
+          "name": "{{ any(result) }}",
+          "uri": "{{ any(result) }}"
         },
         "schema": {
           "fields": [
@@ -75,7 +75,7 @@
         "symlinks": {
           "identifiers": [
             {
-              "namespace": "hive://dataproc-producer-test-m:9083",
+              "namespace": "{{ any(result) }}",
               "name": "default.t1",
               "type": "TABLE"
             }
@@ -87,12 +87,12 @@
   ],
   "outputs": [
     {
-      "namespace": "hdfs://dataproc-producer-test-m",
+      "namespace": "{{ any(result) }}",
       "name": "/user/hive/warehouse/t2",
       "facets": {
         "dataSource": {
-          "name": "hdfs://dataproc-producer-test-m",
-          "uri": "hdfs://dataproc-producer-test-m"
+          "name": "{{ any(result) }}",
+          "uri": "{{ any(result) }}"
         },
         "schema": {
           "fields": [
@@ -111,7 +111,7 @@
             "a": {
               "inputFields": [
                 {
-                  "namespace": "hdfs://dataproc-producer-test-m",
+                  "namespace": "{{ any(result) }}",
                   "name": "/user/hive/warehouse/t1",
                   "field": "a",
                   "transformations": [
@@ -128,7 +128,7 @@
             "b": {
               "inputFields": [
                 {
-                  "namespace": "hdfs://dataproc-producer-test-m",
+                  "namespace": "{{ any(result) }}",
                   "name": "/user/hive/warehouse/t1",
                   "field": "b",
                   "transformations": [
@@ -147,7 +147,7 @@
         "symlinks": {
           "identifiers": [
             {
-              "namespace": "hive://dataproc-producer-test-m:9083",
+              "namespace": "{{ any(result) }}",
               "name": "default.t2",
               "type": "TABLE"
             }
