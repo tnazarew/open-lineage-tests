@@ -1,10 +1,10 @@
 {
-  "eventTime": "2024-10-17T09:18:17.298Z",
+  "eventTime": "2024-10-17T09:18:29.267Z",
   "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
   "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
   "eventType": "COMPLETE",
   "run": {
-    "runId": "019299c5-4f43-7e45-aa6f-c65164159854",
+    "runId": "019299c5-73cf-7069-a70f-74eb8070b577",
     "facets": {
       "parent": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
@@ -35,7 +35,7 @@
       "gcp_dataproc_spark": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
         "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/GcpDataprocRunFacet.json#/$defs/GcpDataprocRunFacet",
-        "queryNodeName": "execute_create_table_command",
+        "queryNodeName": "execute_insert_into_hive_table",
         "appName": "CLI test application",
         "appId": "local-1729156674719",
         "projectId": "gcp-open-lineage-testing"
@@ -44,7 +44,7 @@
   },
   "job": {
     "namespace": "default",
-    "name": "cl_i_test_application.execute_create_table_command.warehouse_t1",
+    "name": "cl_i_test_application.execute_insert_into_hive_table.warehouse_t2",
     "facets": {
       "jobType": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
@@ -56,7 +56,7 @@
       "sql": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
         "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/SQLJobFacet.json#/$defs/SQLJobFacet",
-        "query": "CREATE TABLE IF NOT EXISTS t1 (a INT, b STRING);"
+        "query": "CREATE TABLE IF NOT EXISTS t2 AS SELECT * FROM t1;"
       },
       "gcp_lineage": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
@@ -68,8 +68,7 @@
       }
     }
   },
-  "inputs": [],
-  "outputs": [
+  "inputs": [
     {
       "namespace": "hdfs://dataproc-producer-test-m",
       "name": "/user/hive/warehouse/t1",
@@ -104,11 +103,86 @@
               "type": "TABLE"
             }
           ]
-        },
-        "lifecycleStateChange": {
+        }
+      },
+      "inputFacets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "hdfs://dataproc-producer-test-m",
+      "name": "/user/hive/warehouse/t2",
+      "facets": {
+        "dataSource": {
           "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
-          "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/LifecycleStateChangeDatasetFacet.json#/$defs/LifecycleStateChangeDatasetFacet",
-          "lifecycleStateChange": "CREATE"
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/DatasourceDatasetFacet.json#/$defs/DatasourceDatasetFacet",
+          "name": "hdfs://dataproc-producer-test-m",
+          "uri": "hdfs://dataproc-producer-test-m"
+        },
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-1/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "a",
+              "type": "integer"
+            },
+            {
+              "name": "b",
+              "type": "string"
+            }
+          ]
+        },
+        "columnLineage": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-2-0/ColumnLineageDatasetFacet.json#/$defs/ColumnLineageDatasetFacet",
+          "fields": {
+            "a": {
+              "inputFields": [
+                {
+                  "namespace": "hdfs://dataproc-producer-test-m",
+                  "name": "/user/hive/warehouse/t1",
+                  "field": "a",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "b": {
+              "inputFields": [
+                {
+                  "namespace": "hdfs://dataproc-producer-test-m",
+                  "name": "/user/hive/warehouse/t1",
+                  "field": "b",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "symlinks": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/SymlinksDatasetFacet.json#/$defs/SymlinksDatasetFacet",
+          "identifiers": [
+            {
+              "namespace": "hive://dataproc-producer-test-m:9083",
+              "name": "default.t2",
+              "type": "TABLE"
+            }
+          ]
         }
       },
       "outputFacets": {}
