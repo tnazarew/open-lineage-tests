@@ -33,7 +33,7 @@ def main():
     if not os.path.exists(local_file_path):
         print(f"file {local_file_path} not found")
         # Local file does not exist; do nothing
-        sys.exit(0)
+        sys.exit(1)
 
     if not gcs_path.startswith('gs://'):
         print("Error: GCS path must start with gs://")

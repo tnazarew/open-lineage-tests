@@ -3,6 +3,19 @@ name: Daily Build
 on:
   schedule:
     - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      run_dataplex:
+        description: 'Run Dataplex tests'
+        required: false
+        default: 'true'
+      run_spark_dataproc:
+        description: 'Run Spark Dataproc tests'
+        required: false
+        default: 'true'
+      openlineage_release:
+        description: 'Override OpenLineage release version'
+        required: false
 
 permissions:
   id-token: write
@@ -14,9 +27,9 @@ jobs:
   initialize_workflow:
     runs-on: ubuntu-latest
     outputs:
-      run_dataplex: 'true'
-      run_spark_dataproc: 'true'
-      openlineage_release: ${{ steps.select-components.outputs.ol_release }}
+      run_dataplex: ${{ github.event.inputs.run_dataplex || 'true' }}
+      run_spark_dataproc: ${{ github.event.inputs.run_spark_dataproc || 'true' }}
+      openlineage_release: ${{ github.event.inputs.openlineage_release || steps.select-components.outputs.ol_release }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
