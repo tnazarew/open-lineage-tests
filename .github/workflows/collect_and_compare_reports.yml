@@ -52,4 +52,4 @@ jobs:
         id: fail-for-new-failures
         if: ${{ inputs.fail-for-new-failures }}
         run: |
-          [ -f reports/retention-failures-report.json ] || { exit 1 }
+          jq -e '. == []' reports/retention-failures-report.json > /dev/null || { exit 1 }
