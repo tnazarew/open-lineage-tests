@@ -43,8 +43,6 @@ jobs:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_scenarios == 'true' }}
     uses: ./.github/workflows/check_scenarios.yml
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
      get-latest-snapshots: false
      release: ${{ needs.initialize_workflow.outputs.ol_release }}
