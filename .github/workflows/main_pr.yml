@@ -78,8 +78,8 @@ jobs:
     needs:
       - initialize_workflow
 #      - scenarios
-#      - dataplex
-      - spark_dataproc
+      - dataplex
+#      - spark_dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
