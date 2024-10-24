@@ -1,0 +1,246 @@
+name: Get OpenLineage Artifacts
+description: "Download OpenLineage artifacts"
+author: Tomasz Nazarewicz
+inputs:
+  get-latest-snapshots:
+    description: "first try to download artifacts from OL builds"
+    required: false
+    default: 'false'
+  version:
+    description: "Version of components to use as a fallback to missing OL build artifacts"
+    required: true
+  skip-spark:
+    description: "Skip spark integration download"
+    required: false
+    default: 'false'
+  skip-java:
+    description: "Skip java client download"
+    required: false
+    default: 'false'
+  skip-flink:
+    description: "Skip spark integration download"
+    required: false
+    default: 'false'
+  skip-sql:
+    description: "Skip sql interface download"
+    required: false
+    default: 'false'
+  skip-extensions:
+    description: "Skip extensions download"
+    required: false
+    default: 'false'
+  skip-gcp-lineage:
+    description: "Skip gcp-lineage transport download"
+    required: false
+    default: 'false'
+  skip-gcs:
+    description: "Skip gcs transport download"
+    required: false
+    default: 'false'
+  skip-s3:
+    description: "Skip s3 transport download"
+    required: false
+    default: 'false'
+
+
+outputs:
+  java:
+    value: ${{ steps.consolidate-outputs.outputs.java }}
+    description: "File path of the downloaded openlineage-java jar"
+  spark:
+    value: ${{ steps.consolidate-outputs.outputs.spark }}
+    description: "File path of the downloaded openlineage-spark jar"
+  flink:
+    value: ${{ steps.consolidate-outputs.outputs.flink }}
+    description: "File path of the downloaded openlineage-flink jar"
+  sql:
+    value: ${{ steps.consolidate-outputs.outputs.sql }}
+    description: "File path of the downloaded openlineage-sql-java jar"
+  extensions:
+    value: ${{ steps.consolidate-outputs.outputs.extensions }}
+    description: "File path of the downloaded openlineage-extensions jar"
+  gcp-lineage:
+    value: ${{ steps.consolidate-outputs.outputs.gcp-lineage }}
+    description: "File path of the downloaded transports-gcp-lineage jar"
+  gcs:
+    value: ${{ steps.consolidate-outputs.outputs.gcs }}
+    description: "File path of the downloaded transports-gcs jar"
+  s3:
+    value: ${{ steps.consolidate-outputs.outputs.s3 }}
+    description: "File path of the downloaded transports-s3 jar"
+
+runs:
+  using: "composite"
+  steps:
+    - name: create download dir in tmp
+      id: create-download-dir
+      shell: bash
+      run: mkdir -p /tmp/openlineage_snapshots
+
+    - name: Download OpenLineage artifacts from build
+      if: ${{ inputs.get-latest-snapshots == 'true' }}
+      id: download-snapshots
+      shell: bash
+      run: |
+        python ./scripts/get_latest_unreleased_artifact.py \
+        --path=/tmp/openlineage_snapshots \
+        --skip-java=${{ inputs.skip-java }} \
+        --skip-spark=${{ inputs.skip-spark }} \
+        --skip-flink=${{ inputs.skip-flink }} \
+        --skip-sql=${{ inputs.skip-sql }} \
+        --skip-extensions=${{ inputs.skip-extensions }} \
+        --skip-gcp-lineage=${{ inputs.skip-gcp-lineage }} \
+        --skip-gcs=${{ inputs.skip-gcs }} \
+        --skip-s3=${{ inputs.skip-s3 }}
+
+    - name: list downloads
+      id: list-downloads
+      shell: bash
+      run: |
+        echo "downloaded artifacts:"
+        echo "$(ls /tmp/openlineage_snapshots)"
+
+    # artifacts snapshots are not published in latest build if no code was changed in them
+    # this checks which of not skipped artifacts are missing and marks them as 'to download from maven'
+    # if previous step was skipped, all are missing (besides skipped)
+    - name: Set outputs and mark missing artifacts
+      id: set-action-outputs
+      shell: bash
+      run: |
+        check_artifact_downloaded() {
+          if [ $2 = 'false' ]; then
+            if [ -f /tmp/openlineage_snapshots/$1 ]; then
+              echo "$3=$(ls /tmp/openlineage_snapshots/$1)" >> $GITHUB_OUTPUT
+            else
+              echo "skip-$3=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+        }
+        
+        echo "skip-java=true" >> $GITHUB_OUTPUT
+        echo "skip-spark=true" >> $GITHUB_OUTPUT
+        echo "skip-flink=true" >> $GITHUB_OUTPUT
+        echo "skip-sql=true" >> $GITHUB_OUTPUT
+        echo "skip-extensions=true" >> $GITHUB_OUTPUT
+        echo "skip-gcp-lineage=true" >> $GITHUB_OUTPUT
+        echo "skip-gcs=true" >> $GITHUB_OUTPUT
+        echo "skip-s3=true" >> $GITHUB_OUTPUT
+        
+        check_artifact_downloaded openlineage-java-*.jar ${{ inputs.skip-java }} "java"
+        check_artifact_downloaded openlineage-spark_*.jar ${{ inputs.skip-spark }} "spark"
+        check_artifact_downloaded openlineage-flink-*.jar ${{ inputs.skip-flink }} "flink"
+        check_artifact_downloaded openlineage-sql-java*.jar ${{ inputs.skip-sql }} "sql"
+        check_artifact_downloaded spark-extension-interfaces-*.jar ${{ inputs.skip-extensions }} "extensions"
+        check_artifact_downloaded transports-dataplex-*.jar ${{ inputs.skip-gcp-lineage }} "gcp-lineage"
+        check_artifact_downloaded transports-gcs-*.jar ${{ inputs.skip-gcs }} "gcs"
+        check_artifact_downloaded transports-s3-*.jar ${{ inputs.skip-s3 }} "s3"
+
+    - name: Download openlineage-java Maven Artifact
+      id: download-java-client
+      if: ${{ steps.set-action-outputs.outputs.skip-java == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'openlineage-java'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download openlineage spark integration Maven Artifact
+      id: download-spark-integration
+      if: ${{ steps.set-action-outputs.outputs.skip-spark == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'openlineage-spark_2.12'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download openlineage flink Maven Artifact
+      id: download-flink-integration
+      if: ${{ steps.set-action-outputs.outputs.skip-flink == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'openlineage-flink'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download openlineage-sql Maven Artifact
+      id: download-java-sql
+      if: ${{ steps.set-action-outputs.outputs.skip-sql == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'openlineage-sql-java'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download spark extension interfaces Maven Artifact
+      id: download-spark-extension-interfaces
+      if: ${{ steps.set-action-outputs.outputs.skip-extensions == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'spark-extension-interfaces'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download gcp lineage Maven Artifact
+      id: download-transports-gcp-lineage
+      if: ${{ steps.set-action-outputs.outputs.skip-gcp-lineage == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'transports-dataplex'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download gcs transport Maven Artifact
+      id: download-transports-gcs
+      if: ${{ steps.set-action-outputs.outputs.skip-gcs == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'transports-gcs'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download s3 transport Maven Artifact
+      id: download-transports-s3
+      if: ${{ steps.set-action-outputs.outputs.skip-s3 == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'transports-s3'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+
+    - name: consolidate outputs
+      id: consolidate-outputs
+      shell: bash
+      run: |
+        echo "java=${{ steps.set-action-outputs.outputs.java || steps.download-java-client.outputs.file }}" >> $GITHUB_OUTPUT
+        echo "spark=${{ steps.set-action-outputs.outputs.spark || steps.download-spark-integration.outputs.file }}" >> $GITHUB_OUTPUT
+        echo "flink=${{ steps.set-action-outputs.outputs.flink || steps.download-flink-integration.outputs.file }}" >> $GITHUB_OUTPUT
+        echo "sql=${{ steps.set-action-outputs.outputs.sql || steps.download-java-sql.outputs.file }}" >> $GITHUB_OUTPUT
+        echo "extensions=${{ steps.set-action-outputs.outputs.extensions || steps.download-spark-extension-interfaces.outputs.file }}" >> $GITHUB_OUTPUT
+        echo "gcp-lineage=${{ steps.set-action-outputs.outputs.gcp-lineage || steps.download-transports-gcp-lineage.outputs.file }}" >> $GITHUB_OUTPUT
+        echo "gcs=${{ steps.set-action-outputs.outputs.gcs || steps.download-transports-gcs.outputs.file }}" >> $GITHUB_OUTPUT
+        echo "s3=${{ steps.set-action-outputs.outputs.s3 || steps.download-transports-s3.outputs.file }}" >> $GITHUB_OUTPUT

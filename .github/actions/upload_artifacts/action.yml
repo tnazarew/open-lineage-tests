@@ -1,0 +1,42 @@
+name: Upload Artifact to GCS
+description: "Upload artifact to GCS"
+author: Dominik Dębowczyk
+inputs:
+  local-file-path:
+    description: "Path to the artifact"
+    required: true
+  gcs-path:
+    description: "GCS destination path"
+    required: true
+  credentials:
+    description: "GCP credentials"
+outputs:
+  uploaded-file:
+    value: ${{ steps.upload-artifact.outputs.uploaded_file }}
+    description: "Path to the uploaded artifact"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip' # caching pip dependencies
+    - name: Install dependencies
+      shell: bash
+      run: pip install -r ./scripts/requirements.txt
+    - name: Upload artifact
+      id: upload-artifact
+      shell: bash
+      run: |
+        python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path }} --credentials ${{ inputs.credentials }}
+        exit_code=$?
+
+        if [ $exit_code -ne 0 ]; then
+          echo "An error occurred during the upload process"
+          exit $exit_code
+        else
+          echo "Script executed successfully"
+          echo "uploaded_file=$(cat /tmp/SUCCESS)" >> $GITHUB_OUTPUT
+          rm /tmp/SUCCESS
+        fi

@@ -1,0 +1,94 @@
+[
+  {
+    "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/13b85549-2575-4562-a9ab-8bce3b8e99f1",
+    "start_time": "2024-08-06T13:26:54.118Z",
+    "end_time": "2024-08-06T13:26:54.118Z",
+    "links": [
+      {
+        "source": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/cll_source2"
+        },
+        "target": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/tbl1"
+        }
+      },
+      {
+        "source": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/cll_source1"
+        },
+        "target": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/tbl1"
+        }
+      }
+    ]
+  },
+  {
+    "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/434626e5-b8d0-47b5-98ab-093394171d89",
+    "start_time": "2024-08-06T13:26:54.340Z",
+    "end_time": "2024-08-06T13:26:54.340Z",
+    "links": [
+      {
+        "source": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/cll_source2"
+        },
+        "target": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/tbl1"
+        }
+      },
+      {
+        "source": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/cll_source1"
+        },
+        "target": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/tbl1"
+        }
+      }
+    ]
+  },
+  {
+    "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/887485dc-f0d7-42bb-9ecc-7f9afd5699ae",
+    "start_time": "2024-08-06T13:26:54.268Z",
+    "end_time": "2024-08-06T13:26:54.268Z",
+    "links": [
+      {
+        "source": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/cll_source2"
+        },
+        "target": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/tbl1"
+        }
+      },
+      {
+        "source": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/cll_source1"
+        },
+        "target": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/tbl1"
+        }
+      }
+    ]
+  },
+  {
+    "name": "projects/484892851355/locations/us/processes/82b3582cf1d7d73478613f6458580f97/runs/9cb719f67fe8433e41219deae747a749/lineageEvents/cf7d3a47-1eef-47bb-827c-16f290d1dbfc",
+    "start_time": "2024-08-06T13:26:53.776Z",
+    "end_time": "2024-08-06T13:26:53.776Z",
+    "links": [
+      {
+        "source": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/cll_source2"
+        },
+        "target": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/tbl1"
+        }
+      },
+      {
+        "source": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/cll_source1"
+        },
+        "target": {
+          "fully_qualified_name": "custom:file/tmp/cll_test/tbl1"
+        }
+      }
+    ]
+  }
+]

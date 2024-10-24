@@ -1,0 +1,65 @@
+name: Run syntax validation for OL events
+description: "Runs syntax validation for OL events using spec from given release of OL"
+author: Tomasz Nazarewicz
+inputs:
+  tag:
+    description: "Version of the spec to check against"
+    required: true
+  release:
+    description: "release to run the validation with"
+    required: true
+  target-path:
+    description: "Path to save the report to"
+    required: true
+  event-directory:
+    description: "Directory containing the events to validate"
+    required: true
+  producer-dir:
+    description: "directory with producer definitions"
+    required: true
+    default: './producer'
+  component:
+    description: "Component name to use"
+    required: true
+
+
+outputs:
+  report_path:
+    value: ${{ inputs.target-path }}
+    description: "File path of the downloaded openlineage-java jar"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+
+    - name: create dir for ol spec and report
+      id: dir_for_spec
+      shell: bash
+      run: |
+        mkdir -p spec
+        mkdir -p report
+
+    - name: get latest OL spec
+      uses: actions/checkout@v4
+      with:
+        repository: OpenLineage/OpenLineage
+        ref: ${{ inputs.tag }}
+        path: spec
+        sparse-checkout: |
+          spec/
+
+    - name: Validate OpenLineage events
+      shell: bash
+      run: |
+        pip install -r ./scripts/requirements.txt
+        python scripts/validate_ol_events.py \
+        --event_base_dir=${{ inputs.event-directory }} \
+        --spec_dirs=spec/spec/,spec/spec/facets/,spec/spec/registry/gcp/dataproc/facets,spec/spec/registry/gcp/lineage/facets \
+        --target=${{ inputs.target-path }} \
+        --component="${{ inputs.component }}" \
+        --producer_dir=${{ inputs.producer-dir }} \
+        --release=${{ inputs.release }}

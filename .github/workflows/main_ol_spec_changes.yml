@@ -1,0 +1,112 @@
+name: Check for changes in OL
+# Assumption here is that there will be a change that touches spec or spark integration
+
+on:
+  schedule:
+    - cron: "0 5 * * 0"
+  workflow_dispatch:
+    inputs:
+      run_tests:
+        description: 'Run tests'
+        required: false
+        default: 'true'
+      openlineage_release:
+        description: 'Override OpenLineage release version'
+        required: false
+
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  initialize_workflow:
+    runs-on: ubuntu-latest
+    outputs:
+      changes_in_spec: ${{ github.event.inputs.run_tests || steps.check-changes.outputs.changes_found }}
+      ol_release: ${{ github.event.inputs.openlineage_release || steps.get-release.outputs.openlineage_release }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: create dir for ol spec and report
+        id: dir_for_spec
+        shell: bash
+        run: |
+          mkdir -p openlineage
+
+      - name: get latest OL spec
+        uses: actions/checkout@v4
+        with:
+          repository: OpenLineage/OpenLineage
+          path: openlineage
+
+      - name: check for changes in spec
+        id: check-changes
+        run: | 
+          echo "changes_found=false" >> $GITHUB_OUTPUT
+          
+            python scripts/compare_spec_versions.py \
+            --spec_base=./openlineage/spec \
+            --versions_path=./generated-files/spec_versions.json \
+            --new_versions_path=./updated_spec_versions.json
+          
+          if [ -f updated_spec_versions.json ]; then
+            echo "changes_found=true" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: steps.check-changes.outputs.changes_found == 'true'
+        with:
+          name: spec-versions
+          path: generated-files/updated_spec_versions.json
+          retention-days: 1
+
+      - name: get openlineage release
+        if: steps.check-changes.outputs.changes_found == 'true'
+        id: get-release
+        run: |
+          openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
+          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
+
+
+  ######## COMPONENT VALIDATION ########
+
+  # check if scenarios are still compatible with the new spec
+  scenarios_check:
+    needs:
+      - initialize_workflow
+    if: ${{ success() && needs.initialize_workflow.outputs.changes_in_spec == 'true' }}
+    uses: ./.github/workflows/check_scenarios.yml
+    with:
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      get-latest-snapshots: 'true'
+      fail-for-failures: false
+
+  # check if producers still produce compatible events
+  spark-dataproc:
+    needs:
+      - initialize_workflow
+    if: ${{ success() && needs.initialize_workflow.outputs.changes_in_spec == 'true' }}
+    uses: ./.github/workflows/producer_spark_dataproc.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      get-latest-snapshots: 'true'
+
+######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
+
+  collect-and-compare-reports:
+    needs:
+      - initialize_workflow
+      - scenarios_check
+      - spark-dataproc
+    uses: ./.github/workflows/collect_and_compare_reports.yml
+
+  notify-maintainers:
+    needs: collect-and-compare-reports
+    uses: ./.github/workflows/notify_maintainers.yml
+

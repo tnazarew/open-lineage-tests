@@ -1,1 +1,14 @@
-{}
+[
+  {
+    "name": "dataplex",
+    "latest_version": ""
+  },
+  {
+    "name": "spark_dataproc",
+    "latest_version": ""
+  },
+  {
+    "name": "openlineage",
+    "latest_version": "1.23.0"
+  }
+]

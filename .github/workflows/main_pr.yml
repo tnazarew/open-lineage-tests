@@ -1,0 +1,100 @@
+name: Pull Request trigger
+
+on:
+  pull_request:
+
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  issues: write
+
+
+jobs:
+  initialize_workflow:
+    runs-on: ubuntu-latest
+    outputs:
+      run_dataplex: ${{ steps.changed_files.outputs.dataplex_any_changed }}
+      run_scenarios: ${{ steps.changed_files.outputs.scenarios_any_changed }}
+      run_spark_dataproc: ${{ steps.changed_files.outputs.spark_dataproc_any_changed }}
+      ol_release: ${{ steps.get-release.outputs.openlineage_release }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: changed_files
+        uses: tj-actions/changed-files@v45
+        with:
+          files_yaml: |
+            scenarios:
+              - consumer/scenarios/**
+            dataplex:
+              - consumer/consumers/dataplex/**
+            spark_dataproc:
+              - producer/spark_dataproc/**
+
+      - name: get openlineage release
+        id: get-release
+        run: |
+          openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
+          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
+
+  ######## COMPONENT VALIDATION ########
+
+  scenarios:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_scenarios == 'true' }}
+    uses: ./.github/workflows/check_scenarios.yml
+    with:
+     get-latest-snapshots: false
+     release: ${{ needs.initialize_workflow.outputs.ol_release }}
+
+  dataplex:
+    needs:
+      - initialize_workflow
+      - scenarios
+    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' || needs.initialize_workflow.outputs.run_dataplex }}
+    uses: ./.github/workflows/consumer_dataplex.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+
+  spark_dataproc:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
+    uses: ./.github/workflows/producer_spark_dataproc.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      get-latest-snapshots: 'false'
+
+  ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
+
+  collect-and-compare-reports:
+    needs:
+      - initialize_workflow
+      - scenarios
+      - dataplex
+      - spark_dataproc
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/collect_and_compare_reports.yml
+    with:
+      fail-for-new-failures: true
+
+  generate-compatibility-tables:
+    needs: collect-and-compare-reports
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/generate_compatibility_tables.yml
+
+  update_report:
+    needs:
+      - collect-and-compare-reports
+      - generate-compatibility-tables
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/update_repo_files.yml
+
+

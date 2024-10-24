@@ -1,0 +1,41 @@
+name: Notify Maintainers
+
+on:
+  workflow_call:
+    
+jobs:
+  notify-maintainers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: retention-failures-report
+          path: reports/
+          merge-multiple: true
+
+      - name: check if report is empty
+        id: check-report-empty
+        run: |
+          result=$(jq '. == []' reports/retention-failures-report.json)
+          echo "report-empty=${result}" >> $GITHUB_OUTPUT
+
+      - name: Run task for Collect Reports
+        id: collect-and-merge-reports
+        if: ${{ steps.check-report-empty.outputs.report-empty == 'false'}}
+        run: |
+          python scripts/generate_issue.py \
+          --failure_path=reports/retention-failures-report.json \
+          --issue_path=generated-files/issue.md
+
+      - name: Create Issue From File
+        uses: peter-evans/create-issue-from-file@v5
+        if: ${{ steps.check-report-empty.outputs.report-empty == 'false'}}
+        with:
+          title: An example issue
+          content-filepath: generated-files/issue.md
+          labels: |
+            report
+            automated issue

@@ -1,0 +1,118 @@
+name: Daily Build
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      run_dataplex:
+        description: 'Run Dataplex tests'
+        required: false
+        default: 'true'
+      run_spark_dataproc:
+        description: 'Run Spark Dataproc tests'
+        required: false
+        default: 'true'
+      openlineage_release:
+        description: 'Override OpenLineage release version'
+        required: false
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  initialize_workflow:
+    runs-on: ubuntu-latest
+    outputs:
+      run_dataplex: ${{ github.event.inputs.run_dataplex || 'true' }}
+      run_spark_dataproc: ${{ github.event.inputs.run_spark_dataproc || 'true' }}
+      openlineage_release: ${{ github.event.inputs.openlineage_release || steps.select-components.outputs.ol_release }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+        # there should be part about checking not only the OL version but also the producers and consumers
+        # there is no way to check for new releases of spark_dataproc or dataplex so we just run their tests everytime
+        # also normally new release of OL should trigger all producer tests but for now they are run anyway so no need to trigger
+      - name: Select components to run
+        id: select-components
+        run: |
+          # assuming the version will not exceed 1000 this is the quickest way to get comparable values
+          version_sum() {
+            IFS='.' read -r var1 var2 var3 <<< "$1"
+            echo $(( var1 * 1000000 + var2 * 1000 ))
+          }
+          
+          current_ol=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
+          latest_ol=$(curl https://api.github.com/repos/OpenLineage/OpenLineage/releases/latest -s | jq .tag_name -r)
+
+          sum1=$(version_sum "$latest_ol")
+          sum2=$(version_sum "$current_ol")
+          
+          if (( $(version_sum $latest_ol) > $(version_sum $current_ol) )); then
+              echo "ol_release=${latest_ol}" >> $GITHUB_OUTPUT
+              echo "releases_updated=true" >> $GITHUB_OUTPUT
+              jq --arg latest_ol "$latest_ol" 'map(if .name == "openlineage" then .latest_version = $latest_ol else . end)' \
+              generated-files/releases.json > generated-files/updated_releases.json
+          else
+              echo "ol_release=${current_ol}" >> $GITHUB_OUTPUT  
+          fi       
+
+      - uses: actions/upload-artifact@v4
+        if: steps.select-components.outputs.releases_updated == 'true'
+        with:
+          name: updated_releases
+          path: generated-files/updated_releases.json
+          retention-days: 1
+
+  ######## COMPONENT VALIDATION ########
+
+  dataplex:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' }}
+    uses: ./.github/workflows/consumer_dataplex.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.openlineage_release }}
+
+  spark-dataproc:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
+    uses: ./.github/workflows/producer_spark_dataproc.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.openlineage_release }}
+      get-latest-snapshots: 'false'
+
+  ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
+
+  collect-and-compare-reports:
+    needs:
+      - initialize_workflow
+      - dataplex
+      - spark-dataproc
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/collect_and_compare_reports.yml
+
+  notify-maintainers:
+    needs: collect-and-compare-reports
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/notify_maintainers.yml
+
+  generate-compatibility-tables:
+    needs: collect-and-compare-reports
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/generate_compatibility_tables.yml
+
+  update-repo-files:
+    needs:
+      - initialize_workflow
+      - notify-maintainers
+      - generate-compatibility-tables
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/update_repo_files.yml

@@ -1,0 +1,47 @@
+name: Scenario Validation
+
+on:
+  workflow_call:
+    inputs:
+      release:
+        description: "release tag of OpenLineage to use"
+        type: string
+      get-latest-snapshots:
+        description: "Should the artifact be downloaded from maven repo or circleci"
+        type: string
+      fail-for-failures:
+        description: "should the job fail if there are failures in tests"
+        type: boolean
+
+jobs:
+  run-scenario-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create report.json directory
+        run: mkdir -p reports/
+
+      - name: Validation
+        uses: ./.github/actions/run_event_validation
+        with:
+          component: 'scenarios'
+          tag: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.release }}
+          release: ${{ inputs.release }}
+          target-path: 'reports/scenarios-report.json'
+          event-directory: './consumer/scenarios'
+          producer-dir: './consumer'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scenarios-report
+          path: reports/scenarios-report.json
+          retention-days: 1
+
+      - name: fail for failures in report
+        id: fail-for-failures
+        if: ${{ inputs.fail-for-failures }}
+        run: |
+          jq -e '.scenarios.status == "SUCCESS"' downloads/scenario-report.json > /dev/null || exit 1
+

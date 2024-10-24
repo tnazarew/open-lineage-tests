@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "name": "complete_event",
+      "path": "events/complete_event.json",
+      "tags": {
+        "facets": ["run_event", "parent", "spark_properties", "processing_engine", "gcp_dataproc_spark", "jobType", "sql", "gcp_lineage", "dataSource", "schema", "symlinks", "columnLineage"],
+        "min_version": "1.22.0",
+        "lineage_level": {
+          "hive": ["dataset", "column", "transformation"]
+        }
+      }
+    },
+    {
+      "name": "input_hive",
+      "path": "events/input_hive.json",
+      "tags": {
+        "facets": ["dataSource", "schema", "symlinks", "columnLineage"],
+        "min_version": "1.22.0",
+        "lineage_level": {
+          "hive": ["dataset", "column", "transformation"]
+        }
+      }
+    }
+  ]
+}

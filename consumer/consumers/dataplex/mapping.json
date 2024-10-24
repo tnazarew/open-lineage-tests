@@ -1,0 +1,51 @@
+{
+  "mapped": {
+    "core": {
+      "eventTime": "Run.startTime, Run.endTime, LineageEvent.startTime, LineageEvent.endTime",
+      "eventType": "Run.state",
+      "run.id": "Run.displayName, component of hashed value at the end of Run.name",
+      "job.name": "part of Process.displayName along with job.namespace, component of hashed value at the end of Project.name",
+      "job.namespace": "part of Process.displayName along with job.name, component of hashed value at the end of Project.name",
+      "input.name": "part of LineageEvent.EventLinks.fully_qualified_name along with input.namespace, component of hashed value at the end of LineageEvent.name",
+      "input.namespace": "part of LineageEvent.EventLinks.fully_qualified_name along with input.name, component of hashed value at the end of LineageEvent.name",
+      "output.name": "part of LineageEvent.EventLinks.fully_qualified_name along with output.namespace, component of hashed value at the end of LineageEvent.name",
+      "output.namespace": "part LineageEvent.EventLinks.fully_qualified_name along with output.name, component of hashed value at the end of LineageEvent.name"
+    },
+    "ProcessingEngineRunFacet": {
+      "name": "Run.attribute.processing_engine.name",
+      "openlineageAdapterVersion": "Run.attribute.processing_engine.openlineageAdapterVersion",
+      "version": "Run.attribute.processing_engine.version"
+    },
+    "EnvironmentFacet": {
+      "origin.sourcetype": "Run.attributes.environment-properties.origin.sourcetype",
+      "origin.name": "Run.attributes.environment-properties.origin.name",
+      "spark.app.id": "Run.attributes.environment-properties.spark.app.id",
+      "spark.app.name": "Run.attributes.environment-properties.spark.app.name",
+      "spark.batch.id": "Run.attributes.environment-properties.spark.batch.id",
+      "spark.batch.uuid": "Run.attributes.environment-properties.spark.batch.uuid",
+      "spark.cluster.name": "Run.attributes.environment-properties.spark.cluster.name",
+      "spark.cluster.region": "Run.attributes.environment-properties.spark.cluster.region",
+      "spark.job.id": "Run.attributes.environment-properties.spark.job.id",
+      "spark.job.uuid": "Run.attributes.environment-properties.spark.job.uuid",
+      "spark.project.id": "Run.attributes.environment-properties.spark.project.id",
+      "spark.query.node.name": "Run.attributes.environment-properties.spark.query.node.name",
+      "spark.session.id": "Run.attributes.environment-properties.spark.session.id",
+      "spark.session.uuid": "Run.attributes.environment-properties.spark.session.uuid"
+    }
+  },
+  "knownUnmapped": {
+    "DatasourceDatasetFacet": ["*"],
+    "SchemaDatasetFacet": ["*"],
+    "SymlinksDatasetFacet": ["*"],
+    "JobTypeJobFacet": ["*"],
+    "ParentRunFacet": ["*"]
+  }
+}
+
+
+
+
+
+
+
+
