@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import time
 from os.path import join
 
 from proto import Message
@@ -83,6 +84,7 @@ class Validator:
                 report.append(
                     {"status": "SUCCESS", 'validation_type': 'syntax', 'name': e['name'], 'entity_type': 'openlineage',
                      'tags': {}})
+                time.sleep(0.1)
             except InvalidArgument as exc:
                 report.append(
                     {"status": "FAILURE", 'validation_type': 'syntax', "details": exc.args[0], 'name': e['name'],
