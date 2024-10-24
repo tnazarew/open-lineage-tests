@@ -31,6 +31,7 @@ def main():
     credentials_path = args.credentials
 
     if not os.path.exists(local_file_path):
+        print(f"file {local_file_path} not found")
         # Local file does not exist; do nothing
         sys.exit(0)
 

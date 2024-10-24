@@ -20,6 +20,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create report.json directory
+        run: mkdir -p reports/
+
       - name: Validation
         uses: ./.github/actions/run_event_validation
         with:
