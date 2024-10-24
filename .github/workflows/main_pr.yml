@@ -3,9 +3,13 @@ name: Pull Request trigger
 on:
   pull_request:
 
+
 permissions:
   id-token: write
-  contents: read
+  contents: write
+  pull-requests: write
+  issues: write
+
 
 jobs:
   initialize_workflow:
