@@ -72,13 +72,18 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: create download dir in tmp
+      id: create-download-dir
+      shell: bash
+      run: mkdir -p /tmp/openlineage_snapshots
+
     - name: Download OpenLineage artifacts from build
       if: ${{ inputs.get-latest-snapshots == 'true' }}
       id: download-snapshots
       shell: bash
       run: |
         python ./scripts/get_latest_unreleased_artifact.py \
-        --path=./ \
+        --path=/tmp/openlineage_snapshots \
         --skip-java=${{ inputs.skip-java }} \
         --skip-spark=${{ inputs.skip-spark }} \
         --skip-flink=${{ inputs.skip-flink }} \
@@ -87,6 +92,13 @@ runs:
         --skip-gcp-lineage=${{ inputs.skip-gcp-lineage }} \
         --skip-gcs=${{ inputs.skip-gcs }} \
         --skip-s3=${{ inputs.skip-s3 }}
+
+    - name: list downloads
+      id: list-downloads
+      shell: bash
+      run: |
+        echo "downloaded artifacts:"
+        echo "/tmp/openlineage_snapshots"
 
     # artifacts snapshots are not published in latest build if no code was changed in them
     # this checks which of not skipped artifacts are missing and marks them as 'to download from maven'
@@ -97,8 +109,8 @@ runs:
       run: |
         check_artifact_downloaded() {
           if [ $2 = 'false' ]; then
-            if [ -f ./$1 ]; then
-              echo "$3=$(ls ./$1)" >> $GITHUB_OUTPUT
+            if [ -f /tmp/openlineage_snapshots/$1 ]; then
+              echo "$3=$(ls /tmp/openlineage_snapshots/$1)" >> $GITHUB_OUTPUT
             else
               echo "skip-$3=false" >> $GITHUB_OUTPUT
             fi
