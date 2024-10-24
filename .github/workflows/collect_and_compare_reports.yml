@@ -52,11 +52,4 @@ jobs:
         id: fail-for-new-failures
         if: ${{ inputs.fail-for-new-failures && steps.collect-and-merge-reports.outcome == 'success'}}
         run: |
-          if [ -f reports/retention-failures-report.json ]; then
-            echo "File exists."
-            echo "content: $(cat reports/retention-failures-report.json)"
-            echo "jq -e '. == []' reports/retention-failures-report.json result"
-            echo "jq '. == []' reports/retention-failures-report.json"
-          fi
-
           jq -e '. == []' reports/retention-failures-report.json > /dev/null ||  exit 1
