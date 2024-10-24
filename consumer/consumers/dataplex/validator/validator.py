@@ -144,7 +144,7 @@ class Validator:
                     res = match(exp, matched, "")
                     details.extend([f"{entity_type} {entity_name}, {r}" for r in res])
                 else:
-                    details.extend(f"{entity_type} {entity_name}, no matching entity")
+                    details.append(f"{entity_type} {entity_name}, no matching entity")
             results.append({'entity_type': entity_type, 'status': 'SUCCESS' if len(details) == 0 else 'FAILURE',
                             'details': details, 'validation_type': 'semantics', 'name': k, 'tags': v['tags']})
         return results
@@ -162,7 +162,7 @@ class Validator:
                     res = match(exp, matched, "")
                     details.extend([f"lineage event {entity_name}, {r}" for r in res])
                 else:
-                    details.extend(f"event {entity_name}, no matching entity")
+                    details.append(f"event {entity_name}, no matching entity")
             results.append({'entity_type': 'event', 'status': 'SUCCESS' if len(details) == 0 else 'FAILURE',
                             'details': details, 'validation_type': 'semantics', 'name': k, 'tags': v['tags']})
         return results
