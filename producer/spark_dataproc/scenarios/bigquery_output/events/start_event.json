@@ -25,7 +25,7 @@
             },
             "gcp_dataproc_spark": {
                 "clusterUuid": "{{ is_uuid(result) }}",
-                "jobId": "{{ is_uuid(result) }}",
+                "jobId": "{{ any(result) }}",
                 "jobUuid": "{{ is_uuid(result) }}",
                 "queryNodeName": "execute_save_into_data_source_command",
                 "appName": "Writing to BigQuery",
