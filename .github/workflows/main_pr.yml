@@ -54,8 +54,8 @@ jobs:
   dataplex:
     needs:
       - initialize_workflow
-#      - scenarios
-    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' || needs.initialize_workflow.outputs.run_dataplex }}
+      - scenarios
+    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' }}
     uses: ./.github/workflows/consumer_dataplex.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
