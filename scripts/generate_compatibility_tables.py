@@ -18,14 +18,14 @@ def get_version_status(min_version, max_version):
 
 
 def generate_facets_table(data):
-
+    if len(data) == 0:
+        return None
     facets = get_sorted_facets(data)
 
     table_data = []
 
-
-    # Populate rows for each top-level key
-    for key, value in data.items():
+    components = {key: value for key, value in data.items() if key != 'scenarios'}
+    for key, value in components.items() :
         row = {'Name': key}
         for facet in facets:
             if 'facets' in value and facet in value['facets']:
@@ -43,7 +43,8 @@ def generate_facets_table(data):
 
 def get_sorted_facets(data):
     facets = set()
-    for key, value in data.items():
+    components = {key: value for key, value in data.items() if key != 'scenarios'}
+    for key, value in components.items() :
         if 'facets' in value:
             facets.update(value['facets'].keys())
     desired_order = ["run_event", "jobType", "parent", "dataSource", "processing_engine", "sql", "symlinks", "schema",
@@ -58,9 +59,11 @@ def get_sorted_facets(data):
 
 
 def generate_lineage_table(data):
+    if len(data) == 0:
+        return None
     producers = {}
-
-    for key, value in data.items():
+    components = {key: value for key, value in data.items() if key != 'scenarios'}
+    for key, value in components.items():
         if 'lineage_levels' in value:
             table_data = []
             for datasource, levels in value['lineage_levels'].items():
@@ -80,6 +83,8 @@ def generate_lineage_table(data):
 
 
 def generate_producers_table(data):
+    if len(data) == 0:
+        return None
     # Prepare table header and rows
     consumers = {}
     for key, value in data.items():
@@ -122,20 +127,24 @@ def main():
 
     # Output the tables
     with open(target_path, "w") as file:
-        file.write("# Producers\n")
-        file.write("## Facets Compatibility\n")
-        file.write(producer_facets_table + "\n\n")
-
-        for k, v in lineage_level_tables.items():
-            file.write(f"## Lineage level support for {k}\n")
-            file.write(v + "\n\n")
-
-        file.write("# Consumers\n")
-        file.write("## Facets Compatibility\n")
-        file.write(consumer_facets_table + "\n\n")
-        for k, v in producers_tables.items():
-            file.write(f"## Producers support for {k}\n")
-            file.write(v + "\n")
+        if producer_facets_table is not None or lineage_level_tables is not None:
+            file.write("# Producers\n")
+            if producer_facets_table is not None:
+                file.write("## Facets Compatibility\n")
+                file.write(producer_facets_table + "\n\n")
+        if lineage_level_tables is not None:
+            for k, v in lineage_level_tables.items():
+                file.write(f"## Lineage level support for {k}\n")
+                file.write(v + "\n\n")
+        if consumer_facets_table is not None or producers_tables is not None:
+            file.write("# Consumers\n")
+            if consumer_facets_table is not None:
+                file.write("## Facets Compatibility\n")
+                file.write(consumer_facets_table + "\n\n")
+            if producers_tables is not None:
+                for k, v in producers_tables.items():
+                    file.write(f"## Producers support for {k}\n")
+                    file.write(v + "\n")
 
 
 if __name__ == "__main__":
