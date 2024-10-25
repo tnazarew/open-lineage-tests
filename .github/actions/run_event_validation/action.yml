@@ -52,10 +52,14 @@ runs:
         sparse-checkout: |
           spec/
 
-    - name: Validate OpenLineage events
+    - name: Install python dependencies
       shell: bash
       run: |
         pip install -r ./scripts/requirements.txt
+
+    - name: Validate OpenLineage events
+      shell: bash
+      run: |
         python scripts/validate_ol_events.py \
         --event_base_dir=${{ inputs.event-directory }} \
         --spec_dirs=spec/spec/,spec/spec/facets/,spec/spec/registry/gcp/dataproc/facets,spec/spec/registry/gcp/lineage/facets \

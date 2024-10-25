@@ -1,0 +1,11 @@
+[
+  {
+    "name": "projects/484892851355/locations/us/processes/e9769639e53e2f3c66157b38f3abbfe1",
+    "display_name": "default:reading_from_big_query.adaptive_spark_plan.tmp_my_shakespeare_output",
+    "origin": {
+      "source_type": 6,
+      "name": "projects/gcp-open-lineage-testing/regions/us-west1/clusters/dataproc-producer-test-11500340269"
+    },
+    "attributes": {}
+  }
+]

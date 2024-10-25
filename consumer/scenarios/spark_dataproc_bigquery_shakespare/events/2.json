@@ -1,20 +1,20 @@
 {
-  "eventTime": "2024-10-16T16:53:47.541Z",
+  "eventTime": "2024-10-24T13:36:23.165Z",
   "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
   "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
-  "eventType": "RUNNING",
+  "eventType": "COMPLETE",
   "run": {
-    "runId": "0192963f-f6f8-71c0-8380-500bc70883ee",
+    "runId": "0192bebd-e2ae-7bee-83a2-fdead806a93f",
     "facets": {
       "parent": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
         "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ParentRunFacet.json#/$defs/ParentRunFacet",
         "run": {
-          "runId": "0192963f-929e-731b-a075-9bb14bf41d38"
+          "runId": "0192bebd-a11d-7ce8-8ef2-0170af5329d5"
         },
         "job": {
           "namespace": "default",
-          "name": "shakespeare_on_spark"
+          "name": "reading_from_big_query"
         }
       },
       "spark_properties": {
@@ -22,7 +22,7 @@
         "_schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunFacet",
         "properties": {
           "spark.master": "yarn",
-          "spark.app.name": "Shakespeare on Spark"
+          "spark.app.name": "Reading from BigQuery"
         }
       },
       "processing_engine": {
@@ -32,28 +32,23 @@
         "name": "spark",
         "openlineageAdapterVersion": "1.23.0"
       },
-      "spark_jobDetails": {
-        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
-        "_schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunFacet",
-        "jobId": 2
-      },
       "gcp_dataproc_spark": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
         "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/GcpDataprocRunFacet.json#/$defs/GcpDataprocRunFacet",
-        "clusterUuid": "a47b5791-881b-4e83-a3cc-547fe97e5caf",
-        "jobId": "a27383af-64db-4893-b03b-c472ab0512cf",
-        "jobUuid": "a27383af-64db-4893-b03b-c472ab0512cf",
+        "clusterUuid": "8c279fae-5e7c-42c4-9c2e-cb19f257550d",
+        "jobId": "784d9b85-729b-4504-b360-bc0e3e4b1104",
+        "jobUuid": "784d9b85-729b-4504-b360-bc0e3e4b1104",
         "queryNodeName": "adaptive_spark_plan",
-        "appName": "Shakespeare on Spark",
-        "clusterName": "dataproc-producer-test",
-        "appId": "application_1729097245443_0002",
+        "appName": "Reading from BigQuery",
+        "clusterName": "dataproc-producer-test-11500340269",
+        "appId": "application_1729776798415_0001",
         "projectId": "gcp-open-lineage-testing"
       }
     }
   },
   "job": {
     "namespace": "default",
-    "name": "shakespeare_on_spark.adaptive_spark_plan.outputs_1729097570970",
+    "name": "reading_from_big_query.adaptive_spark_plan.tmp_my_shakespeare_output",
     "facets": {
       "jobType": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
@@ -67,16 +62,56 @@
         "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/GcpLineageJobFacet.json#/$defs/GcpLineageJobFacet",
         "origin": {
           "sourceType": "DATAPROC",
-          "name": "projects/gcp-open-lineage-testing/regions/us-west1/clusters/dataproc-producer-test"
+          "name": "projects/gcp-open-lineage-testing/regions/us-west1/clusters/dataproc-producer-test-11500340269"
         }
       }
     }
   },
-  "inputs": [],
+  "inputs": [
+    {
+      "namespace": "bigquery",
+      "name": "bigquery-public-data.samples.shakespeare",
+      "facets": {
+        "dataSource": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/DatasourceDatasetFacet.json#/$defs/DatasourceDatasetFacet",
+          "name": "bigquery",
+          "uri": "bigquery"
+        },
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-1/SchemaDatasetFacet.json#/$defs/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "word",
+              "type": "string",
+              "description": "A single unique word (where whitespace is the delimiter) extracted from a corpus."
+            },
+            {
+              "name": "word_count",
+              "type": "long",
+              "description": "The number of times this word appears in this corpus."
+            },
+            {
+              "name": "corpus",
+              "type": "string",
+              "description": "The work from which this word was extracted."
+            },
+            {
+              "name": "corpus_date",
+              "type": "long",
+              "description": "The year in which this corpus was published."
+            }
+          ]
+        }
+      },
+      "inputFacets": {}
+    }
+  ],
   "outputs": [
     {
-      "namespace": "file",
-      "name": "/tmp/outputs/1729097570970",
+      "namespace": "hdfs://dataproc-producer-test-m",
+      "name": "/user/hive/warehouse/t2",
       "facets": {
         "dataSource": {
           "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
@@ -190,7 +225,14 @@
           }
         }
       },
-      "outputFacets": {}
+      "outputFacets": {
+        "outputStatistics": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.23.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-2/OutputStatisticsOutputDatasetFacet.json#/$defs/OutputStatisticsOutputDatasetFacet",
+          "rowCount": 1,
+          "size": 9
+        }
+      }
     }
   ]
 }

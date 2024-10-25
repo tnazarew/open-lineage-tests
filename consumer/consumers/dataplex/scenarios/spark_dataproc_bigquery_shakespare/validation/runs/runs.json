@@ -1,0 +1,16 @@
+[
+  {
+    "name": "projects/484892851355/locations/us/processes/e9769639e53e2f3c66157b38f3abbfe1/runs/75c33ceac65f084bb53d5f90308d9cb5",
+    "display_name": "0192bebd-e2ae-7bee-83a2-fdead806a93f",
+    "attributes": {
+      "processing_engine": {
+        "version": "3.5.1",
+        "openlineageAdapterVersion": "1.23.0",
+        "name": "spark"
+      }
+    },
+    "start_time": "2024-10-24T13:36:08.351Z",
+    "end_time": "2024-10-24T13:36:23.165Z",
+    "state": 2
+  }
+]

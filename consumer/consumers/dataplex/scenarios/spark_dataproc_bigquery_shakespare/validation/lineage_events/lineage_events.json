@@ -1,0 +1,32 @@
+[
+  {
+    "name": "{{ any(result) }}",
+    "start_time": "2024-10-24T13:36:23.165Z",
+    "end_time": "2024-10-24T13:36:23.165Z",
+    "links": [
+      {
+        "source": {
+          "fully_qualified_name": "bigquery:bigquery-public-data.samples.shakespeare"
+        },
+        "target": {
+          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t2"
+        }
+      }
+    ]
+  },
+  {
+    "name": "{{ any(result) }}",
+    "start_time": "2024-10-24T13:36:08.351Z",
+    "end_time": "2024-10-24T13:36:08.351Z",
+    "links": [
+      {
+        "source": {
+          "fully_qualified_name": "bigquery:bigquery-public-data.samples.shakespeare"
+        },
+        "target": {
+          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t2"
+        }
+      }
+    ]
+  }
+]

@@ -1,6 +1,0 @@
-{
-  "scenario_groups": [
-    "run_event",
-    "spark_dataproc"
-  ]
-}
