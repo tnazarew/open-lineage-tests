@@ -1,4 +1,4 @@
-name: Daily Build
+name: Release check
 
 on:
   schedule:
