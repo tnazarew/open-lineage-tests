@@ -34,7 +34,10 @@
                   "column",
                   "transformation"
                 ],
-                "jdbc": ["dataset", "column"]
+                "jdbc": [
+                  "dataset",
+                  "column"
+                ]
               }
             }
           }
@@ -80,16 +83,502 @@
         "status": "SUCCESS",
         "tests": [
           {
-            "entity_type": "process",
-            "status": "SUCCESS",
-            "details": [],
-            "validation_type": "semantics",
             "name": "mock",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
             "tags": {
               "facets": [],
               "max_version": "1.23.0",
               "min_version": "1.22.0",
               "producer": "spark"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "dataplex",
+    "component_type": "consumer",
+    "scenarios": [
+      {
+        "name": "simple_run_event",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "simple_run_event.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "process",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "runs",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "lineage_events",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          }
+        ]
+      },
+      {
+        "name": "spark_dataproc_simple_producer_test",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "4.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "3.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "2.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "process",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "runs",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "processing_engine"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "lineage_events",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "spark_dataproc",
+    "component_type": "producer",
+    "scenarios": [
+      {
+        "name": "bigquery_input",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:reading_from_big_query.adaptive_spark_plan.tmp_my_shakespeare_output:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:reading_from_big_query.adaptive_spark_plan.tmp_my_shakespeare_output:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:reading_from_big_query:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:reading_from_big_query:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:reading_from_big_query.adaptive_spark_plan.tmp_my_shakespeare_output:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "complete_event",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "parent",
+                "spark_properties",
+                "processing_engine",
+                "gcp_dataproc_spark",
+                "jobType",
+                "gcp_lineage",
+                "dataSource",
+                "schema",
+                "columnLineage"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "input_bigquery",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource",
+                "schema",
+                "columnLineage"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "bigquery_output",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:writing_to_big_query.execute_save_into_data_source_command:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1730690800131_0002-0969f479-7f57-40e2-80ec-9d3c54d447d3:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.execute_save_into_data_source_command:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1730690800131_0002-0969f479-7f57-40e2-80ec-9d3c54d447d3:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1730690800131_0002-0969f479-7f57-40e2-80ec-9d3c54d447d3:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "start_event",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "parent",
+                "spark_properties",
+                "processing_engine",
+                "gcp_dataproc_spark",
+                "jobType",
+                "gcp_lineage",
+                "dataSource",
+                "schema",
+                "columnLineage"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "simple_scenario",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:cl_i_test_application.execute_create_table_command.warehouse_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:cl_i_test_application.drop_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:cl_i_test_application.drop_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:cl_i_test_application:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:cl_i_test_application:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:cl_i_test_application.execute_create_hive_table_as_select_command.default_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "complete_event",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "parent",
+                "spark_properties",
+                "processing_engine",
+                "gcp_dataproc_spark",
+                "jobType",
+                "sql",
+                "gcp_lineage",
+                "dataSource",
+                "schema",
+                "symlinks",
+                "columnLineage"
+              ],
+              "min_version": "1.22.0",
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "input_hive",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource",
+                "schema",
+                "symlinks",
+                "columnLineage"
+              ],
+              "min_version": "1.22.0",
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
             }
           }
         ]
