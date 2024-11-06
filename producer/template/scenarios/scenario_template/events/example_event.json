@@ -1,0 +1,28 @@
+{
+  "eventType": "COMPLETE",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": "{{ any(result) }}"
+  },
+  "job": {
+    "namespace": "namespace",
+    "name": "name",
+    "facets": "{{ any(result) }}"
+  },
+  "inputs": [
+    {
+      "namespace": "input_namespace",
+      "name": "input_name",
+      "facets": "{{ any(result) }}",
+      "inputFacets": "{{ any(result) }}"
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "output_namespace",
+      "name": "output_name",
+      "facets": "{{ any(result) }}",
+      "outputFacets": "{{ any(result) }}"
+    }
+  ]
+}

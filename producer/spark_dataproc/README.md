@@ -1,4 +1,9 @@
-# Usage
+# Spark Dataproc
+
+Checks the compatibility of the producer by running the spark jobs on dataproc cluster and then running validation script on the output.
+
+## Running locally
+
 To run dataproc tests locally use the command:
 ```commandline
 ./run-spark-dataproc-tests.sh 

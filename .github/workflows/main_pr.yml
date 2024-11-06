@@ -23,6 +23,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: check file structure
+        id: check-structure
+        run: ./scripts/check_structure.sh
+
+      - name: check configs
+        id: check-configs
+        run: ./scripts/check_configs.sh
+
       - name: Get changed files
         id: changed_files
         uses: tj-actions/changed-files@v45

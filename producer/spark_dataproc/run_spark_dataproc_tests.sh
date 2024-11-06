@@ -33,9 +33,9 @@ GCS_BUCKET=""
 DATAPROC_CLUSTER_NAME=""
 
 # Variables with default values
-PRODUCER_OUTPUT_EVENTS_DIR=../output
+PRODUCER_OUTPUT_EVENTS_DIR=output
 OPENLINEAGE_RELEASE=1.23.0
-REPORT_PATH="../report.json"
+REPORT_PATH="../spark_dataproc_report.json"
 
 # If -h or --help is passed, print usage and exit
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
@@ -71,11 +71,11 @@ fi
 OL_SPEC_DIRECTORIES=$OPENLINEAGE_DIRECTORY/spec/,$OPENLINEAGE_DIRECTORY/spec/facets/,$OPENLINEAGE_DIRECTORY/spec/registry/gcp/dataproc/facets,$OPENLINEAGE_DIRECTORY/spec/registry/gcp/lineage/facets
 
 # fail if scenarios are not defined in scenario directory
-[[ $(ls ../scenarios | wc -l) -gt 0 ]] || { echo >&2 "NO SCENARIOS DEFINED IN ../scenarios"; exit 1; }
+[[ $(ls scenarios | wc -l) -gt 0 ]] || { echo >&2 "NO SCENARIOS DEFINED IN scenarios"; exit 1; }
 # fail if gsutil is not installed
-command -v gsutil >/dev/null 2>&1      || { echo >&2 "gsutil is required see https://cloud.google.com/storage/docs/gsutil_install"; exit 1; }
+command -v gsutil >/dev/null 2>&1   || { echo >&2 "gsutil is required see https://cloud.google.com/storage/docs/gsutil_install"; exit 1; }
 
-mkdir -p $PRODUCER_OUTPUT_EVENTS_DIR
+mkdir -p "$PRODUCER_OUTPUT_EVENTS_DIR"
 
 #install python dependencies
 python -m pip install --upgrade pip
@@ -90,16 +90,16 @@ fi
 # start the cluster
 echo "STARTING DATAPROC CLUSTER"
 python producer/spark_dataproc/runner/dataproc_workflow.py create-cluster \
-  --project-id $GCP_PROJECT \
-  --region $GCP_REGION \
-  --cluster-name $DATAPROC_CLUSTER_NANE \
-  --credentials-file $GCP_CREDENTIALS_JSON_PATH \
+  --project-id "$GCP_PROJECT" \
+  --region "$GCP_REGION" \
+  --cluster-name "$DATAPROC_CLUSTER_NAME" \
+  --credentials-file "$GCP_CREDENTIALS_JSON_PATH" \
   --metadata "SPARK_BQ_CONNECTOR_URL=gs://$GCS_BUCKET/jars/spark-3.5-bigquery-0.41.0.jar,OPENLINEAGE_SPARK_URL=gs://$GCS_BUCKET/jars/openlineage-spark_2.12-$OPENLINEAGE_RELEASE.jar" \
   --initialization-actions="gs://$GCS_BUCKET/scripts/get_openlineage_jar.sh"
 
 echo "DATAPROC CLUSTER STARTED"
 
-for scenario_path in ../scenarios/*
+for scenario_path in scenarios/*
 do
   scenario="${scenario_path##*/}"
   echo "RUNNING SPARK JOB FOR $scenario SCENARIO"
@@ -108,22 +108,22 @@ do
     --project-id gcp-open-lineage-testing \
     --region us-west1 \
     --cluster-name dataproc-producer-test \
-    --gcs-bucket $GCS_BUCKET \
+    --gcs-bucket "$GCS_BUCKET" \
     --python-job producer/spark_dataproc/scenarios/$scenario/test/test.py \
-    --jars $GCS_TRANSPORT_JAR_PATH \
+    --jars "$GCS_TRANSPORT_JAR_PATH" \
     --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
     --output-directory "$PRODUCER_EVENTS_DIR/$scenario" \
-    --credentials-file $GCP_CREDENTIALS_JSON_PATH \
+    --credentials-file "$GCP_CREDENTIALS_JSON_PATH" \
     --dataproc-image-version 2.2-ubuntu22 \
     --job-args "file:///tmp/outputs/$(date +%s%3N)"
 
 done
 
 python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
-  --project-id $GCP_PROJECT \
-  --region $GCP_REGION \
-  --cluster-name $DATAPROC_CLUSTER_NANE \
-  --credentials-file $GCP_CREDENTIALS_JSON_PATH
+  --project-id "$GCP_PROJECT" \
+  --region "$GCP_REGION" \
+  --cluster-name "$DATAPROC_CLUSTER_NAME" \
+  --credentials-file "$GCP_CREDENTIALS_JSON_PATH"
 
 echo "TERMINATING DATAPROC CLUSTER"
 
@@ -131,12 +131,12 @@ echo "EVENT VALIDATION"
 
 pip install -r ./scripts/requirements.txt
 
-python scripts/validate_ol_events.py \
---event_base_dir=$PRODUCER_OUTPUT_EVENTS_DIR \
---spec_dirs=$OL_SPEC_DIRECTORIES \
---target=$REPORT_PATH \
+python ../../scripts/validate_ol_events.py \
+--event_base_dir="$PRODUCER_OUTPUT_EVENTS_DIR" \
+--spec_dirs="$OL_SPEC_DIRECTORIES" \
+--target="$REPORT_PATH" \
 --component="spark_dataproc" \
---producer_dir=../
+--producer_dir=.
 
 echo "EVENT VALIDATION FINISHED"
 echo "REPORT CREATED IN $REPORT_PATH"
