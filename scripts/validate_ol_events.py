@@ -195,16 +195,22 @@ def main():
         scenario_path = get_path(base_dir, component, scenario_name)
         if isdir(scenario_path):
             config = get_config(producer_dir, component, scenario_name)
-            expected = get_expected_events(producer_dir, component, scenario_name, config, release)
-            result_events = {file: load_json(path) for file in listdir(scenario_path) if
-                             isfile(path := join(scenario_path, file))}
-            tests = validate_scenario_syntax(result_events, validator)
+            if component == 'scenarios':
+                if release_between(release, config['tags'].get('min_version'), config['tags'].get('max_version')):
+                    result_events = {file: load_json(path) for file in listdir(scenario_path) if
+                                     isfile(path := join(scenario_path, file))}
+                    tests = validate_scenario_syntax(result_events, validator)
+                    scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
+            else:
+                expected = get_expected_events(producer_dir, component, scenario_name, config, release)
+                result_events = {file: load_json(path) for file in listdir(scenario_path) if
+                                 isfile(path := join(scenario_path, file))}
+                tests = validate_scenario_syntax(result_events, validator)
 
-            if all_tests_succeeded(tests) and expected is not None and not component == 'scenarios':
-                for name, res in OLSemanticValidator(expected).validate(result_events).items():
-                    tests[name] = res
-
-            scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
+                if all_tests_succeeded(tests) and expected is not None:
+                    for name, res in OLSemanticValidator(expected).validate(result_events).items():
+                        tests[name] = res
+                scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
     report = Report({component: Component(component, 'producer', scenarios)})
     with open(target, 'w') as f:
         json.dump(report.to_dict(), f, indent=2)
