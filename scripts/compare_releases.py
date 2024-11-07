@@ -10,10 +10,12 @@ def min_version(v1, v2):
     return v2 if version_to_number(v1) > version_to_number(v2) else v1
 
 
-def version_between(v, v_min, v_max):
-    ge_min = v_min is None or version_to_number(v) >= version_to_number(v_min)
-    le_max = v_max is None or version_to_number(v) <= version_to_number(v_max)
-    return ge_min and le_max
+def release_between(release, min_version, max_version):
+    max_ver = 999999999 if max_version is None else version_to_number(max_version)
+    min_ver = 0 if min_version is None else version_to_number(min_version)
+    rel = version_to_number(release)
+
+    return min_ver <= rel <= max_ver
 
 
 def version_to_number(version):

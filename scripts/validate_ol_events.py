@@ -7,6 +7,7 @@ from os import listdir
 from os.path import isfile, join, isdir
 from jsonschema import Draft202012Validator
 from report import Test, Scenario, Component, Report
+from compare_releases import release_between
 from compare_events import match
 
 
@@ -117,22 +118,6 @@ def get_event_identification(event, default):
 
 def all_tests_succeeded(syntax_tests):
     return not any(t.status == "FAILURE" for t in syntax_tests.values())
-
-
-def version_to_number(version):
-    split = version.split('.')
-    major = int(split[0])
-    minor = int(split[0])
-    patch = int(split[0])
-    return major * 1000000 + minor * 1000 + patch
-
-
-def release_between(release, min_version, max_version):
-    max_ver = 999999999 if max_version is None else version_to_number(max_version)
-    min_ver = 0 if min_version is None else version_to_number(min_version)
-    rel = version_to_number(release)
-
-    return min_ver <= rel <= max_ver
 
 
 def get_expected_events(producer_dir, component, scenario_name, config, release):

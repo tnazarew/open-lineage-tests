@@ -1,4 +1,4 @@
-from scripts.compare_releases import max_version, min_version
+from compare_releases import max_version, min_version
 
 
 class Report:
