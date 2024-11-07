@@ -1,3 +1,6 @@
+from compare_releases import max_version, min_version
+
+
 class Report:
     def __init__(self, components):
         self.components = components
@@ -62,7 +65,6 @@ class Component:
             output["producers"] = inputs
         return output
 
-
     def get_new_failures(self, old):
         os = old.scenarios if old is not None and old.scenarios is not None else {}
         nfs = {k: nfs for k, v in self.scenarios.items() if
@@ -124,30 +126,12 @@ class Scenario:
             output["producers"] = inputs
         return output
 
-
     def update_facet_versions(self, f, entity, max_ver, min_ver):
         if entity.get(f) is None:
             entity[f] = {'max_version': max_ver, 'min_version': min_ver}
         else:
-            entity[f]['max_version'] = self.max_version(max_ver, entity[f].get('max_version'))
-            entity[f]['min_version'] = self.min_version(min_ver, entity[f].get('min_version'))
-
-    def max_version(self, v1, v2):
-        if v1 is None or v2 is None:
-            return None
-        return v2 if self.version_to_number(v1) < self.version_to_number(v2) else v1
-
-    def min_version(self, v1, v2):
-        if v1 is None or v2 is None:
-            return None
-        return v2 if self.version_to_number(v1) > self.version_to_number(v2) else v1
-
-    def version_to_number(self, version):
-        split = version.split('.')
-        major = int(split[0])
-        minor = int(split[0])
-        patch = int(split[0])
-        return major * 1000000 + minor * 1000 + patch
+            entity[f]['max_version'] = max_version(max_ver, entity[f].get('max_version'))
+            entity[f]['min_version'] = min_version(min_ver, entity[f].get('min_version'))
 
     def get_new_failures(self, old):
         if self.status == 'SUCCESS':

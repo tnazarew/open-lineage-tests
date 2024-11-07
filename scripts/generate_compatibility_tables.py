@@ -18,11 +18,9 @@ def get_version_status(min_version, max_version):
 
 
 def generate_facets_table(data):
-
     facets = get_sorted_facets(data)
 
     table_data = []
-
 
     # Populate rows for each top-level key
     for key, value in data.items():
@@ -112,7 +110,8 @@ def main():
     with open(report_path, 'r') as c:
         report = json.load(c)
     consumer_report = Report.from_dict([e for e in report if e['component_type'] == 'consumer'])
-    producer_report = Report.from_dict([e for e in report if e['component_type'] == 'producer'])
+    producer_report = Report.from_dict(
+        [e for e in report if e['component_type'] == 'producer' and e['name'] != 'scenarios'])
     consumer_tag_summary = consumer_report.get_tag_summary()
     producer_tag_summary = producer_report.get_tag_summary()
     consumer_facets_table = generate_facets_table(consumer_tag_summary)

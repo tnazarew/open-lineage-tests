@@ -7,6 +7,7 @@ from os import listdir
 from os.path import isfile, join, isdir
 from jsonschema import Draft202012Validator
 from report import Test, Scenario, Component, Report
+from compare_releases import release_between
 from compare_events import match
 
 
@@ -119,22 +120,6 @@ def all_tests_succeeded(syntax_tests):
     return not any(t.status == "FAILURE" for t in syntax_tests.values())
 
 
-def version_to_number(version):
-    split = version.split('.')
-    major = int(split[0])
-    minor = int(split[0])
-    patch = int(split[0])
-    return major * 1000000 + minor * 1000 + patch
-
-
-def release_between(release, min_version, max_version):
-    max_ver = 999999999 if max_version is None else version_to_number(max_version)
-    min_ver = 0 if min_version is None else version_to_number(min_version)
-    rel = version_to_number(release)
-
-    return min_ver <= rel <= max_ver
-
-
 def get_expected_events(producer_dir, component, scenario_name, config, release):
     if component == 'scenarios':
         return None
@@ -195,16 +180,22 @@ def main():
         scenario_path = get_path(base_dir, component, scenario_name)
         if isdir(scenario_path):
             config = get_config(producer_dir, component, scenario_name)
-            expected = get_expected_events(producer_dir, component, scenario_name, config, release)
-            result_events = {file: load_json(path) for file in listdir(scenario_path) if
-                             isfile(path := join(scenario_path, file))}
-            tests = validate_scenario_syntax(result_events, validator)
+            if component == 'scenarios':
+                if release_between(release, config['tags'].get('min_version'), config['tags'].get('max_version')):
+                    result_events = {file: load_json(path) for file in listdir(scenario_path) if
+                                     isfile(path := join(scenario_path, file))}
+                    tests = validate_scenario_syntax(result_events, validator)
+                    scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
+            else:
+                expected = get_expected_events(producer_dir, component, scenario_name, config, release)
+                result_events = {file: load_json(path) for file in listdir(scenario_path) if
+                                 isfile(path := join(scenario_path, file))}
+                tests = validate_scenario_syntax(result_events, validator)
 
-            if all_tests_succeeded(tests) and expected is not None and not component == 'scenarios':
-                for name, res in OLSemanticValidator(expected).validate(result_events).items():
-                    tests[name] = res
-
-            scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
+                if all_tests_succeeded(tests) and expected is not None:
+                    for name, res in OLSemanticValidator(expected).validate(result_events).items():
+                        tests[name] = res
+                scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
     report = Report({component: Component(component, 'producer', scenarios)})
     with open(target, 'w') as f:
         json.dump(report.to_dict(), f, indent=2)
