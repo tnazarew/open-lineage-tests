@@ -34,7 +34,7 @@ jobs:
         uses: peter-evans/create-issue-from-file@v5
         if: ${{ steps.check-report-empty.outputs.report-empty == 'false'}}
         with:
-          title: An example issue
+          title: new failures in report from run ${{ github.run_id }}
           content-filepath: generated-files/issue.md
           labels: |
             report
