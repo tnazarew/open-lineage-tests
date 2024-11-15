@@ -34,7 +34,10 @@
                   "column",
                   "transformation"
                 ],
-                "jdbc": ["dataset", "column"]
+                "jdbc": [
+                  "dataset",
+                  "column"
+                ]
               }
             }
           }
@@ -80,13 +83,162 @@
         "status": "SUCCESS",
         "tests": [
           {
-            "entity_type": "process",
-            "status": "SUCCESS",
-            "details": [],
-            "validation_type": "semantics",
             "name": "mock",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
             "tags": {
               "facets": [],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "dataplex",
+    "component_type": "consumer",
+    "scenarios": [
+      {
+        "name": "simple_run_event",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "simple_run_event.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "process",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "runs",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "lineage_events",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          }
+        ]
+      },
+      {
+        "name": "spark_dataproc_simple_producer_test",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "4.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "3.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "2.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "1.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "process",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "runs",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "processing_engine"
+              ],
+              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "lineage_events",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
               "max_version": "1.23.0",
               "min_version": "1.22.0",
               "producer": "spark"
