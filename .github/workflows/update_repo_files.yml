@@ -46,3 +46,4 @@ jobs:
             generated-files/compatibility-table.md
           branch: "test-${{ github.run_id }}"
           title: "[bot] update report with data from run ${{ github.run_id }}"
+          signoff: true
