@@ -19,6 +19,7 @@ jobs:
       run_scenarios: ${{ steps.changed_files.outputs.scenarios_any_changed }}
       run_spark_dataproc: ${{ steps.changed_files.outputs.spark_dataproc_any_changed }}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
+      any_run: ${{ steps.changed_files.outputs.any_changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,7 +43,6 @@ jobs:
               - consumer/consumers/dataplex/**
             spark_dataproc:
               - producer/spark_dataproc/**
-            
 
       - name: get openlineage release
         id: get-release
@@ -89,13 +89,12 @@ jobs:
       - scenarios
       - dataplex
       - spark_dataproc
-    if: ${{ !failure() }}
+    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run}}
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
       fail-for-new-failures: true
 
   generate-compatibility-tables:
     needs: collect-and-compare-reports
-    if: ${{ !failure() }}
     uses: ./.github/workflows/generate_compatibility_tables.yml
 
