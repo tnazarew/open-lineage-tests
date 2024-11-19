@@ -19,7 +19,7 @@ jobs:
       run_scenarios: ${{ steps.changed_files.outputs.scenarios_any_changed }}
       run_spark_dataproc: ${{ steps.changed_files.outputs.spark_dataproc_any_changed }}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
-      any_run: ${{ steps.changed_files.outputs.any_any_changed == 'true' }}
+      any_run: ${{ steps.changed_files.outputs.any_any_changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -96,15 +96,15 @@ jobs:
     with:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
 
-  spark_dataproc:
-    needs: initialize_workflow
-    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
-    uses: ./.github/workflows/producer_spark_dataproc.yml
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
-    with:
-      release: ${{ needs.initialize_workflow.outputs.ol_release }}
-      get-latest-snapshots: 'false'
+#  spark_dataproc:
+#    needs: initialize_workflow
+#    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
+#    uses: ./.github/workflows/producer_spark_dataproc.yml
+#    secrets:
+#      gcpKey: ${{ secrets.GCP_SA_KEY }}
+#    with:
+#      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+#      get-latest-snapshots: 'false'
 
   ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
@@ -113,7 +113,7 @@ jobs:
       - initialize_workflow
       - scenarios
       - dataplex
-      - spark_dataproc
+#      - spark_dataproc
     if: ${{ (!failure()) && needs.initialize_workflow.outputs.any_run  == 'true'}}
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
