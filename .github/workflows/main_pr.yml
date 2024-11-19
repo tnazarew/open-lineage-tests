@@ -48,26 +48,6 @@ jobs:
               - consumer/consumers/**
               - producer/**
 
-      - name: test1
-        id: test1
-        if: ${{ steps.changed_files.outputs.any_changed }}
-        run: echo "VALUE IS BOOLEAN TRUE"
-
-      - name: test2
-        id: test2
-        if: ${{ !steps.changed_files.outputs.any_changed }}
-        run: echo "VALUE IS BOOLEAN FALSE"
-
-      - name: test3
-        id: test3
-        if: ${{ steps.changed_files.outputs.any_changed == 'true'}}
-        run: echo "VALUE IS STRING"
-
-      - name: test4
-        id: test4
-        if: ${{ steps.changed_files.outputs.any_changed == 'false'}}
-        run: echo "VALUE IS STRING FALSE"
-
       - name: get openlineage release
         id: get-release
         run: |
@@ -96,15 +76,15 @@ jobs:
     with:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
 
-#  spark_dataproc:
-#    needs: initialize_workflow
-#    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
-#    uses: ./.github/workflows/producer_spark_dataproc.yml
-#    secrets:
-#      gcpKey: ${{ secrets.GCP_SA_KEY }}
-#    with:
-#      release: ${{ needs.initialize_workflow.outputs.ol_release }}
-#      get-latest-snapshots: 'false'
+  spark_dataproc:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
+    uses: ./.github/workflows/producer_spark_dataproc.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      get-latest-snapshots: 'false'
 
   ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
@@ -113,7 +93,7 @@ jobs:
       - initialize_workflow
       - scenarios
       - dataplex
-#      - spark_dataproc
+      - spark_dataproc
     if: ${{ (!failure()) && needs.initialize_workflow.outputs.any_run  == 'true'}}
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
