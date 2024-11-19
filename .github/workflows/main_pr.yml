@@ -44,6 +44,16 @@ jobs:
             spark_dataproc:
               - producer/spark_dataproc/**
 
+      - name: test1
+        id: test1
+        if: ${{ steps.changed_files.outputs.any_changed }}
+        run: echo "VALUE IS BOOLEAN"
+
+      - name: test2
+        id: test2
+        if: ${{ steps.changed_files.outputs.any_changed == 'true'}}
+        run: echo "VALUE IS STRING"
+
       - name: get openlineage release
         id: get-release
         run: |
