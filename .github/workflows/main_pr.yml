@@ -47,6 +47,7 @@ jobs:
       - name: get openlineage release
         id: get-release
         run: |
+          echo " any changed value is ${{ steps.changed_files.outputs.any_changed }}"
           openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
           echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
 
@@ -89,7 +90,7 @@ jobs:
       - scenarios
       - dataplex
       - spark_dataproc
-    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run  == 'true'}}
+    if: ${{ (!failure()) && needs.initialize_workflow.outputs.any_run  == 'true'}}
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
       fail-for-new-failures: true
