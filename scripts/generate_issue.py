@@ -22,6 +22,8 @@ def get_failures(components):
             result += '\n'.join(
                 [f"name: {t['name']},  \nvalidation_type: {t['validation_type']}  \nentity_type: {t['entity_type']}  \ndetails:  \n\t" +
                  '  \n\t'.join([f"`{d}`" for d in t['details']]) for t in failed['tests']])
+            result += '\n'
+        result += '\n'
     return result
 
 

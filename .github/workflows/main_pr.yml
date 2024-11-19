@@ -42,6 +42,7 @@ jobs:
               - consumer/consumers/dataplex/**
             spark_dataproc:
               - producer/spark_dataproc/**
+            
 
       - name: get openlineage release
         id: get-release

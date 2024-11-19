@@ -9,7 +9,7 @@
         },
         "job": {
           "namespace": "default",
-          "name": "cl_i_test_application"
+          "name": "cli_test_application"
         }
       },
       "spark_properties": {
@@ -33,7 +33,7 @@
   },
   "job": {
     "namespace": "default",
-    "name": "cl_i_test_application.execute_insert_into_hive_table.warehouse_t2",
+    "name": "cli_test_application.execute_insert_into_hive_table.warehouse_t2",
     "facets": {
       "jobType": {
         "processingType": "BATCH",

@@ -16,6 +16,9 @@ jobs:
           path: reports/
           merge-multiple: true
 
+      - name: check-for-updated
+        run:
+
       - name: Install dependencies
         run: |
           pip install py-markdown-table 
