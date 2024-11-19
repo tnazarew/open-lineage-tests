@@ -19,7 +19,7 @@ jobs:
       run_scenarios: ${{ steps.changed_files.outputs.scenarios_any_changed }}
       run_spark_dataproc: ${{ steps.changed_files.outputs.spark_dataproc_any_changed }}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
-      any_run: ${{ steps.changed_files.outputs.any_changed }}
+      any_run: ${{ steps.changed_files.outputs.any_any_changed == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,6 +43,10 @@ jobs:
               - consumer/consumers/dataplex/**
             spark_dataproc:
               - producer/spark_dataproc/**
+            any:
+              - consumer/scenarios/**
+              - consumer/consumers/**
+              - producer/**
 
       - name: test1
         id: test1
