@@ -47,12 +47,22 @@ jobs:
       - name: test1
         id: test1
         if: ${{ steps.changed_files.outputs.any_changed }}
-        run: echo "VALUE IS BOOLEAN"
+        run: echo "VALUE IS BOOLEAN TRUE"
 
       - name: test2
+        id: test1
+        if: ${{ !steps.changed_files.outputs.any_changed }}
+        run: echo "VALUE IS BOOLEAN FALSE"
+
+      - name: test3
         id: test2
         if: ${{ steps.changed_files.outputs.any_changed == 'true'}}
         run: echo "VALUE IS STRING"
+
+      - name: test4
+        id: test2
+        if: ${{ steps.changed_files.outputs.any_changed == 'false'}}
+        run: echo "VALUE IS STRING FALSE"
 
       - name: get openlineage release
         id: get-release
