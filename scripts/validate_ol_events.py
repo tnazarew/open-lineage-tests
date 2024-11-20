@@ -208,7 +208,7 @@ def main():
                 expected = get_expected_events(producer_dir, component, scenario_name, config, release)
                 result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                  isfile(path := join(scenario_path, file))}
-                tests = {}  # validate_scenario_syntax(result_events, validator)
+                tests = validate_scenario_syntax(result_events, validator)
 
                 if all_tests_succeeded(tests) and expected is not None:
                     for name, res in OLSemanticValidator(expected).validate(result_events).items():
