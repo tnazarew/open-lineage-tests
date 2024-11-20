@@ -9,13 +9,13 @@
         },
         "job": {
           "namespace": "default",
-          "name": "cli_test_application"
+          "name": "simple_test"
         }
       },
       "spark_properties": {
         "properties": {
           "spark.master": "local",
-          "spark.app.name": "CLI test application"
+          "spark.app.name": "simple test"
         }
       },
       "processing_engine": {
@@ -25,7 +25,7 @@
       },
       "gcp_dataproc_spark": {
         "queryNodeName": "execute_insert_into_hive_table",
-        "appName": "CLI test application",
+        "appName": "simple test",
         "appId": "{{ any(result) }}",
         "projectId": "gcp-open-lineage-testing"
       }

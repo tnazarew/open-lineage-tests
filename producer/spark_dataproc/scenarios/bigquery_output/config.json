@@ -1,19 +1,8 @@
 {
   "tests": [
     {
-      "name": "start_event",
-      "path": "events/start_event.json",
-      "tags": {
-        "facets": ["run_event", "parent", "spark_properties", "processing_engine", "gcp_dataproc_spark", "jobType", "gcp_lineage", "dataSource", "schema", "columnLineage"],
-        "min_version": "1.24.0",
-        "lineage_level": {
-          "bigquery": ["dataset", "column", "transformation"]
-        }
-      }
-    },
-    {
       "name": "start_event_1.23.0",
-      "path": "events/start_event_1_23_0.json",
+      "path": "events/complete.json",
       "tags": {
         "facets": ["run_event", "parent", "spark_properties", "processing_engine", "gcp_dataproc_spark", "jobType", "gcp_lineage", "dataSource", "schema", "columnLineage"],
         "max_version": "1.23.0",
