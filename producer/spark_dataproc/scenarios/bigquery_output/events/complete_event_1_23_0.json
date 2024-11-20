@@ -20,10 +20,10 @@
         }
       },
       "processing_engine": {
-                "version": "3.5.1",
-                "name": "spark",
-                "openlineageAdapterVersion": "{{ any(result) }}"
-            },
+        "version": "3.5.1",
+        "name": "spark",
+        "openlineageAdapterVersion": "{{ any(result) }}"
+      },
       "gcp_dataproc_spark": {
         "clusterUuid": "{{ is_uuid(result) }}",
         "jobId": "{{ any(result) }}",
