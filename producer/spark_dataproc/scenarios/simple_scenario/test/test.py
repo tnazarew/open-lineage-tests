@@ -2,7 +2,7 @@ import time
 
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.master("local").appName("CLI test application").enableHiveSupport().getOrCreate()
+spark = SparkSession.builder.master("local").appName("simple test").enableHiveSupport().getOrCreate()
 
 spark.sql("DROP TABLE IF EXISTS t1;")
 spark.sql("DROP TABLE IF EXISTS t2;")

@@ -23,7 +23,7 @@
                 "name": "spark",
                 "openlineageAdapterVersion": "{{ any(result) }}"
             },
-            "gcp_dataproc_spark": {
+            "gcp_dataproc": {
                 "jobUuid": "{{ is_uuid(result) }}",
                 "queryNodeName": "adaptive_spark_plan",
                 "appName": "Reading from BigQuery",

@@ -8,10 +8,11 @@ from proto import Message
 
 from google.api_core.exceptions import InvalidArgument
 from google.oauth2.service_account import Credentials
-from google.cloud.datacatalog_lineage_v1 import LineageClient
+from google.cloud.datacatalog_lineage_v1 import LineageClient, SearchLinksRequest
 from compare_events import match
 from google.protobuf.json_format import ParseDict
 from google.protobuf import struct_pb2
+from scripts.compare_releases import release_between
 
 
 class Validator:
@@ -22,20 +23,6 @@ class Validator:
         self.parent = parent
         self.release = release
 
-    def version_to_number(self, version):
-        split = version.split('.')
-        major = int(split[0])
-        minor = int(split[0])
-        patch = int(split[0])
-        return major * 1000000 + minor * 1000 + patch
-
-    def release_between(self, min_version, max_version):
-        max_ver = 999999999 if max_version is None else self.version_to_number(max_version)
-        min_ver = 0 if min_version is None else self.version_to_number(min_version)
-        rel = self.version_to_number(self.release)
-
-        return min_ver <= rel <= max_ver
-
     def load_ol_events(self, scenario):
         return [{'name': entry.name, 'payload': ParseDict(json.load(open(entry.path, 'r')), struct_pb2.Struct())}
                 for entry in os.scandir(f"{self.scenario_dir}/{scenario}/events") if entry.is_file()]
@@ -44,7 +31,7 @@ class Validator:
         d = {}
         scenario_dir = join(self.consumer_dir, "scenarios", scenario)
         for e in config['tests']:
-            if self.release_between(e['tags'].get('min_version'), e['tags'].get('max_version')):
+            if release_between(self.release, e['tags'].get('min_version'), e['tags'].get('max_version')):
                 name = e['name']
                 path = e['path']
                 entity = e['entity']
@@ -114,6 +101,18 @@ class Validator:
         processes = [Message.to_dict(p) for p in self.client.list_processes(parent=self.parent)]
         runs = [Message.to_dict(r) for p in processes for r in self.client.list_runs(parent=p['name'])]
         lineage_events = [Message.to_dict(e) for r in runs for e in self.client.list_lineage_events(parent=r['name'])]
+
+        links = []
+
+        for le in lineage_events:
+            for l in le["links"]:
+                page_result = self.client.search_links(request=SearchLinksRequest(
+                    source=l["source"], target=l["target"], parent=self.parent))
+                for resp in page_result:
+                    links.append(resp)
+
+
+
         return processes, runs, lineage_events
 
     def validate_api_state(self, scenario, config):
@@ -187,7 +186,11 @@ def get_arguments():
 
     args = parser.parse_args()
 
-    client = LineageClient(credentials=Credentials.from_service_account_file(args.credentials))
+    credentials = Credentials.from_service_account_file(args.credentials)
+    client = LineageClient(credentials=credentials)
+    # dataplex_client = DataplexServiceClient(credentials=credentials)
+    # metadata_service_client = MetadataServiceClient(credentials=credentials)
+
     consumer_dir = args.consumer_dir
     scenario_dir = args.scenario_dir
     parent = args.parent
@@ -200,11 +203,16 @@ def get_arguments():
 def main():
     consumer_dir, scenario_dir, parent, client, release, dump = get_arguments()
     validator = Validator(client, consumer_dir, scenario_dir, parent, release)
-    scenarios = list_scenarios(consumer_dir)
-    reports = [validator.validate(scenario, dump) for scenario in scenarios]
-    t = open('dataplex-report.json', 'w')
-    print(os.path.abspath(t.name))
-    json.dump([{"name": "dataplex", "component_type": "consumer", "scenarios": reports}], t, indent=2)
+    validator.validate("spark_dataproc_simple_producer_test", dump)
+
+
+
+
+    # scenarios = list_scenarios(consumer_dir)
+    # reports = [validator.validate(scenario, dump) for scenario in scenarios]
+    # t = open('dataplex-report.json', 'w')
+    # print(os.path.abspath(t.name))
+    # json.dump([{"name": "dataplex", "component_type": "consumer", "scenarios": reports}], t, indent=2)
 
 
 if __name__ == "__main__":

@@ -21,6 +21,6 @@ def release_between(release, min_version, max_version):
 def version_to_number(version):
     split = version.split('.')
     major = int(split[0])
-    minor = int(split[0])
-    patch = int(split[0])
+    minor = int(split[1])
+    patch = int(split[2])
     return major * 1000000 + minor * 1000 + patch

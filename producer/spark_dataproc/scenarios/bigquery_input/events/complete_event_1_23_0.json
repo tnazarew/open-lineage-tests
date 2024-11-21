@@ -1,5 +1,5 @@
 {
-    "eventType": "START",
+    "eventType": "COMPLETE",
     "run": {
         "runId": "{{ is_uuid(result) }}",
         "facets": {
@@ -9,35 +9,31 @@
                 },
                 "job": {
                     "namespace": "default",
-                    "name": "writing_to_big_query"
+                    "name": "reading_from_big_query"
                 }
             },
             "spark_properties": {
                 "properties": {
                     "spark.master": "yarn",
-                    "spark.app.name": "Writing to BigQuery"
+                    "spark.app.name": "Reading from BigQuery"
                 }
             },
             "processing_engine": {
-                "version": "3.5.1",
+                "version": "{{ any(result) }}",
                 "name": "spark",
-                "openlineageAdapterVersion": "1.23.0"
+                "openlineageAdapterVersion": "{{ any(result) }}"
             },
             "gcp_dataproc_spark": {
-                "clusterUuid": "{{ is_uuid(result) }}",
-                "jobId": "{{ any(result) }}",
                 "jobUuid": "{{ is_uuid(result) }}",
-                "queryNodeName": "execute_save_into_data_source_command",
-                "appName": "Writing to BigQuery",
-                "clusterName": "{{ any(result) }}",
-                "appId": "{{ any(result) }}",
+                "queryNodeName": "adaptive_spark_plan",
+                "appName": "Reading from BigQuery",
                 "projectId": "gcp-open-lineage-testing"
             }
         }
     },
     "job": {
         "namespace": "default",
-        "name": "writing_to_big_query.execute_save_into_data_source_command",
+        "name": "reading_from_big_query.adaptive_spark_plan.tmp_my_shakespeare_output",
         "facets": {
             "jobType": {
                 "processingType": "BATCH",
@@ -91,12 +87,12 @@
     ],
     "outputs": [
         {
-            "namespace": "bigquery",
-            "name": "gcp-open-lineage-testing.e2e_dataset.wordcount_output",
+            "namespace": "file",
+            "name": "/tmp/my_shakespeare_output",
             "facets": {
                 "dataSource": {
-                    "name": "bigquery",
-                    "uri": "bigquery"
+                    "name": "file",
+                    "uri": "file"
                 },
                 "schema": {
                     "fields": [
@@ -106,7 +102,7 @@
                             "description": "A single unique word (where whitespace is the delimiter) extracted from a corpus."
                         },
                         {
-                            "name": "word_count",
+                            "name": "sum(word_count)",
                             "type": "long"
                         }
                     ]
@@ -115,6 +111,19 @@
                     "fields": {
                         "word": {
                             "inputFields": [
+                                {
+                                    "namespace": "bigquery",
+                                    "name": "bigquery-public-data.samples.shakespeare",
+                                    "field": "word_count",
+                                    "transformations": [
+                                        {
+                                            "type": "INDIRECT",
+                                            "subtype": "FILTER",
+                                            "description": "",
+                                            "masking": false
+                                        }
+                                    ]
+                                },
                                 {
                                     "namespace": "bigquery",
                                     "name": "bigquery-public-data.samples.shakespeare",
@@ -131,12 +140,18 @@
                                             "subtype": "GROUP_BY",
                                             "description": "",
                                             "masking": false
+                                        },
+                                        {
+                                            "type": "INDIRECT",
+                                            "subtype": "FILTER",
+                                            "description": "",
+                                            "masking": false
                                         }
                                     ]
                                 }
                             ]
                         },
-                        "word_count": {
+                        "sum(word_count)": {
                             "inputFields": [
                                 {
                                     "namespace": "bigquery",
@@ -146,6 +161,12 @@
                                         {
                                             "type": "INDIRECT",
                                             "subtype": "GROUP_BY",
+                                            "description": "",
+                                            "masking": false
+                                        },
+                                        {
+                                            "type": "INDIRECT",
+                                            "subtype": "FILTER",
                                             "description": "",
                                             "masking": false
                                         }
@@ -161,6 +182,12 @@
                                             "subtype": "AGGREGATION",
                                             "description": "",
                                             "masking": false
+                                        },
+                                        {
+                                            "type": "INDIRECT",
+                                            "subtype": "FILTER",
+                                            "description": "",
+                                            "masking": false
                                         }
                                     ]
                                 }
@@ -169,7 +196,12 @@
                     }
                 }
             },
-            "outputFacets": {}
+            "outputFacets": {
+                "outputStatistics": {
+                    "rowCount": 1,
+                    "size": 9
+                }
+            }
         }
     ]
 }
