@@ -62,8 +62,8 @@ jobs:
     if: ${{ needs.initialize_workflow.outputs.run_scenarios == 'true' }}
     uses: ./.github/workflows/check_scenarios.yml
     with:
-     get-latest-snapshots: false
-     release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      get-latest-snapshots: false
+      release: ${{ needs.initialize_workflow.outputs.ol_release }}
 
   dataplex:
     needs:
@@ -100,6 +100,7 @@ jobs:
       fail-for-new-failures: true
 
   generate-compatibility-tables:
-    needs: collect-and-compare-reports
+    needs:
+      - collect-and-compare-reports
     uses: ./.github/workflows/generate_compatibility_tables.yml
 
