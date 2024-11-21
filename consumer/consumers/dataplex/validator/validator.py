@@ -9,10 +9,11 @@ from proto import Message
 from google.api_core.exceptions import InvalidArgument
 from google.oauth2.service_account import Credentials
 from google.cloud.datacatalog_lineage_v1 import LineageClient, SearchLinksRequest
-from compare_events import match
 from google.protobuf.json_format import ParseDict
 from google.protobuf import struct_pb2
-from scripts.compare_releases import release_between
+from compare_releases import release_between
+from compare_events import diff
+
 
 
 class Validator:
@@ -102,17 +103,14 @@ class Validator:
         runs = [Message.to_dict(r) for p in processes for r in self.client.list_runs(parent=p['name'])]
         lineage_events = [Message.to_dict(e) for r in runs for e in self.client.list_lineage_events(parent=r['name'])]
 
-        links = []
-
-        for le in lineage_events:
-            for l in le["links"]:
-                page_result = self.client.search_links(request=SearchLinksRequest(
-                    source=l["source"], target=l["target"], parent=self.parent))
-                for resp in page_result:
-                    links.append(resp)
-
-
-
+        # links = []
+        #
+        # for le in lineage_events:
+        #     for l in le["links"]:
+        #         page_result = self.client.search_links(request=SearchLinksRequest(
+        #             source=l["source"], target=l["target"], parent=self.parent))
+        #         for resp in page_result:
+        #             links.append(resp)
         return processes, runs, lineage_events
 
     def validate_api_state(self, scenario, config):
@@ -140,7 +138,7 @@ class Validator:
                 entity_name = exp['name'].rsplit('/', 1)
                 matched = next((proc for proc in result if proc['name'] == exp['name']), None)
                 if matched is not None:
-                    res = match(exp, matched, "")
+                    res = diff(exp, matched, "")
                     details.extend([f"{entity_type} {entity_name}, {r}" for r in res])
                 else:
                     details.append(f"{entity_type} {entity_name}, no matching entity")
@@ -158,7 +156,7 @@ class Validator:
                 entity_name = exp['start_time']
                 matched = next((r for r in result if exp['start_time'] == r['start_time']), None)
                 if matched is not None:
-                    res = match(exp, matched, "")
+                    res = diff(exp, matched, "")
                     details.extend([f"lineage event {entity_name}, {r}" for r in res])
                 else:
                     details.append(f"event {entity_name}, no matching entity")
@@ -188,9 +186,6 @@ def get_arguments():
 
     credentials = Credentials.from_service_account_file(args.credentials)
     client = LineageClient(credentials=credentials)
-    # dataplex_client = DataplexServiceClient(credentials=credentials)
-    # metadata_service_client = MetadataServiceClient(credentials=credentials)
-
     consumer_dir = args.consumer_dir
     scenario_dir = args.scenario_dir
     parent = args.parent
@@ -203,16 +198,11 @@ def get_arguments():
 def main():
     consumer_dir, scenario_dir, parent, client, release, dump = get_arguments()
     validator = Validator(client, consumer_dir, scenario_dir, parent, release)
-    validator.validate("spark_dataproc_simple_producer_test", dump)
-
-
-
-
-    # scenarios = list_scenarios(consumer_dir)
-    # reports = [validator.validate(scenario, dump) for scenario in scenarios]
-    # t = open('dataplex-report.json', 'w')
-    # print(os.path.abspath(t.name))
-    # json.dump([{"name": "dataplex", "component_type": "consumer", "scenarios": reports}], t, indent=2)
+    scenarios = list_scenarios(consumer_dir)
+    reports = [validator.validate(scenario, dump) for scenario in scenarios]
+    t = open('dataplex-report.json', 'w')
+    print(os.path.abspath(t.name))
+    json.dump([{"name": "dataplex", "component_type": "consumer", "scenarios": reports}], t, indent=2)
 
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ jobs:
         if [ -f consumer/consumers/dataplex/validator/requirements.txt ]; then pip install -r consumer/consumers/dataplex/validator/requirements.txt; fi
     - name: Run python script
       run: |
-        python consumer/consumers/dataplex/validator/validator.py \
+        export PYTHONPATH=scripts &&  python consumer/consumers/dataplex/validator/validator.py \
         --credentials ${{ steps.gcp-auth.outputs.credentials_file_path }} \
         --consumer_dir consumer/consumers/dataplex \
         --scenario_dir consumer/scenarios/ \
