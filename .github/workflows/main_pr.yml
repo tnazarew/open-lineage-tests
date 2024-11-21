@@ -69,7 +69,7 @@ jobs:
     needs:
       - initialize_workflow
       - scenarios
-    if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' }}
+    if: ${{ !failure() && needs.initialize_workflow.outputs.run_dataplex == 'true' }}
     uses: ./.github/workflows/consumer_dataplex.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
@@ -94,7 +94,7 @@ jobs:
       - scenarios
       - dataplex
       - spark_dataproc
-    if: ${{ (!failure()) && needs.initialize_workflow.outputs.any_run  == 'true'}}
+    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run  == 'true'}}
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
       fail-for-new-failures: true
