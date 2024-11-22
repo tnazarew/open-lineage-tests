@@ -345,6 +345,35 @@
                 ]
               }
             }
+          },
+          {
+            "name": "complete_event",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "parent",
+                "spark_properties",
+                "processing_engine",
+                "gcp_dataproc",
+                "jobType",
+                "gcp_lineage",
+                "dataSource",
+                "schema",
+                "columnLineage"
+              ],
+              "min_version": "1.24.0",
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
           }
         ]
       },
@@ -428,6 +457,59 @@
                 "columnLineage"
               ],
               "max_version": "1.23.0",
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732282398466_0002-1a47efc8-e046-4d9a-bac7-49a8fc6b9eca:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732282398466_0002-1a47efc8-e046-4d9a-bac7-49a8fc6b9eca:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732282398466_0002-1a47efc8-e046-4d9a-bac7-49a8fc6b9eca:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "complete_event",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "parent",
+                "spark_properties",
+                "processing_engine",
+                "gcp_dataproc_spark",
+                "jobType",
+                "gcp_lineage",
+                "dataSource",
+                "schema",
+                "columnLineage"
+              ],
+              "min_version": "1.24.0",
               "lineage_level": {
                 "bigquery": [
                   "dataset",
@@ -544,7 +626,7 @@
                 "symlinks",
                 "columnLineage"
               ],
-              "min_version": "1.22.0",
+              "min_version": "1.24.0",
               "lineage_level": {
                 "hive": [
                   "dataset",
@@ -576,6 +658,14 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
