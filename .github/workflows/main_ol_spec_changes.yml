@@ -51,9 +51,9 @@ jobs:
             python scripts/compare_spec_versions.py \
             --spec_base=./openlineage/spec \
             --versions_path=./generated-files/spec_versions.json \
-            --new_versions_path=./updated_spec_versions.json
+            --new_versions_path=./updated-spec-versions.json
           
-          if [ -f updated_spec_versions.json ]; then
+          if [ -f updated-spec-versions.json ]; then
             echo "changes_found=true" >> $GITHUB_OUTPUT
           fi
 
@@ -61,7 +61,7 @@ jobs:
         if: steps.check-changes.outputs.changes_found == 'true'
         with:
           name: spec-versions
-          path: generated-files/updated_spec_versions.json
+          path: generated-files/updated-spec-versions.json
           retention-days: 1
 
       - name: get openlineage release

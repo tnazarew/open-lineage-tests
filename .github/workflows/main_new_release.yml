@@ -56,7 +56,7 @@ jobs:
               echo "ol_release=${latest_ol}" >> $GITHUB_OUTPUT
               echo "releases_updated=true" >> $GITHUB_OUTPUT
               jq --arg latest_ol "$latest_ol" 'map(if .name == "openlineage" then .latest_version = $latest_ol else . end)' \
-              generated-files/releases.json > generated-files/updated_releases.json
+              generated-files/releases.json > generated-files/updated-releases.json
           else
               echo "ol_release=${current_ol}" >> $GITHUB_OUTPUT  
           fi       
@@ -64,8 +64,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: steps.select-components.outputs.releases_updated == 'true'
         with:
-          name: updated_releases
-          path: generated-files/updated_releases.json
+          name: updated-releases
+          path: generated-files/updated-releases.json
           retention-days: 1
 
   ######## COMPONENT VALIDATION ########
