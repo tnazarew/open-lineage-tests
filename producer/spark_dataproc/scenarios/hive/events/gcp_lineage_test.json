@@ -1,8 +1,8 @@
 {
   "eventType": "COMPLETE",
-  "namespace": "default",
-  "name": "simple_test.execute_insert_into_hive_table.warehouse_t2",
   "job": {
+    "namespace": "default",
+    "name": "simple_test.execute_insert_into_hive_table.warehouse_t2",
     "facets": {
       "gcp_lineage": {
         "origin": {
