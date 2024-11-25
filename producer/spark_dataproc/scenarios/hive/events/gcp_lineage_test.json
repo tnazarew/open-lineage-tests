@@ -2,6 +2,8 @@
   "eventType": "COMPLETE",
   "job": {
     "facets": {
+      "namespace": "default",
+      "name": "simple_test.execute_insert_into_hive_table.warehouse_t2",
       "gcp_lineage": {
         "origin": {
           "sourceType": "DATAPROC",

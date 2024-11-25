@@ -45,23 +45,22 @@ def create_run_event(data, output_dir):
         item["facets"] = {}
         item["outputFacets"] = {}
 
-    write_facet_file(os.path.join(output_dir, "run_event_test.json"), run_event_data)
+    write_facet_file(os.path.join(output_dir, "run_event.json"), run_event_data)
 
 
-def collect_facets(section_data, section_name, facet_collection):
+def collect_facets(section_data, section_name, facet_collection, facet_key):
     """Collect facets from inputs or outputs and organize them in a dictionary."""
     for item in section_data:
-        for facet_type in ["facets", "inputFacets", "outputFacets"]:
-            if facet_type in item:
-                for facet_name, facet_data in item[facet_type].items():
-                    facet_info = {
-                        "namespace": item["namespace"],
-                        "name": item["name"],
-                        facet_type: {
-                            facet_name: facet_data
-                        }
+        if facet_key in item:
+            for facet_name, facet_data in item[facet_key].items():
+                facet_info = {
+                    "namespace": item["namespace"],
+                    "name": item["name"],
+                    facet_key: {
+                        facet_name: facet_data
                     }
-                    facet_collection[facet_name][section_name].append(facet_info)
+                }
+                facet_collection[facet_name][section_name].append(facet_info)
 
 
 def collect_single_facets(section_data, section_name, facet_collection):
@@ -73,13 +72,16 @@ def collect_single_facets(section_data, section_name, facet_collection):
 def process_and_write_facets(facet_collection, output_base, output_dir):
     """Write aggregated facet data to separate files."""
     for facet_name, sections in facet_collection.items():
-        output_data = output_base.copy()
+        output_data = copy.deepcopy(output_base)
 
+        # Add collected sections to output without modifying job fields
         for section, content in sections.items():
-            # Preserve arrays for inputs/outputs, but objects for run/job
-            output_data[section] = content if isinstance(content, list) else {"facets": content}
+            if section == "job":
+                output_data[section]["facets"] = content  # Preserve job namespace and name
+            else:
+                output_data[section] = content if isinstance(content, list) else {"facets": content}
 
-        write_facet_file(os.path.join(output_dir, f"{facet_name}_test.json"), output_data)
+        write_facet_file(os.path.join(output_dir, f"{facet_name}.json"), output_data)
 
 
 def write_facet_file(file_path, data):
@@ -107,9 +109,11 @@ def main():
     collect_single_facets(data["run"]["facets"], "run", facet_collection)
     collect_single_facets(data["job"]["facets"], "job", facet_collection)
 
-    # Collect from inputs and outputs
-    collect_facets(data.get("inputs", []), "inputs", facet_collection)
-    collect_facets(data.get("outputs", []), "outputs", facet_collection)
+    # Collect from inputs and outputs (including inputFacets and outputFacets)
+    collect_facets(data.get("inputs", []), "inputs", facet_collection, "facets")
+    collect_facets(data.get("inputs", []), "inputs", facet_collection, "inputFacets")
+    collect_facets(data.get("outputs", []), "outputs", facet_collection, "facets")
+    collect_facets(data.get("outputs", []), "outputs", facet_collection, "outputFacets")
 
     # Process and write facets to files
     process_and_write_facets(facet_collection, output_base, output_dir)
