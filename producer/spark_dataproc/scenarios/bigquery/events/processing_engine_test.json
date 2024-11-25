@@ -1,0 +1,16 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_.*') }}"
+  },
+  "run": {
+    "facets": {
+      "processing_engine": {
+        "version": "3.5.1",
+        "name": "spark",
+        "openlineageAdapterVersion": "{{ any(result) }}"
+      }
+    }
+  }
+}

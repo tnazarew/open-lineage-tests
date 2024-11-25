@@ -1,0 +1,21 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_.*') }}"
+  },
+  "run": {
+    "facets": {
+      "gcp_dataproc": {
+        "clusterUuid": "{{ is_uuid(result) }}",
+        "jobId": "{{ any(result) }}",
+        "jobUuid": "{{ is_uuid(result) }}",
+        "queryNodeName": "adaptive_spark_plan",
+        "appName": "Writing to BigQuery",
+        "clusterName": "{{ match(result, 'dataproc-producer-test-.+') }}",
+        "appId": "{{ match(result, 'application_.+') }}",
+        "projectId": "gcp-open-lineage-testing"
+      }
+    }
+  }
+}

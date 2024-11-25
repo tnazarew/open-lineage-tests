@@ -1,0 +1,12 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "facets": {
+      "jobType": {
+        "processingType": "BATCH",
+        "integration": "SPARK",
+        "jobType": "SQL_JOB"
+      }
+    }
+  }
+}
