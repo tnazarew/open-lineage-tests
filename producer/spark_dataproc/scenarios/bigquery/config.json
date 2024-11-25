@@ -39,8 +39,8 @@
     {
       "name": "gcp_dataproc_spark_test",
       "path": "events/gcp_dataproc_spark_test.json",
-      "max_version": "1.23.0",
       "tags": {
+        "max_version": "1.23.0",
         "facets": [
           "gcp_dataproc_spark"
         ]
