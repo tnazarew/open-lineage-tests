@@ -12,7 +12,7 @@ validate_consumer_config() {
     local valid_structure=$(jq -e '
         .tests and
         (all(.tests[]; .name and .path and .entity and
-            (.tags | .facets and .producer)))' "$config_file")
+            (.tags | .facets)))' "$config_file")
 
     if [[ "$valid_structure" != "true" ]]; then
         echo "Invalid consumer config structure in: $config_file"
@@ -26,7 +26,7 @@ validate_producer_config() {
     local valid_structure=$(jq -e '
         .tests and
         (all(.tests[]; .name and .path and
-            (.tags | .facets and .lineage_level)))' "$config_file")
+            (.tags | .facets)))' "$config_file")
 
     if [[ "$valid_structure" != "true" ]]; then
         echo "Invalid producer config structure in: $config_file"

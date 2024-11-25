@@ -1,0 +1,15 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_.*') }}",
+    "facets": {
+      "gcp_lineage": {
+        "origin": {
+          "sourceType": "DATAPROC",
+          "name": "{{ match(result, 'projects/gcp-open-lineage-testing/regions/us-west1/clusters/dataproc-producer-test-.*') }}"
+        }
+      }
+    }
+  }
+}

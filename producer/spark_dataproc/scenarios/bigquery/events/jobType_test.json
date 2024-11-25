@@ -1,0 +1,14 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_.*') }}",
+    "facets": {
+      "jobType": {
+        "processingType": "BATCH",
+        "integration": "SPARK",
+        "jobType": "SQL_JOB"
+      }
+    }
+  }
+}

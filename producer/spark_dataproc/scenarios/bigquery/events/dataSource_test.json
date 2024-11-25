@@ -1,0 +1,31 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_.*') }}"
+  },
+  "inputs": [
+    {
+      "namespace": "bigquery",
+      "name": "bigquery-public-data.samples.shakespeare",
+      "facets": {
+        "dataSource": {
+          "name": "bigquery",
+          "uri": "bigquery"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "{{ match(result, '.spark-bigquery-application_.*') }}",
+      "facets": {
+        "dataSource": {
+          "name": "gs://open-lineage-e2e",
+          "uri": "gs://open-lineage-e2e"
+        }
+      }
+    }
+  ]
+}
