@@ -518,6 +518,30 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732419217171_0002-cf9077d9-244d-4961-a8b8-723b4e56e341:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732419217171_0002-cf9077d9-244d-4961-a8b8-723b4e56e341:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732419217171_0002-cf9077d9-244d-4961-a8b8-723b4e56e341:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
