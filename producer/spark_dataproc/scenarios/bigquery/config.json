@@ -1,4 +1,7 @@
 {
+  "patterns": [
+    "writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_"
+  ],
   "tests": [
     {
       "name": "run_event_test",

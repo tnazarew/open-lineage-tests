@@ -127,9 +127,18 @@ def load_json(path):
         return json.load(f)
 
 
-def get_event_identification(event, default):
+def extract_pattern(identifier, patterns):
+    if patterns is not None:
+        for pattern in patterns:
+            match = re.search(pattern, identifier)
+            if match:
+                return match.group(0)
+    return identifier
+
+
+def get_event_identifier(event, default, patterns):
     if 'job' in event and 'eventType' in event and 'name' in event['job'] and 'namespace' in event['job']:
-        return f"{event['job']['namespace']}:{event['job']['name']}:{event['eventType']}"
+        return f"{event['job']['namespace']}:{extract_pattern(event['job']['name'], patterns)}:{event['eventType']}"
     else:
         return default
 
@@ -150,11 +159,11 @@ def get_expected_events(producer_dir, component, scenario_name, config, release)
     return test_events
 
 
-def validate_scenario_syntax(result_events, validator):
+def validate_scenario_syntax(result_events, validator, config):
     syntax_tests = {}
     for name, event in result_events.items():
         details = validator.validate(event)
-        identification = get_event_identification(event, name)
+        identification = get_event_identifier(event, name, config.get('patterns'))
         syntax_tests[identification] = Test(identification, "FAILURE" if len(details) > 0 else "SUCCESS",
                                             'syntax', 'openlineage', details, {})
     return syntax_tests
@@ -202,13 +211,13 @@ def main():
                 if release_between(release, config['tags'].get('min_version'), config['tags'].get('max_version')):
                     result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                      isfile(path := join(scenario_path, file))}
-                    tests = validate_scenario_syntax(result_events, validator)
+                    tests = validate_scenario_syntax(result_events, validator, config)
                     scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
             else:
                 expected = get_expected_events(producer_dir, component, scenario_name, config, release)
                 result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                  isfile(path := join(scenario_path, file))}
-                tests = validate_scenario_syntax(result_events, validator)
+                tests = validate_scenario_syntax(result_events, validator, config)
 
                 if all_tests_succeeded(tests) and expected is not None:
                     for name, res in OLSemanticValidator(expected).validate(result_events).items():
