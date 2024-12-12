@@ -114,7 +114,9 @@ jobs:
       fail-for-new-failures: true
 
   notify-maintainers:
-    needs: collect-and-compare-reports
+    needs:
+      - initialize_workflow
+      - collect-and-compare-reports
     if: ${{ failure() }}
     uses: ./.github/workflows/notify_maintainers.yml
     with:

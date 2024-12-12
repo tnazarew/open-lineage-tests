@@ -27,7 +27,7 @@ jobs:
   initialize_workflow:
     runs-on: ubuntu-latest
     outputs:
-      run_dataplex: ${{ example.variable1 || 'true' }}
+      run_dataplex: ${{ github.event.inputs.run_dataplex || 'true' }}
       run_spark_dataproc: ${{ github.event.inputs.run_spark_dataproc || 'true' }}
       openlineage_release: ${{ github.event.inputs.openlineage_release || steps.select-components.outputs.ol_release }}
       execution_time: ${{ steps.get-execution-time.outputs.execution_time }}
