@@ -110,7 +110,8 @@ class Scenario:
                     self.update_facet_versions(f, facets, max_ver, min_ver)
 
                 if component_type == 'producer':
-                    for datasource, lineage_levels in tags['lineage_level'].items():
+                    lineage_levels = tags['lineage_level'].items() if 'lineage_level' in tags else {}
+                    for datasource, lineage_levels in lineage_levels:
                         for ll in lineage_levels:
                             if inputs.get(datasource) is None:
                                 inputs[datasource] = {}
