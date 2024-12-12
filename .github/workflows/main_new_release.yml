@@ -105,9 +105,15 @@ jobs:
     uses: ./.github/workflows/collect_and_compare_reports.yml
 
   notify-maintainers:
-    needs: collect-and-compare-reports
+    needs:
+      - initialize_workflow
+      - collect-and-compare-reports
     if: ${{ !failure() }}
     uses: ./.github/workflows/notify_maintainers.yml
+    with:
+      workflow-type: 'release'
+      trigger-type: ${{ github.event.inputs.openlineage_release && 'manual' || 'scheduled' }}
+      execution-time: ${{ needs.initialize_workflow.outputs.execution_time }}
 
   generate-compatibility-tables:
     needs: collect-and-compare-reports
