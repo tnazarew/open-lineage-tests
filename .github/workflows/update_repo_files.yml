@@ -1,7 +1,19 @@
 name: Update repo files
 on:
   workflow_call:
-
+    inputs:
+      trigger-type:
+        type: string
+        required: true
+        description: "trigger type to use in partial report name"
+      workflow-type:
+        type: string
+        required: true
+        description: "type of workflow calling, allowed values: release, spec_change"
+      execution-time:
+        type: string
+        required: true
+        description: "time of execution"
 permissions:
   id-token: write
   contents: write  # Add any other permissions as needed
@@ -19,31 +31,34 @@ jobs:
         with:
           ref: refs/heads/main
 
-      - name: Create report.json directory
-        run: mkdir -p reports/
-
       - uses: actions/download-artifact@v4
         with:
           pattern: updated-*
           path: generated-files/
           merge-multiple: true
 
-      - id: replace-modified-files
+      - id: update-files
         name: Replace Modified Files
         run: |
-          mv ./generated-files/updated-report.json ./generated-files/report.json || echo "updated-report.json no found"
-          mv ./generated-files/updated-releases.json ./generated-files/releases.json || echo "updated-releases.json no found"
-          mv ./generated-files/updated-spec-versions.json ./generated-files/spec_versions.json || echo "updated-spec-versions.json no found"
-          mv ./generated-files/updated-compatibility-table.md ./generated-files/compatibility-table.md || echo "updated-compatibility-table.md no found"
+          if [[ "${{ inputs.workflow-type }}" == "release" ]]; then
+            historical_report_name="${{inputs.trigger-type}}_${{ inputs.execution-time }}.json"
+            mv ./generated-files/updated-new-report.json ./generated-files/historical_reports/${historical_report_name} || echo "updated-new-report.json not found"
+            mv ./generated-files/updated-report.json ./generated-files/report.json || echo "updated-report.json not found"
+            mv ./generated-files/updated-releases.json ./generated-files/releases.json || echo "updated-releases.json not found"
+            mv ./generated-files/updated-compatibility-table.md ./generated-files/compatibility-table.md || echo "updated-compatibility-table.md not found"
+          elif [[ "$string" == "spec_change" ]]; then
+            mv ./generated-files/updated-spec-versions.json ./generated-files/spec_versions.json || echo "updated-spec-versions.json not found"
+          fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           add-paths: |
+            generated-files/historical_reports/*
             generated-files/report.json
             generated-files/releases.json
             generated-files/spec_versions.json
             generated-files/compatibility-table.md
-          branch: "test-${{ github.run_id }}"
-          title: "[bot] update report with data from run ${{ github.run_id }}"
+          branch: "test-${{ github.run_id }}-${{ inputs.execution-time }}"
+          title: "[bot] update report with data from run ${{ github.run_id }} execution time: ${{ inputs.execution-time }}"
           signoff: true

@@ -34,6 +34,7 @@ def main():
     failures = new_report.get_new_failures(old_report)
     old_report.update(new_report)
 
+    json.dump(new_report.to_dict(), open(join(base_dir, 'new-report.json'), 'w'), indent=2)
     json.dump(failures.to_dict(), open(join(base_dir, 'retention-failures-report.json'), 'w'), indent=2)
     json.dump(old_report.to_dict(), open(join(base_dir, 'updated-report.json'), 'w'), indent=2)
 
