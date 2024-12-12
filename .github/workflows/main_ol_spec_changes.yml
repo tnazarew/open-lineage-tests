@@ -27,7 +27,12 @@ jobs:
     outputs:
       changes_in_spec: ${{ github.event.inputs.run_tests || steps.check-changes.outputs.changes_found }}
       ol_release: ${{ github.event.inputs.openlineage_release || steps.get-release.outputs.openlineage_release }}
+      execution_time: ${{ steps.get-execution-time.outputs.execution_time }}
     steps:
+      - name: Get execution time
+        id: get-execution-time
+        run: echo "execution_time=$(date +'%Y%d%m%H%M')" >> $GITHUB_OUTPUT
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -105,8 +110,25 @@ jobs:
       - scenarios_check
       - spark-dataproc
     uses: ./.github/workflows/collect_and_compare_reports.yml
+    with:
+      fail-for-new-failures: true
 
   notify-maintainers:
     needs: collect-and-compare-reports
+    if: ${{ failure() }}
     uses: ./.github/workflows/notify_maintainers.yml
+    with:
+      workflow-type: 'spec_change'
+      trigger-type: ${{ github.event.inputs.openlineage_release && 'manual' || 'scheduled' }}
+      execution-time: ${{ needs.initialize_workflow.outputs.execution_time }}
 
+  update-repo-files:
+    needs:
+      - initialize_workflow
+      - notify-maintainers
+    if: ${{ !failure() }}
+    uses: ./.github/workflows/update_repo_files.yml
+    with:
+     workflow-type: 'spec_change'
+     trigger-type: ${{ github.event.inputs.openlineage_release && 'manual' || 'scheduled' }}
+     execution-time: ${{ needs.initialize_workflow.outputs.execution_time }}

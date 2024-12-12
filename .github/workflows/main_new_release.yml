@@ -27,10 +27,15 @@ jobs:
   initialize_workflow:
     runs-on: ubuntu-latest
     outputs:
-      run_dataplex: ${{ github.event.inputs.run_dataplex || 'true' }}
+      run_dataplex: ${{ example.variable1 || 'true' }}
       run_spark_dataproc: ${{ github.event.inputs.run_spark_dataproc || 'true' }}
       openlineage_release: ${{ github.event.inputs.openlineage_release || steps.select-components.outputs.ol_release }}
+      execution_time: ${{ steps.get-execution-time.outputs.execution_time }}
     steps:
+      - name: Get execution time
+        id: get-execution-time
+        run: echo "execution_time=$(date +'%Y%d%m%H%M')" >> $GITHUB_OUTPUT
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -116,3 +121,7 @@ jobs:
       - generate-compatibility-tables
     if: ${{ !failure() }}
     uses: ./.github/workflows/update_repo_files.yml
+    with:
+     workflow-type: 'release'
+     trigger-type: ${{ github.event.inputs.openlineage_release && 'manual' || 'scheduled' }}
+     execution-time: ${{ needs.initialize_workflow.outputs.execution_time }}

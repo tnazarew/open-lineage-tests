@@ -2,6 +2,19 @@ name: Notify Maintainers
 
 on:
   workflow_call:
+    inputs:
+      trigger-type:
+        type: string
+        required: true
+        description: "trigger type to use in partial report name"
+      workflow-type:
+        type: string
+        required: true
+        description: "type of workflow calling, allowed values: release, spec_change"
+      execution-time:
+        type: string
+        required: true
+        description: "time of execution"
     
 jobs:
   notify-maintainers:
